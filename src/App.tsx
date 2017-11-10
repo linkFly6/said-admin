@@ -1,17 +1,17 @@
 import * as React from 'react';
-import './App.css';
+import './App.styl';
 import Hello from './components/Hello';
 
 const logo = require('./logo.svg');
 
 function App() {
   return (
-    <div className="App">
-      <div className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <div className="app">
+      <div className="app-header">
+        <img src={logo} className="app-logo" alt="logo" />
         <h2>Welcome to React</h2>
       </div>
-      <p className="App-intro">
+      <p className="app-intro">
         To get started, edit <code>src/App.tsx</code> and save to reload.
       </p>
       <Hello name="TypeScript" />
@@ -20,4 +20,3 @@ function App() {
 }
 
 export default App;
-
