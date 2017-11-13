@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 class AddSaid extends Component {
   render() {
@@ -6,8 +6,8 @@ class AddSaid extends Component {
       <div>
         页面 AddSaid
       </div>
-    );
+    )
   }
 }
 
-export default AddSaid;
+export default AddSaid

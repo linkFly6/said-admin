@@ -1,9 +1,14 @@
-import React, { Component } from 'react'
+import * as React from 'react'
 import './App.styl'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd'
 // import Icon from '../components/icon/icon'
 import * as History from 'history'
 import { ClickParam } from 'antd/lib/menu'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
+
+import Home from './home'
+import Said from './said'
+
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
 
@@ -63,8 +68,13 @@ export default class App extends React.Component<{}, object> {
             />
           </Header>
           <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-            Content
-        </Content>
+            <BrowserRouter>
+              <Switch>
+                <Route path="/index" component={Home} />
+                <Route path="/said" component={Said} />
+              </Switch>
+            </BrowserRouter>
+          </Content>
         </Layout>
       </Layout>
     )
