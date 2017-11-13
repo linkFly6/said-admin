@@ -5,18 +5,17 @@ import './assets/fonts/iconfont'
 import App from './views/App'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
-import { createStore } from 'redux'
-import { enthusiasm } from './reducers/index'
-import { StoreState } from './types/index'
+import store from './ducks'
 
 import './index.styl'
 
-
-
-const store = createStore<StoreState>(enthusiasm, {
-  enthusiasmLevel: 1,
-  languageName: 'TypeScript',
-})
+// import { createStore } from 'redux'
+// import { enthusiasm } from './reducers/index'
+// import { StoreState } from './types/index'
+// const store = createStore<StoreState>(enthusiasm, {
+//   enthusiasmLevel: 1,
+//   languageName: 'TypeScript',
+// })
 
 ReactDOM.render(
   <Provider store={store}>

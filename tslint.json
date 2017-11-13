@@ -41,7 +41,6 @@
       "variables-before-functions"
     ],
     "jsx-boolean-value": false,
-    "no-any": true,
     "no-arg": true,
     "no-bitwise": [
       "error",
@@ -53,7 +52,6 @@
     ],
     "no-consecutive-blank-lines": false,
     "no-construct": true,
-    "no-debugger": true,
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
