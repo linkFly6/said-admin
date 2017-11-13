@@ -1,10 +1,13 @@
-import * as React from 'react'
+import React, { Component } from 'react'
 import './App.styl'
-import Hello from './components/Hello'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd'
+// import Icon from '../components/icon/icon'
+import * as History from 'history'
+import { ClickParam } from 'antd/lib/menu'
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
-const logo = require('./logo.svg')
+
+const history = History.createBrowserHistory()
 
 export default class App extends React.Component<{}, object> {
   state = {
