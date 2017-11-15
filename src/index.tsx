@@ -4,7 +4,8 @@ import 'antd/dist/antd.css'
 import './assets/fonts/iconfont'
 import App from './views/App'
 import { Provider } from 'react-redux'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, Router } from 'react-router-dom'
+import history from './assets/js/history'
 import store from './ducks'
 
 import './index.styl'
@@ -25,7 +26,9 @@ ReactDOM.render(
         <Route path="/login" component={Login} />
       </Switch>
     </BrowserRouter> */}
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>,
   document.getElementById('root') as HTMLElement
 )

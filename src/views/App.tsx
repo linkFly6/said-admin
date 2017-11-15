@@ -4,7 +4,7 @@ import { Layout, Menu, Breadcrumb, Icon } from 'antd'
 // import Icon from '../components/icon/icon'
 import createHistory from 'history/createBrowserHistory'
 import { ClickParam } from 'antd/lib/menu'
-import { BrowserRouter, Route, Switch } from 'react-router-dom'
+import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom'
 
 import Home from './home'
 // import Said from './said'
@@ -15,13 +15,14 @@ const { Header, Content, Sider } = Layout
 
 const history = createHistory()
 
+@withRouter
 export default class App extends React.Component<{}, object> {
   state = {
     current: '1',
     openKeys: ['said'],
   }
   handleClick = (e: ClickParam) => {
-    history.push(e.key)
+    (this.props as any).history.push(e.key)
     console.log('Clicked: ', this)
     this.setState({ current: e.key })
   }

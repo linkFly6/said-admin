@@ -9,8 +9,6 @@ import { Dispatch, DispatchProp } from 'react-redux'
 
 
 
-
-
 // action type
 export const constants = {
   ADD: 'SAID/ADD',
@@ -31,7 +29,7 @@ export interface ActionAdd<T> {
 
 export interface DispatchProps {
   add(item: SaidModel): ActionAdd<SaidModel>
-  loadSaidLists(): Dispatch<ActionAdd<SaidModel>>
+  loadSaidLists(): (dispatch: any) => Promise<ActionAdd<SaidModel>[]>
 }
 
 export const actions: DispatchProps = {
