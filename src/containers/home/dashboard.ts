@@ -1,16 +1,10 @@
 // redux 将 UI 层分为容器组件和展示组件，容器组件处理数据，展示组件负责展现数据，改动 UI 的时候只会影响到展示组件
 
 import { connect } from 'react-redux'
-import { actions, ActionAdd, constants } from '../../ducks/said'
+import { actions } from '../../ducks/said'
 // import { saidType }  from  '../../constants'
-import Index from '../../views/said'
-import { bindActionCreators, Dispatch } from 'redux'
-import { SaidModel } from '../../types/said'
-
-
-export interface StateProps {
-  articles: SaidModel[],
-}
+import Index, { StateProps } from '../../views/said'
+import { bindActionCreators } from 'redux'
 
 /*
   connect方法接受两个参数： mapStateToProps 和 mapDispatchToProps 。它们定义了 UI 组件的业务逻辑。
@@ -22,6 +16,7 @@ export interface StateProps {
 const mapStateToProps = (state: StateProps) => ({
   articles: state.articles
 })
+
 
 
 // function mapDispatchToProps(dispatch: any) {

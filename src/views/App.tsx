@@ -79,8 +79,9 @@ export default class App extends React.Component<{}, object> {
             <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
               <BrowserRouter>
                 <Switch>
-                  <Route path="/index" component={Home} />
-                  <Route path="/said" component={Said} />
+                  <Route path="/" component={Home} exact/>
+                  <Route path="/index" component={Home} exact/>
+                  <Route path="/said" component={Said} exact/>
                 </Switch>
               </BrowserRouter>
             </Content>

@@ -4,9 +4,14 @@
 */
 // import Promise from 'Promise'
 // actionTypes
-import { Said } from '../types'
-import { Dispatch } from 'react-redux'
+import { SaidModel } from '../types/said'
+import { Dispatch, DispatchProp } from 'react-redux'
 
+
+
+
+
+// action type
 export const constants = {
   ADD: 'SAID/ADD',
   UPDATE: 'SAID/UPDATE',
@@ -14,13 +19,64 @@ export const constants = {
   REMOVE: 'SAID/REMOVE',
 }
 
+// actions
+
+export interface ActionAdd<T> {
+  type: typeof constants.ADD,
+  payload: T,
+  error: boolean | null,
+  meta: string,
+}
+
+
+export interface DispatchProps {
+  add(item: SaidModel): ActionAdd<SaidModel>
+  loadSaidLists(): Dispatch<ActionAdd<SaidModel>>
+}
+
+export const actions: DispatchProps = {
+  // 社区规范参见这里：https://github.com/acdlite/flux-standard-action
+  add: (item: SaidModel): ActionAdd<SaidModel> => ({
+    type: constants.ADD,
+    // 数据载体， containers 中的容器组件会 dispatch 数据到这里（也就是 item）
+    payload: item,
+    error: false, // error 的情况下为 true，并且 payload 为 Error 数据
+    meta: '元数据，提供数据描述'
+  }),
+
+  loadSaidLists: () => {
+    // 通过 redux-thunk 中间件，返回函数
+    return (dispatch: Dispatch<ActionAdd<SaidModel>>) => {
+      return new Promise<SaidModel[]>((resolve: (values: SaidModel[]) => void) => {
+        window.setTimeout(
+          function () {
+            resolve([{
+              key: 0,
+              name: '测试名称1',
+              context: `测试正文 - ${Date.now()}`
+            },
+            {
+              key: 1,
+              name: '测试名称2',
+              context: `测试正文 - ${Date.now()}`
+            }])
+          },
+          2000)
+      }).then((datas: SaidModel[]) => {
+        return datas.map((data) => {
+          return dispatch(actions.add(data))
+        })
+      })
+    }
+  }
+}
 
 
 
-const initialState: Said[] = [] // Article
+const initialState: SaidModel[] = [] // Article
 
-// reducer
-export default function (state: Said[] = initialState /* state 应该有一个默认值 */, action: SaidADD<Said>) {
+// reducer = 处理数据
+export default function (state: SaidModel[] = initialState /* state 应该有一个默认值 */, action: ActionAdd<SaidModel>) {
   switch (action.type) {
     case constants.ADD: {
       return [
@@ -40,49 +96,8 @@ export default function (state: Said[] = initialState /* state 应该有一个�
   return state
 }
 
-export interface SaidADD<T> {
-  type: typeof constants.ADD,
-  payload: T,
-  error: any | null,
-  meta: string,
-}
-
-// actions
 
 
-export const actions = {
-  // 社区规范参见这里：https://github.com/acdlite/flux-standard-action
-  add: (item: Said): SaidADD<Said> => ({
-    type: constants.ADD,
-    // 数据载体， containers 中的容器组件会 dispatch 数据到这里（也就是 item）
-    payload: item,
-    error: null, // error 的情况下为 true，并且 payload 为 Error 数据
-    meta: '元数据，提供数据描述'
-  }),
 
-  loadSaidLists: () => {
-    // 通过 redux-thunk 中间件，返回函数
-    return (dispatch: Dispatch<SaidADD<Said>>) => {
-      return new Promise<Said[]>((resolve: (values: Said[]) => void) => {
-        window.setTimeout(
-          function () {
-            resolve([{
-              key: 0,
-              name: '测试名称1',
-              context: `测试正文 - ${Date.now()}`
-            },
-            {
-              key: 1,
-              name: '测试名称2',
-              context: `测试正文 - ${Date.now()}`
-            }])
-          },
-          2000)
-      }).then((datas: Said[]) => {
-        datas.forEach((data) => {
-          dispatch(actions.add(data))
-        })
-      })
-    }
-  }
-}
+
+

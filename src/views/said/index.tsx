@@ -2,14 +2,14 @@
 import * as React from 'react'
 import { Table, Button } from 'antd'
 import { connect } from 'react-redux'
-import { Said } from '../../types/index'
+import { SaidModel } from '../../types/said'
 import store from '../../ducks'
 import * as duckSaid from '../../ducks/said'
 
 var id = 2
 
 export interface StateProps {
-  articles: Said[]
+  articles: SaidModel[]
 }
 
 // export default class Index extends React.Component<{}, object> {
@@ -61,7 +61,7 @@ function addData() {
 
 store.dispatch(duckSaid.actions.loadSaidLists())
 
-export default function ({ articles }: { articles: Said[] }) {
+export default function ({ articles }: StateProps & duckSaid.DispatchProps) {
   const columns = [{
     title: '名称',
     dataIndex: 'name',
