@@ -2,9 +2,9 @@ import * as React from 'react'
 import './App.styl'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd'
 // import Icon from '../components/icon/icon'
-import createHistory from 'history/createBrowserHistory'
 import { ClickParam } from 'antd/lib/menu'
-import { BrowserRouter, Route, Switch, withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
+import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps } from 'react-router-dom'
 
 import Home from './home'
 // import Said from './said'
@@ -13,17 +13,18 @@ import Said from '../containers/said'
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
 
-const history = createHistory()
-
 @withRouter
-export default class App extends React.Component<{}, object> {
+export default class App extends React.Component<RouteComponentProps<{}>, object> {
   state = {
     current: '1',
     openKeys: ['said'],
   }
+  componentWillReceiveProps() {
+    console.log(this.props.location)
+  }
+
   handleClick = (e: ClickParam) => {
-    (this.props as any).history.push(e.key)
-    console.log('Clicked: ', this)
+    this.props.history.push(e.key)
     this.setState({ current: e.key })
   }
   onOpenChange = (openKeys: string[]) => {
@@ -55,7 +56,7 @@ export default class App extends React.Component<{}, object> {
             >
               <SubMenu key="said" title={<span><Icon type="article" />Said 管理</span>}>
                 <Menu.Item key="/said"><Icon type="rizhi11" />Said 概况</Menu.Item>
-                <Menu.Item key="/said/add"><Icon type="bianxie" />添加 Said</Menu.Item>
+                <Menu.Item key="/index"><Icon type="bianxie" />添加 Said</Menu.Item>
               </SubMenu>
               <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
                 <Menu.Item key="3"><Icon type="rizhi11" />Blog 管理</Menu.Item>
@@ -78,13 +79,13 @@ export default class App extends React.Component<{}, object> {
               <Breadcrumb.Item>App</Breadcrumb.Item>
             </Breadcrumb>
             <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
-              <BrowserRouter>
-                <Switch>
-                  <Route path="/" component={Home} exact/>
-                  <Route path="/index" component={Home} exact/>
-                  <Route path="/said" component={Said} exact/>
-                </Switch>
-              </BrowserRouter>
+              {/* <Router history={history}> */}
+              <Switch>
+                <Route path="/" component={Home} exact />
+                <Route path="/index" component={Home} exact />
+                <Route path="/said" component={Said} exact />
+              </Switch>
+              {/* </Router> */}
             </Content>
           </Layout>
         </Layout>
@@ -92,3 +93,5 @@ export default class App extends React.Component<{}, object> {
     )
   }
 }
+
+// export default withRouter(connect()(App as any))

@@ -3,6 +3,12 @@
     "tslint-react"
   ],
   "rules": {
+    "jsx-curly-spacing": [
+      true,
+      {
+        "when": "never"
+      }
+    ],
     "align": [
       true,
       "parameters",
@@ -36,20 +42,17 @@
     ],
     "member-ordering": [
       true,
-      "public-before-private",
-      "static-before-instance",
-      "variables-before-functions"
-    ],
-    "jsx-boolean-value": false,
-    "no-arg": true,
-    "no-bitwise": [
-      "error",
       {
-        "allow": [
-          "~"
+        "order": [
+          "public-before-private",
+          "static-before-instance",
+          "variables-before-functions"
         ]
       }
     ],
+    "jsx-boolean-value": false,
+    "no-arg": true,
+    "no-bitwise": false,
     "no-consecutive-blank-lines": false,
     "no-construct": true,
     "no-duplicate-variable": true,
