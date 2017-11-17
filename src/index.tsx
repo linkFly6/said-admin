@@ -29,7 +29,9 @@ ReactDOM.render(
       </Switch>
     </BrowserRouter> */}
     <BrowserRouter>
-      <App { ...({} as RouteComponentProps<any>) } />
+      <Router history={history}>
+        <App { ...({} as RouteComponentProps<any>) } />
+      </Router>
     </BrowserRouter>
   </Provider>,
   document.getElementById('root') as HTMLElement

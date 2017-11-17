@@ -9,6 +9,7 @@ import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps }
 import Home from './home'
 // import Said from './said'
 import Said from '../containers/said'
+import SaidAdd from '../containers/said/add'
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
@@ -56,7 +57,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
             >
               <SubMenu key="said" title={<span><Icon type="article" />Said 管理</span>}>
                 <Menu.Item key="/said"><Icon type="rizhi11" />Said 概况</Menu.Item>
-                <Menu.Item key="/index"><Icon type="bianxie" />添加 Said</Menu.Item>
+                <Menu.Item key="/said/add"><Icon type="bianxie" />添加 Said</Menu.Item>
               </SubMenu>
               <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
                 <Menu.Item key="3"><Icon type="rizhi11" />Blog 管理</Menu.Item>
@@ -84,6 +85,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Route path="/" component={Home} exact />
                 <Route path="/index" component={Home} exact />
                 <Route path="/said" component={Said} exact />
+                <Route path="/said/add" component={SaidAdd} exact />
               </Switch>
               {/* </Router> */}
             </Content>
