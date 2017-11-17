@@ -12,7 +12,8 @@ export default class extends React.Component<{}, StateProps> {
   constructor(props: {}) {
     super(props)
     // this.state = { editorState: EditorState.createEmpty() }
-    this.state = { editorState: EditorState.createWithContent(ContentState.createFromText(`\`\`\`ts
+    this.state = {
+      editorState: EditorState.createWithContent(ContentState.createFromText(`\`\`\`ts
     import Action from "./action";
     export const MY_ACTION = "MY_ACTION";
     export type MY_ACTION = { foo: number, message: string }
@@ -26,55 +27,71 @@ export default class extends React.Component<{}, StateProps> {
             }
         }
     }
-    \`\`\``)) }
-    this.onChange = (editorState: EditorState) => {
-      // 获取编辑器文本
-      // console.log(editorState.getCurrentContent().getPlainText())
-      console.log(editorState.getCurrentContent())
-      this.setState({ editorState })
-    }
-
-    this.onParsted = (blobs: Array<Blob>): DraftHandleValue => {
-      // 获取光标的 key
-      const selection = this.state.editorState.getSelection()
-      const focusKey = selection.getFocusKey()
-      const currentContent = this.state.editorState.getCurrentContent()
-      const entityKey = currentContent.createEntity(
-        'LINKPHOTO', 
-        'IMMUTABLE',
-        { replaceTarget: '插入的文本' })
-      // this.state.editorState.getSelection().set(focusKey)
-      const modifiedContent = Modifier.replaceText(currentContent, selection, '插入的值', void 0, entityKey as any)
-      const newState = EditorState.push(
-        this.state.editorState, modifiedContent, this.state.editorState.getLastChangeType())
-      this.setState({
-        editorState: newState
-      })
-      return 'handled'
+    \`\`\``))
     }
   }
   // tslint:disable-next-line:no-empty
-  onChange(editorState: EditorState) { }
-
-  onParsted(blobs: Array<Blob>): DraftHandleValue {
-    // this.state.editorState.getCurrentContent()
-    return 'not-handled'
+  onChange(editorState: EditorState) {
+    // 获取编辑器文本
+    // console.log(editorState.getCurrentContent().getPlainText())
+    console.log(editorState.getCurrentContent())
+    this.setState({ editorState })
   }
 
-  onDropped (selection: SelectionState, files: Array<Blob>): DraftHandleValue {
-    console.log(selection)
-    return 'not-handled'
+  onParsted(blobs: Array<Blob>): DraftHandleValue {
+    const createKey = this.insertText(
+      this.state.editorState.getSelection(), 'onParsted 文本', { replaceTarget: 'onParsted - meta 信息' })
+    return 'handled'
+  }
+
+  onDropped(selection: SelectionState, files: Array<Blob>): DraftHandleValue {
+    const createKey = this.insertText(selection, 'onDropped 文本', { replaceTarget: 'onDropped - meta 信息' })
+    return 'handled'
+  }
+
+  insertText(selection: SelectionState, text: string, meta: object) {
+    // const focusKey = selection.getFocusKey()
+    const currentContent = this.state.editorState.getCurrentContent()
+    const entity = currentContent.createEntity(
+      'LINKPHOTO',
+      'IMMUTABLE',
+      meta)
+    const createKey = currentContent.getLastCreatedEntityKey()
+
+    // this.state.editorState.getSelection().set(focusKey)
+    const modifiedContent = Modifier.replaceText(currentContent, selection, text, void 0, createKey)
+    let newState = EditorState.push(
+      this.state.editorState, modifiedContent, this.state.editorState.getLastChangeType())
+
+    let updatedSelection = selection.merge({
+      focusKey: 'bar',
+      focusOffset: 0,
+    }) as SelectionState
+    // newState = EditorState.acceptSelection(newState, new SelectionState({
+    //   anchorKey: createKey,
+    //   anchorOffset: length,
+    //   focusKey: createKey,
+    //   focusOffset: length,
+    //   isBackward: false,
+    // }))
+
+    newState = EditorState.acceptSelection(newState, updatedSelection)
+
+    this.setState({
+      editorState: newState
+    })
+    return createKey
   }
   render() {
     return (
       <div className="said-editor">
         <div className="said-editor-content">
-          <Editor 
+          <Editor
             editorState={this.state.editorState}
-            onChange={this.onChange}
+            onChange={this.onChange.bind(this)}
             placeholder="输入内容"
-            handlePastedFiles={this.onParsted}
-            handleDroppedFiles={this.onDropped}
+            handlePastedFiles={this.onParsted.bind(this)}
+            handleDroppedFiles={this.onDropped.bind(this)}
           />
         </div>
       </div>
