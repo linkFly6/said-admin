@@ -51,6 +51,7 @@
       }
     ],
     "jsx-no-bind": false,
+    "jsx-no-string-ref": false,
     "jsx-boolean-value": false,
     "no-arg": true,
     "no-bitwise": false,

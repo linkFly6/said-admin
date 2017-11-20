@@ -1,97 +1,40 @@
 import * as React from 'react'
+
 import './said-editor.styl'
-// import Editor from 'draft-js-plugins-editor'
-import { Editor, EditorState, ContentState, DraftHandleValue, SelectionState, Modifier } from 'draft-js'
-import 'draft-js/dist/Draft.css'
+
+
+
 
 interface StateProps {
-  editorState: EditorState
 }
 
 export default class extends React.Component<{}, StateProps> {
   constructor(props: {}) {
     super(props)
-    // this.state = { editorState: EditorState.createEmpty() }
-    this.state = {
-      editorState: EditorState.createWithContent(ContentState.createFromText(`\`\`\`ts
-    import Action from "./action";
-    export const MY_ACTION = "MY_ACTION";
-    export type MY_ACTION = { foo: number, message: string }
-    
-    export function doMyAction(message: string): Action<MY_ACTION> {
-        return {
-            type: MY_ACTION,
-            payload: {
-                foo: 123,
-                message
-            }
-        }
-    }
-    \`\`\``))
-    }
+  }
+
+  onParste(e: Event) {
+    console.log(e)
+    return e.preventDefault()
   }
   // tslint:disable-next-line:no-empty
-  onChange(editorState: EditorState) {
-    // 获取编辑器文本
-    // console.log(editorState.getCurrentContent().getPlainText())
-    console.log(editorState.getCurrentContent())
-    this.setState({ editorState })
-  }
-
-  onParsted(blobs: Array<Blob>): DraftHandleValue {
-    const createKey = this.insertText(
-      this.state.editorState.getSelection(), 'onParsted 文本', { replaceTarget: 'onParsted - meta 信息' })
-    return 'handled'
-  }
-
-  onDropped(selection: SelectionState, files: Array<Blob>): DraftHandleValue {
-    const createKey = this.insertText(selection, 'onDropped 文本', { replaceTarget: 'onDropped - meta 信息' })
-    return 'handled'
-  }
-
-  insertText(selection: SelectionState, text: string, meta: object) {
-    // const focusKey = selection.getFocusKey()
-    const currentContent = this.state.editorState.getCurrentContent()
-    const entity = currentContent.createEntity(
-      'LINKPHOTO',
-      'IMMUTABLE',
-      meta)
-    const createKey = currentContent.getLastCreatedEntityKey()
-
-    // this.state.editorState.getSelection().set(focusKey)
-    const modifiedContent = Modifier.replaceText(currentContent, selection, text, void 0, createKey)
-    let newState = EditorState.push(
-      this.state.editorState, modifiedContent, this.state.editorState.getLastChangeType())
-
-    let updatedSelection = selection.merge({
-      focusKey: 'bar',
-      focusOffset: 0,
-    }) as SelectionState
-    // newState = EditorState.acceptSelection(newState, new SelectionState({
-    //   anchorKey: createKey,
-    //   anchorOffset: length,
-    //   focusKey: createKey,
-    //   focusOffset: length,
-    //   isBackward: false,
-    // }))
-
-    newState = EditorState.acceptSelection(newState, updatedSelection)
-
-    this.setState({
-      editorState: newState
-    })
-    return createKey
+  onDrop(e: DragEvent) {
+    console.dir(this.refs.inputArea)
+    console.log()
+    console.log(e)
+    console.log(e.dataTransfer.files[0])
+    return e.preventDefault()
   }
   render() {
     return (
       <div className="said-editor">
         <div className="said-editor-content">
-          <Editor
-            editorState={this.state.editorState}
-            onChange={this.onChange.bind(this)}
+          <textarea
+            ref="inputArea"
             placeholder="输入内容"
-            handlePastedFiles={this.onParsted.bind(this)}
-            handleDroppedFiles={this.onDropped.bind(this)}
+            className="said-editor-body"
+            onPaste={this.onParste.bind(this)}
+            onDrop={this.onDrop.bind(this)}
           />
         </div>
       </div>
