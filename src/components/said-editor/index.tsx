@@ -1,6 +1,7 @@
 import * as React from 'react'
 
 import './said-editor.styl'
+import { getSelection } from '../../assets/js/editor'
 
 
 
@@ -23,6 +24,10 @@ export default class extends React.Component<{}, StateProps> {
     console.log()
     console.log(e)
     console.log(e.dataTransfer.files[0])
+    const textarea = this.refs.inputArea as HTMLTextAreaElement
+    textarea.focus()
+    console.log(textarea.value)
+    getSelection(textarea)
     return e.preventDefault()
   }
   render() {

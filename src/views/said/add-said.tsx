@@ -1,5 +1,6 @@
 import * as React from 'react'
-import SaidEditor from '../../components/said-editor'
+// import SaidEditor from '../../components/said-editor'
+import SaidEditor from '../../components/said-editor/editor'
 
 
 export interface StateProps { }
