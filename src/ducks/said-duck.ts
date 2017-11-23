@@ -4,7 +4,7 @@
 */
 // import Promise from 'Promise'
 // actionTypes
-import { SaidModel } from '../types/said'
+import { SaidDemoModel } from '../types/said'
 import { Dispatch, DispatchProp } from 'react-redux'
 
 
@@ -18,7 +18,6 @@ export const constants = {
 }
 
 // actions
-
 export interface ActionAdd<T> {
   type: typeof constants.ADD,
   payload: T,
@@ -28,13 +27,13 @@ export interface ActionAdd<T> {
 
 
 export interface DispatchProps {
-  add(item: SaidModel): ActionAdd<SaidModel>
-  loadSaidLists(): (dispatch: any) => Promise<ActionAdd<SaidModel>[]>
+  add(item: SaidDemoModel): ActionAdd<SaidDemoModel>
+  loadSaidLists(): (dispatch: any) => Promise<ActionAdd<SaidDemoModel>[]>
 }
 
 export const actions: DispatchProps = {
   // 社区规范参见这里：https://github.com/acdlite/flux-standard-action
-  add: (item: SaidModel): ActionAdd<SaidModel> => ({
+  add: (item: SaidDemoModel): ActionAdd<SaidDemoModel> => ({
     type: constants.ADD,
     // 数据载体， containers 中的容器组件会 dispatch 数据到这里（也就是 item）
     payload: item,
@@ -44,8 +43,8 @@ export const actions: DispatchProps = {
 
   loadSaidLists: () => {
     // 通过 redux-thunk 中间件，返回函数
-    return (dispatch: Dispatch<ActionAdd<SaidModel>>) => {
-      return new Promise<SaidModel[]>((resolve: (values: SaidModel[]) => void) => {
+    return (dispatch: Dispatch<ActionAdd<SaidDemoModel>>) => {
+      return new Promise<SaidDemoModel[]>((resolve: (values: SaidDemoModel[]) => void) => {
         window.setTimeout(
           function () {
             resolve([{
@@ -60,7 +59,7 @@ export const actions: DispatchProps = {
             }])
           },
           2000)
-      }).then((datas: SaidModel[]) => {
+      }).then((datas: SaidDemoModel[]) => {
         return datas.map((data) => {
           return dispatch(actions.add(data))
         })
@@ -71,10 +70,10 @@ export const actions: DispatchProps = {
 
 
 
-const initialState: SaidModel[] = [] // Article
+const initialState: SaidDemoModel[] = [] // Article
 
 // reducer = 处理数据
-export default function (state: SaidModel[] = initialState /* state 应该有一个默认值 */, action: ActionAdd<SaidModel>) {
+export default function (state: SaidDemoModel[] = initialState /* state 应该有一个默认值 */, action: ActionAdd<SaidDemoModel>) {
   switch (action.type) {
     case constants.ADD: {
       return [

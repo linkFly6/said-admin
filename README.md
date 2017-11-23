@@ -1,4 +1,11 @@
-# TypeScript React Starter
+
+
+# Said-Admin
+
+
+# 请求架构
+
+前台访问用 `cookie`，后台 + 前台管理员访问接口带 `token`， `token` 每次进行校验
 
 This quick start guide will teach you how to wire up TypeScript with [React](http://facebook.github.io/react/).
 By the end, you'll have

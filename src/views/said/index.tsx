@@ -2,14 +2,14 @@
 import * as React from 'react'
 import { Table, Button } from 'antd'
 import { connect } from 'react-redux'
-import { SaidModel } from '../../types/said'
+import { SaidDemoModel } from '../../types/said'
 import store from '../../ducks'
-import * as duckSaid from '../../ducks/said'
+import * as duckSaid from '../../ducks/said-duck'
 
 var id = 2
 
 export interface StateProps {
-  articles: SaidModel[]
+  articles: SaidDemoModel[]
 }
 
 // export default class Index extends React.Component<{}, object> {

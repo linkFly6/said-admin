@@ -10,6 +10,7 @@ import Home from './home'
 // import Said from './said'
 import Said from '../containers/said'
 import SaidAdd from '../containers/said/add'
+import BlogAdd from '../containers/blog/add'
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
@@ -21,7 +22,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
     openKeys: ['said'],
   }
   componentWillReceiveProps() {
-    console.log(this.props.location)
+    // console.log(this.props.location)
   }
 
   handleClick = (e: ClickParam) => {
@@ -61,7 +62,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
               </SubMenu>
               <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
                 <Menu.Item key="3"><Icon type="rizhi11" />Blog 管理</Menu.Item>
-                <Menu.Item key="4"><Icon type="bianxie" />添加 Blog</Menu.Item>
+                <Menu.Item key="/blog/add"><Icon type="bianxie" />添加 Blog</Menu.Item>
               </SubMenu>
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
                 <Menu.Item key="5"><Icon type="tupian" />图片管理</Menu.Item>
@@ -86,6 +87,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Route path="/index" component={Home} exact />
                 <Route path="/said" component={Said} exact />
                 <Route path="/said/add" component={SaidAdd} exact />
+                <Route path="/blog/add" component={BlogAdd} exact />
               </Switch>
               {/* </Router> */}
             </Content>
