@@ -3,7 +3,7 @@
 import * as React from 'react'
 import * as ReactCodeMirror from 'react-codemirror'
 import * as CodeMirror from 'CodeMirror'
-import './style.styl'
+import './said-editor.styl'
 import 'codemirror/lib/codemirror.css'
 // import 'codemirror/theme/solarized.css'
 import 'codemirror/mode/markdown/markdown'
