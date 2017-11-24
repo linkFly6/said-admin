@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect, DispatchProp } from 'react-redux'
-import { actions, DispatchProps } from '../../ducks/dashboard'
+import { actions, DispatchProps } from '../../ducks/dashboard-duck'
 import { LogFileModel } from '../../types/dashboard'
 import { Dispatch } from 'redux'
 

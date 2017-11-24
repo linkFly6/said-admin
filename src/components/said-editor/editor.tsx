@@ -40,10 +40,15 @@ export default class extends React.Component<{}, StateProps> {
     return this.value
   }
 
-  inserTextInNewLine(instance: CodeMirror.Editor, text: string) {
+  inserTextInNewLine(
+    instance: CodeMirror.Editor,
+    position: { left: number, top: number },
+    text: string) {
     const doc = instance.getDoc()
-    const cursor = doc.getCursor()
-
+    
+    // cursor 获取的是光标最后一次的位置，拖拽的时候不会改变光标的位置，所以要使用 coordsChar 来计算光标位置
+    // const cursor = doc.getCursor()
+    const cursor = instance.coordsChar(position)
     /**
      * 如果前面有字符（或空字符），则插入一行，且将内容插入到新行里（共两行）
      * 如果前面没有字符（或空字符），将内容直接插入到本行
@@ -60,7 +65,12 @@ export default class extends React.Component<{}, StateProps> {
     //     ch: cursor.ch,
     //   }))
     // const line = doc.getLine(cursor.line)
-    doc.replaceRange(text, doc.getCursor())
+    doc.replaceRange(text, cursor)
+    // 把光标定位到拖拽点
+    doc.setCursor({
+      line: cursor.line,
+      ch: cursor.ch + text.length,
+    })
     // 后面可以使用 doc.getAllMarks() 获取标记符号
     // doc.setBookmark() 删除标记
     // return doc.markText(cursor, doc.getCursor())
@@ -69,7 +79,12 @@ export default class extends React.Component<{}, StateProps> {
   componentDidMount() {
     this.codeMirror.on('drop', (instance: CodeMirror.Editor, e: DragEvent) => {
       const markText = `![uploding](${this.now})`
-      this.inserTextInNewLine(instance, markText)
+      this.inserTextInNewLine(
+        instance, {
+          left: e.x,
+          top: e.y,
+        },
+        markText)
       setTimeout(() => { instance.focus() }, 0)
 
       setTimeout(() => {
