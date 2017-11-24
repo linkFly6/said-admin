@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps } from 'react-router-dom'
 
 import Home from './home'
+import { Images } from './others'
 // import Said from './said'
 import Said from '../containers/said'
 import SaidAdd from '../containers/said/add'
@@ -64,7 +65,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Menu.Item key="4"><Icon type="bianxie" />添加 Blog</Menu.Item>
               </SubMenu>
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
-                <Menu.Item key="5"><Icon type="tupian" />图片管理</Menu.Item>
+                <Menu.Item key="/others/images"><Icon type="tupian" />图片管理</Menu.Item>
                 <Menu.Item key="6"><Icon type="icon14" />音乐管理</Menu.Item>
                 <Menu.Item key="7"><Icon type="biaoqian" />标签管理</Menu.Item>
               </SubMenu>
@@ -86,6 +87,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Route path="/index" component={Home} exact />
                 <Route path="/said" component={Said} exact />
                 <Route path="/said/add" component={SaidAdd} exact />
+                <Route path="/others/images" component={Images} exact />
               </Switch>
               {/* </Router> */}
             </Content>
