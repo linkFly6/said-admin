@@ -119,7 +119,7 @@ export default class extends React.Component<{}, StateProps> {
             }}
           />
         </div>
-        <Button type="primary" onClick={this.getText.bind(this)}>Primary</Button>
+        {/* <Button type="primary" onClick={this.getText.bind(this)}>Primary</Button> */}
       </div>
     )
   }

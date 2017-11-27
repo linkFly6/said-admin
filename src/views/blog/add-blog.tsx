@@ -80,12 +80,27 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
               <FormItem>
                 {
                   getFieldDecorator(
-                    'xxxxx',
+                    'summary',
                     {
                       validateTrigger: ['onChange', 'onBlur'],
-                      rules: [{ required: true, message: '分类xxx' }],
+                      rules: [{ required: true, message: '请输入简述,支持多行' }],
                     })(
-                    <Input style={{ width: '100%' }} placeholder="文章标题" size="large" />
+                    <Input.TextArea
+                      placeholder="简述\n支持多行"
+                      autosize={{ minRows: 4, maxRows: 4 }}
+                    />
+                    )
+                }
+              </FormItem>
+              <FormItem>
+                {
+                  getFieldDecorator(
+                    'tags',
+                    {
+                      validateTrigger: ['onChange', 'onBlur'],
+                      rules: [{ required: true, message: '请输入标签' }],
+                    })(
+                    <Input placeholder="标签" size="large" />
                     )
                 }
               </FormItem>
@@ -107,26 +122,24 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
                       dataSource={options}
                       optionLabelProp="value"
                     >
-                      <Input style={{ width: '100%' }} placeholder="文章标题" size="large" />
+                      <Input placeholder="分类" size="large" />
                     </AutoComplete>
                     )
                 }
               </FormItem>
               <FormItem>
-                <Collapse bordered={false} defaultActiveKey={['1']}>
+                <Collapse bordered={false} defaultActiveKey={['1']} className={s.collapse}>
                   <Collapse.Panel header="高级选项" key="1">
-                    <Row>
-                      <Col span={24}>
-                        <Input.TextArea
-                          placeholder="JavaScript 代码\n用于定制文章页代码"
-                          autosize={{ minRows: 4, maxRows: 4 }}
-                        />
-                        <Input.TextArea
-                          placeholder="css 代码\n用于定制文章页代码"
-                          autosize={{ minRows: 4, maxRows: 4 }}
-                        />
-                      </Col>
-                    </Row>
+                    <div className={s.marginBootom}>
+                      <Input.TextArea
+                        placeholder="JavaScript 代码\n用于定制文章页代码"
+                        autosize={{ minRows: 4, maxRows: 4 }}
+                      />
+                    </div>
+                    <Input.TextArea
+                      placeholder="css 代码\n用于定制文章页代码"
+                      autosize={{ minRows: 4, maxRows: 4 }}
+                    />
                   </Collapse.Panel>
                 </Collapse>
               </FormItem>
@@ -135,10 +148,15 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
               </FormItem> */}
             </Col>
           </Row>
-          <Row>
-            <Col span={12} offset={12}>
+          <Row type="flex" justify="center">
+            <Col span={2}>
               <Button loading={false} size="large">
                 预览
+              </Button>
+            </Col>
+            <Col span={2}>
+              <Button type="primary" size="large">
+                发表
               </Button>
             </Col>
           </Row>

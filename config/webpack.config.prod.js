@@ -163,7 +163,8 @@ module.exports = {
                 loader: require.resolve('typings-for-css-modules-loader'),
                 options: {
                   modules: true,
-                  namedExport: true
+                  namedExport: true,
+                  camelCase
                 },
               },
               'stylus-loader',
