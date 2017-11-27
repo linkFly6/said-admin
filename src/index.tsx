@@ -10,7 +10,7 @@ import history from './assets/js/history'
 import store from './ducks'
 import { RouteComponentProps } from 'react-router-dom'
 
-import './index.styl'
+import * as s from './index.styl'
 
 // import { createStore } from 'redux'
 // import { enthusiasm } from './reducers/index'

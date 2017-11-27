@@ -1,5 +1,4 @@
 import * as React from 'react'
-import './App.styl'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd'
 // import Icon from '../components/icon/icon'
 import { ClickParam } from 'antd/lib/menu'
@@ -38,8 +37,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
   render() {
     return (
       <Layout>
-        <Header className="header">
-          <div className="logo" />
+        <Header>
           <Menu
             theme="dark"
             mode="horizontal"

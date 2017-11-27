@@ -1,10 +1,10 @@
 import * as React from 'react'
 // import SaidEditor from '../../components/said-editor'
-import './add-blog.styl'
 import { Button, Form, Input, Row, Col, AutoComplete } from 'antd'
 import * as antd from 'antd'
 import SaidEditor from '../../components/said-editor/editor'
 import { FormComponentProps } from 'antd/lib/form/Form'
+import * as s from './add-blog.styl'
 
 
 
@@ -28,7 +28,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
     return (
-      <div className="view add-blog">
+      <div className={`${s.view} ${s.addBlog}`}>
         <Form layout="vertical">
           <Row>
             <Col span={14}>

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Card, Layout } from 'antd'
-import './index.styl'
+import * as s from './index.styl'
 
 export interface StateProps {
 }
@@ -10,8 +10,8 @@ export default class ImageManager extends React.Component<StateProps> {
     return (
       <Layout>
         <Card noHovering title="图片管理" bodyStyle={{ padding: 0 }}>
-          <Card.Grid className="cardGrid">
-            <div className="gridImage">
+          <Card.Grid className={s.cardGrid}>
+            <div className={s.gridImage}>
               <img src="http://t2.hddhhn.com/uploads/tu/201607/176/efqomc0rcmu.jpg" />
             </div>
             <div>
