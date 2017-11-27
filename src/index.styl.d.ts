@@ -1,5 +1,1 @@
-export interface IIndexStyl {
-
-}
-
-export const locals: IIndexStyl;
+export const root: string;

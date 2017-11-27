@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Layout, Menu, Breadcrumb, Icon } from 'antd'
+import * as s from './App.styl'
 // import Icon from '../components/icon/icon'
 import { ClickParam } from 'antd/lib/menu'
 import { connect } from 'react-redux'
