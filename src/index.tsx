@@ -10,16 +10,6 @@ import history from './assets/js/history'
 import store from './ducks'
 import { RouteComponentProps } from 'react-router-dom'
 
-import './index.styl'
-
-// import { createStore } from 'redux'
-// import { enthusiasm } from './reducers/index'
-// import { StoreState } from './types/index'
-// const store = createStore<StoreState>(enthusiasm, {
-//   enthusiasmLevel: 1,
-//   languageName: 'TypeScript',
-// })
-
 ReactDOM.render(
   <Provider store={store}>
     {/* <BrowserRouter>

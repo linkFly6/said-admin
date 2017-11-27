@@ -7,7 +7,8 @@
     "@types/react-router-dom": "^4.2.1",
     "react-router-dom": "^4.2.2",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.1"
+    "stylus-loader": "^3.0.1",
+    "typings-for-css-modules-loader": "^1.7.0"
   },
   "dependencies": {
     "@types/jest": "^21.1.5",

@@ -3,7 +3,7 @@
 import * as React from 'react'
 import * as ReactCodeMirror from 'react-codemirror'
 import * as CodeMirror from 'CodeMirror'
-import './said-editor.styl'
+import * as s from './said-editor.styl'
 import 'codemirror/lib/codemirror.css'
 // import 'codemirror/theme/solarized.css'
 import 'codemirror/mode/markdown/markdown'
@@ -45,7 +45,7 @@ export default class extends React.Component<{}, StateProps> {
     position: { left: number, top: number },
     text: string) {
     const doc = instance.getDoc()
-    
+
     // cursor 获取的是光标最后一次的位置，拖拽的时候不会改变光标的位置，所以要使用 coordsChar 来计算光标位置
     // const cursor = doc.getCursor()
     const cursor = instance.coordsChar(position)
@@ -105,8 +105,8 @@ export default class extends React.Component<{}, StateProps> {
 
   render() {
     return (
-      <div className="said-editor">
-        <div className="said-editor-content">
+      <div className={s.saidEditor}>
+        <div className={s.saidEditorContent}>
           <ReactCodeMirror
             ref="codeMirror"
             onChange={this.onChange.bind(this)}
