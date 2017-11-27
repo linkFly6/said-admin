@@ -1,12 +1,34 @@
 import * as React from 'react'
 // import SaidEditor from '../../components/said-editor'
-import { Button, Form, Input, Row, Col, AutoComplete } from 'antd'
-import * as antd from 'antd'
+import { Button, Form, Input, Row, Col, AutoComplete, Switch, Collapse } from 'antd'
 import SaidEditor from '../../components/said-editor/editor'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import * as s from './add-blog.styl'
 
 
+
+class FormItem extends React.Component<{}> {
+  render() {
+    return (
+      <Form.Item
+        labelCol={{
+          xs: { span: 24 },
+          sm: { span: 24 },
+        }}
+        wrapperCol={{
+          xs: { span: 24 },
+          sm: { span: 24 }
+        }}
+      // validateStatus="error"
+      // hasFeedback
+      >
+        {
+          this.props.children
+        }
+      </Form.Item>
+    )
+  }
+}
 
 export interface StateProps { }
 
@@ -25,6 +47,10 @@ const options: any = [
 ]
 
 class AddBlog extends React.Component<FormComponentProps & StateProps> {
+
+  // tslint:disable-next-line:no-empty
+  onToggleCustom(checked: boolean) { }
+
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
     return (
@@ -32,18 +58,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
         <Form layout="vertical">
           <Row>
             <Col span={14}>
-              <Form.Item
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }}
-              // validateStatus="error"
-              // hasFeedback
-              >
+              <FormItem>
                 {
                   getFieldDecorator(
                     'title',
@@ -54,37 +69,15 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
                     <Input style={{ width: '100%' }} placeholder="文章标题" size="large" />
                     )
                 }
-              </Form.Item>
-              <Form.Item
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }}
-                // validateStatus="error"
-                hasFeedback
-              >
+              </FormItem>
+              <FormItem>
                 <div className="editor">
                   <SaidEditor />
                 </div>
-              </Form.Item>
+              </FormItem>
             </Col>
             <Col span={8} offset={2}>
-              <Form.Item
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }}
-                // validateStatus="error"
-                hasFeedback
-              >
+              <FormItem>
                 {
                   getFieldDecorator(
                     'xxxxx',
@@ -95,22 +88,9 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
                     <Input style={{ width: '100%' }} placeholder="文章标题" size="large" />
                     )
                 }
-              </Form.Item>
+              </FormItem>
 
-
-              <Form.Item
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }}
-                // validateStatus="error"
-                hasFeedback
-              >
-
+              <FormItem>
                 {
                   getFieldDecorator(
                     'category',
@@ -131,8 +111,28 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
                     </AutoComplete>
                     )
                 }
-              </Form.Item>
+              </FormItem>
+              <FormItem>
+                <Collapse bordered={false} defaultActiveKey={['1']}>
+                  <Collapse.Panel header="高级选项" key="1">
+                    <Row>
+                      <Col span={24}>
+                        <Input.TextArea
+                          placeholder="JavaScript 代码\n用于定制文章页代码"
+                          autosize={{ minRows: 4, maxRows: 4 }}
+                        />
+                        <Input.TextArea
+                          placeholder="css 代码\n用于定制文章页代码"
+                          autosize={{ minRows: 4, maxRows: 4 }}
+                        />
+                      </Col>
+                    </Row>
+                  </Collapse.Panel>
+                </Collapse>
+              </FormItem>
+              {/* <FormItem>
 
+              </FormItem> */}
             </Col>
           </Row>
           <Row>
@@ -143,7 +143,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps> {
             </Col>
           </Row>
         </Form>
-      </div>
+      </div >
     )
   }
 }
