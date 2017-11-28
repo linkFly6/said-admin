@@ -21,6 +21,17 @@ npm i -d
 npm start
 ```
 
+- Said 模块 [@Jemair](https://github.com/Jemair)
+  - 列表
+  - 添加/修改
+  - 图片管理
+  - 音乐管理
+- Blog 模块 [@linkFly](https://github.com/linkFly6)
+  - 列表
+  - 添加/修改
+  - 分类管理 (标签待定开发)
+  - 首页
+
 ## 请求架构
 
 待定
