@@ -11,7 +11,9 @@ import { Images } from './others'
 // import Said from './said'
 import Said from '../containers/said'
 import SaidAdd from '../containers/said/add'
+import Blog from '../containers/blog'
 import BlogAdd from '../containers/blog/add'
+
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
@@ -21,14 +23,24 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
   state = {
     current: '1',
     openKeys: ['said'],
+    routePaths: ['said'],
   }
   componentWillReceiveProps() {
     // console.log(this.props.location)
   }
 
   handleClick = (e: ClickParam) => {
+
     this.props.history.push(e.key)
-    this.setState({ current: e.key })
+    let routePaths = e.key.split('/')
+    // 如果是 /said/blog 的路径
+    if (!routePaths[0]) {
+      routePaths.shift()
+    }
+    this.setState({
+      current: e.key,
+      routePaths
+    })
   }
   onOpenChange = (openKeys: string[]) => {
     const state = this.state
@@ -37,7 +49,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
   }
   render() {
     return (
-      <Layout>
+      <Layout className={s.app}>
         <Header>
           <Menu
             theme="dark"
@@ -61,7 +73,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Menu.Item key="/said/add"><Icon type="bianxie" />添加 Said</Menu.Item>
               </SubMenu>
               <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
-                <Menu.Item key="3"><Icon type="rizhi11" />Blog 管理</Menu.Item>
+                <Menu.Item key="/blog"><Icon type="rizhi11" />Blog 管理</Menu.Item>
                 <Menu.Item key="/blog/add"><Icon type="bianxie" />添加 Blog</Menu.Item>
               </SubMenu>
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
@@ -76,9 +88,12 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
             </Menu>
           </Sider>
           <Layout style={{ padding: '0 24px 24px' }}>
-            <Breadcrumb style={{ margin: '12px 0' }}>
-              <Breadcrumb.Item>List</Breadcrumb.Item>
-              <Breadcrumb.Item>App</Breadcrumb.Item>
+            <Breadcrumb className={s.appBreadcrumb}>
+              {
+                this.state.routePaths.map((path: string) => {
+                  return <Breadcrumb.Item key={path}>{path}</Breadcrumb.Item>
+                })
+              }
             </Breadcrumb>
             <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
               {/* <Router history={history}> */}
@@ -88,6 +103,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Route path="/said" component={Said} exact />
                 <Route path="/said/add" component={SaidAdd} exact />
                 <Route path="/others/images" component={Images} exact />
+                <Route path="/blog" component={Blog} exact />
                 <Route path="/blog/add" component={BlogAdd} exact />
               </Switch>
               {/* </Router> */}
