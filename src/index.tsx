@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import 'antd/dist/antd.css'
-import './assets/fonts/iconfont'
+import './assets/fonts/iconfont.css'
 import App from './views/App'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, HashRouter } from 'react-router-dom'

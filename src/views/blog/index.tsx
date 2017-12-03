@@ -21,7 +21,7 @@ const columns = [{
 }, {
   title: '评论',
   dataIndex: 'info.commentCount',
-  key: 'likeCount',
+  key: 'commentCount',
 }, {
   title: '更新时间',
   dataIndex: 'info.updateTime',

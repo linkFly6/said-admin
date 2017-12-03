@@ -164,7 +164,7 @@ module.exports = {
                 options: {
                   modules: true,
                   namedExport: true,
-                  camelCase
+                  camelCase: true,
                 },
               },
               'stylus-loader',

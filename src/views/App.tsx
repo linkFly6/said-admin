@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { Layout, Menu, Breadcrumb, Icon } from 'antd'
+import { Layout, Menu, Breadcrumb } from 'antd'
 import * as s from './App.styl'
-// import Icon from '../components/icon/icon'
+import Icon from '../components/icon/icon'
 import { ClickParam } from 'antd/lib/menu'
 import { connect } from 'react-redux'
 import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps } from 'react-router-dom'
@@ -13,6 +13,7 @@ import Said from '../containers/said'
 import SaidAdd from '../containers/said/add'
 import Blog from '../containers/blog'
 import BlogAdd from '../containers/blog/add'
+import Category from '../containers/category'
 
 
 const { SubMenu } = Menu
@@ -79,7 +80,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
                 <Menu.Item key="/others/images"><Icon type="tupian" />图片管理</Menu.Item>
                 <Menu.Item key="6"><Icon type="icon14" />音乐管理</Menu.Item>
-                <Menu.Item key="7"><Icon type="biaoqian" />标签管理</Menu.Item>
+                <Menu.Item key="/category"><Icon type="biaoqian" />分类管理</Menu.Item>
               </SubMenu>
               <SubMenu key="site" title={<span><Icon type="diannao" />站点管理</span>}>
                 <Menu.Item key="8"><Icon type="tongji" />访问概况</Menu.Item>
@@ -105,6 +106,7 @@ export default class App extends React.Component<RouteComponentProps<{}>, object
                 <Route path="/others/images" component={Images} exact />
                 <Route path="/blog" component={Blog} exact />
                 <Route path="/blog/add" component={BlogAdd} exact />
+                <Route path="/category" component={Category} exact />
               </Switch>
               {/* </Router> */}
             </Content>
