@@ -11,6 +11,7 @@ export const constants = {
   ADD: 'CATEGORY/ADD',
   UPDATE: 'CATEGORY/UPDATE',
   LOAD: 'CATEGORY/LOAD',
+  FIND: 'CATEGORY/FIND',
   REMOVE: 'CATEGORY/REMOVE',
 }
 
@@ -23,9 +24,17 @@ export interface ActionAdd<T> {
 }
 
 
+export interface ActionEdit<T> {
+  type: typeof constants.UPDATE,
+  payload: T,
+  error: boolean | null,
+  meta: string,
+}
+
+
 export interface DispatchProps {
   add(item: CategoryModel): ActionAdd<CategoryModel>
-  // loadCategoryLists(): (dispatch: any) => Promise<ActionAdd<CategoryModel>[]>
+  edit(id: string, item: CategoryModel): ActionAdd<CategoryModel>
 }
 
 export const actions: DispatchProps = {
@@ -38,31 +47,13 @@ export const actions: DispatchProps = {
     meta: 'meta'
   }),
 
-  // loadCategoryLists: () => {
-  //   // 通过 redux-thunk 中间件，返回函数
-  //   return (dispatch: Dispatch<ActionAdd<CategoryModel>>) => {
-  //     return new Promise<CategoryModel[]>((resolve: (values: CategoryModel[]) => void) => {
-  //       window.setTimeout(
-  //         function () {
-  //           resolve([{
-  //             key: 0,
-  //             name: '测试名称1',
-  //             context: `测试正文 - ${Date.now()}`
-  //           },
-  //           {
-  //             key: 1,
-  //             name: '测试名称2',
-  //             context: `测试正文 - ${Date.now()}`
-  //           }])
-  //         },
-  //         2000)
-  //     }).then((datas: CategoryModel[]) => {
-  //       return datas.map((data) => {
-  //         return dispatch(actions.add(data))
-  //       })
-  //     })
-  //   }
-  // }
+  edit: (id: string, item: CategoryModel): ActionEdit<CategoryModel> => ({
+    type: constants.UPDATE,
+    // 数据载体， containers 中的容器组件会 dispatch 数据到这里（也就是 item）
+    payload: item,
+    error: false, // error 的情况下为 true，并且 payload 为 Error 数据
+    meta: 'meta'
+  }),
 }
 
 
@@ -70,7 +61,9 @@ export const actions: DispatchProps = {
 const initialState: CategoryModel[] = [] // Article
 
 // reducer = 处理数据
-export default function (state: CategoryModel[] = initialState /* state 应该有一个默认值 */, action: ActionAdd<CategoryModel>) {
+export default function (
+  state: CategoryModel[] = initialState,
+  action: ActionAdd<CategoryModel> | ActionEdit<CategoryModel>) {
   switch (action.type) {
     case constants.ADD: {
       return [
@@ -79,7 +72,12 @@ export default function (state: CategoryModel[] = initialState /* state 应该�
       ]
     }
     case constants.UPDATE:
-      break
+      return state.map(item => {
+        if (item._id === (action as ActionEdit<CategoryModel>).payload._id) {
+          return action.payload
+        }
+        return item
+      })
     case constants.LOAD:
       break
     case constants.REMOVE:

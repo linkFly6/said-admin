@@ -8,31 +8,14 @@ import * as s from './index.styl'
 import * as duckCategory from '../../ducks/category-duck'
 
 
-const columns = [
-  // {
-  //   title: 'ID',
-  //   dataIndex: '_id',
-  //   key: '_id',
-  //   colSpan: 0,
-  // }, 
-  {
-    title: 'Icon',
-    dataIndex: 'icon',
-    key: 'icon',
-  }, {
-    title: '分类',
-    dataIndex: 'name',
-    key: 'name',
-  }, {
-    title: '操作',
-    key: 'action',
-    render: (text, record) => (
-      <span>
-        <Icon type="edit" />
-        <Icon type="delete" />
-      </span>
-    )
-  }]
+const EditableCell = ({ editable, value, onChange }) => (
+  <div>
+    {editable
+      ? <Input style={{ margin: '-5px 0' }} value={value} onChange={e => onChange(e.target.value)} />
+      : value
+    }
+  </div>
+)
 
 export interface StateProps {
   categorys: CategoryModel[],
@@ -50,7 +33,38 @@ interface State {
 }
 
 class Index extends React.Component<StateProps & DispatchProp<duckCategory.DispatchProps>, State> {
+  columns: (
+    { title: string; dataIndex: string; key: string; }
+    | { title: string; key: string; render: (text: any, record: any) => JSX.Element; })[]
 
+  constructor(props: StateProps & DispatchProp<duckCategory.DispatchProps>) {
+    super(props)
+    this.columns = [
+      // {
+      //   title: 'ID',
+      //   dataIndex: '_id',
+      //   key: '_id',
+      //   colSpan: 0,
+      // }, 
+      {
+        title: 'Icon',
+        dataIndex: 'icon',
+        key: 'icon',
+      }, {
+        title: '分类',
+        dataIndex: 'name',
+        key: 'name',
+      }, {
+        title: '操作',
+        key: 'action',
+        render: (text, record) => (
+          <span className={s.tableCellOp}>
+            <Button icon="edit" type="primary" />
+            <Button icon="delete" type="danger" />
+          </span>
+        )
+      }]
+  }
   state: State = {
     visible: false,
     editModel: {
@@ -59,6 +73,30 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
       validateStatus: 'success',
       errMsg: '',
     }
+  }
+
+  renderColumns(text: any, record: any, column: string) {
+    return (
+      <EditableCell
+        editable={record.editable}
+        value={text}
+        onChange={value => this.handleColumnChange(value, record._id, column)}
+      />
+    )
+  }
+
+
+  handleColumnChange(value: string, key: string, column: string) {
+    console.log('handleColumnChange')
+    console.log(arguments)
+    // const category =  this.props.categorys.find()
+    
+  }
+
+
+  edit(key: string) {
+    console.log('edit')
+    console.log(arguments)
   }
 
   setEditModel = (editModel: {
@@ -176,7 +214,7 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Button size="large" type="primary" onClick={this.handleAddCategory}>新增</Button>
+                <Button size="large" icon="plus" type="primary" onClick={this.handleAddCategory}>新增</Button>
               </Col>
             </Row>
 
@@ -186,7 +224,7 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
         <Row>
           <Col span={24}>
             <Table
-              columns={columns}
+              columns={this.columns}
               dataSource={this.props.categorys}
               bordered={true}
             />
