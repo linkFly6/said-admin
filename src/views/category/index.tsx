@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { DispatchProp } from 'react-redux'
-import { Button, Row, Col, Table, Icon, Modal, Form, Input } from 'antd'
+import { Button, Row, Col, Table, Icon, Modal, Form, Input, Popconfirm } from 'antd'
 import { FormItemProps } from 'antd/lib/form/FormItem'
 import SelectCategory from '../../components/select-catogory'
 import { CategoryModel } from '../../types/category'
@@ -8,14 +8,8 @@ import * as s from './index.styl'
 import * as duckCategory from '../../ducks/category-duck'
 
 
-const EditableCell = ({ editable, value, onChange }) => (
-  <div>
-    {editable
-      ? <Input style={{ margin: '-5px 0' }} value={value} onChange={e => onChange(e.target.value)} />
-      : value
-    }
-  </div>
-)
+type Category = { editable?: boolean } & CategoryModel
+
 
 export interface StateProps {
   categorys: CategoryModel[],
@@ -29,7 +23,8 @@ interface State {
     name: string
     validateStatus: FormItemProps['validateStatus']
     errMsg: string
-  }
+  },
+  cacheData: Category[]
 }
 
 class Index extends React.Component<StateProps & DispatchProp<duckCategory.DispatchProps>, State> {
@@ -50,16 +45,52 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
         title: 'Icon',
         dataIndex: 'icon',
         key: 'icon',
+        // (_, record: Category) => this.renderColumns(_, record, 'name')
+        render: (_, category: Category) => (
+          <div>
+            {
+              <SelectCategory
+                icon={process.env.PUBLIC_URL + category.icon}
+                changeIcon={icon => this.handleChangeColumnIcon(icon, category._id)}
+              />
+            }
+          </div>
+        )
       }, {
         title: '分类',
         dataIndex: 'name',
         key: 'name',
+        render: (text, category: Category) => (
+          <div>
+            {category.editable
+              ? <Input
+                style={{ margin: '-5px 0' }}
+                value={text}
+                onChange={e => this.handleColumnChange(e.target.value, category._id)}
+              />
+              : text
+            }
+          </div>
+        )
       }, {
         title: '操作',
         key: 'action',
-        render: (text, record) => (
+        render: (_, category: Category) => (
           <span className={s.tableCellOp}>
-            <Button icon="edit" type="primary" />
+            {
+              category.editable ?
+                (
+                  <span>
+                    <Popconfirm title="确定是否保存?" onConfirm={() => this.save(category._id)}>
+                      {
+                        // onClick={() => this.edit(category, false)}
+                      }
+                      <Button icon="save" type="primary" />
+                    </Popconfirm>
+                    <Button icon="close" onClick={() => this.removeCache(category._id)} />
+                  </span>) :
+                <Button icon="edit" type="primary" onClick={() => this.edit(category, true)} />
+            }
             <Button icon="delete" type="danger" />
           </span>
         )
@@ -72,31 +103,58 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
       name: '',
       validateStatus: 'success',
       errMsg: '',
+    },
+    cacheData: []
+  }
+
+  // 编辑项
+  edit(category: Category, editable: boolean) {
+    const cate = this.props.categorys.find(item => item._id === category._id)
+    if (cate && this.props.dispatch) {
+      // (cate as Category).editable = true
+      if (editable) {
+        (cate as Category).editable = true
+      } else {
+        delete (cate as Category).editable
+        this.removeCache(cate._id)
+      }
+      this.props.dispatch(duckCategory.actions.edit(category._id, cate))
     }
   }
 
-  renderColumns(text: any, record: any, column: string) {
-    return (
-      <EditableCell
-        editable={record.editable}
-        value={text}
-        onChange={value => this.handleColumnChange(value, record._id, column)}
-      />
-    )
+  // 取消编辑
+  chancel(id: string) {
+    const category = this.removeCache(id)
+    const cate = this.props.categorys.find(item => item._id === id)
+    if (cate && this.props.dispatch) {
+      delete (cate as Category).editable
+      this.props.dispatch(duckCategory.actions.edit(id, cate))
+    }
   }
 
-
-  handleColumnChange(value: string, key: string, column: string) {
-    console.log('handleColumnChange')
-    console.log(arguments)
-    // const category =  this.props.categorys.find()
-    
+  // 移除缓存
+  removeCache(id: string) {
+    const cacheDataIndex = this.state.cacheData.findIndex(item => item._id === id)
+    if (~cacheDataIndex) {
+      const newData = [...this.state.cacheData]
+      const category = newData.splice(cacheDataIndex, 1)
+      this.setState({
+        cacheData: newData
+      })
+      return category[0]
+    }
+    return null
   }
 
-
-  edit(key: string) {
-    console.log('edit')
-    console.log(arguments)
+  // 保存编辑
+  save(id: string) {
+    const cate = this.props.categorys.find(item => item._id === id)
+    if (cate && this.props.dispatch) {
+      const category = { ...cate } as Category
+      Object.assign(category, this.state.cacheData.find(item => id === item._id))
+      this.removeCache(id)
+      this.props.dispatch(duckCategory.actions.edit(id, cate))
+    }
   }
 
   setEditModel = (editModel: {
@@ -114,17 +172,32 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
     this.setState(state)
     return state
   }
-  showModal = () => {
-    this.setState({
-      visible: true,
-    })
+
+
+
+
+  handleColumnChange(value: string, id: string) {
+    // const category =  this.props.categorys.find()
+    const newData = [...this.state.cacheData]
+    const cate = newData.find(item => item._id === id)
+    if (cate) {
+      cate.name = value
+      this.setState({
+        cacheData: newData,
+      })
+    }
   }
 
-  handleOk = (e) => {
-    console.log(e)
-    this.setState({
-      visible: false
-    })
+
+  handleChangeColumnIcon(icon: string, id: string) {
+    const newData = [...this.state.cacheData]
+    const cate = newData.find(item => item._id === id)
+    if (cate) {
+      cate.icon = icon
+      this.setState({
+        cacheData: newData,
+      })
+    }
   }
 
   handleCancel = (e) => {
@@ -138,6 +211,7 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
       name: e.target.value
     })
   }
+
 
   handleChangeIcon = (icon: string) => {
     this.setEditModel({
@@ -224,6 +298,7 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
         <Row>
           <Col span={24}>
             <Table
+              rowKey="_id"
               columns={this.columns}
               dataSource={this.props.categorys}
               bordered={true}
