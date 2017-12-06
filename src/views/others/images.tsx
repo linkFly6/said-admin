@@ -32,13 +32,14 @@ export default class ImageManager extends React.Component<StateProps> {
     if (!fileList[0].type.includes('image')) {
       message.error('拖图片！')
     }
-    const filePrevs = []
+    const previewList = [] as string[]
     const reader = new FileReader()
     reader.readAsDataURL(fileList[0])
     reader.onload = (event) => {
-      // console.log(event.target.result as any)
+      const target = event.target as any
+      previewList.push(target.result)
+      this.setState((prevState: PrevState) => ({images: [...prevState.images, ...previewList]}))
     }
-    this.setState((prevState: PrevState) => [...prevState.images, fileList[0]])
     e.stopPropagation()
     e.preventDefault()
     return false
