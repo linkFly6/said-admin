@@ -5,6 +5,7 @@ import * as s from './index.styl'
 interface StateProp {
   icon?: string
   name?: string
+  disabled?: boolean
   changeIcon?: (src: string) => void
 }
 
@@ -36,6 +37,13 @@ export default class SelectCategory extends React.Component<StateProp> {
     if (this.props.changeIcon) this.props.changeIcon(src)
   }
   render() {
+    if (this.props.disabled) {
+      return (
+        <div className={`${s.component} ${s.selectCategory}`}>
+          <img src={this.props.icon} />
+        </div>
+      )
+    }
     return (
       <Popover
         content={
@@ -55,7 +63,7 @@ export default class SelectCategory extends React.Component<StateProp> {
         placement="bottomLeft"
         onVisibleChange={this.handleVisibleChange}
       >
-        <div className={`${s.component} ${s.selectCategory}`}>
+        <div className={`${s.component} ${s.selectCategory} ${s.touch}`}>
           <img src={this.props.icon} />
         </div>
       </Popover>

@@ -6,9 +6,7 @@ import SelectCategory from '../../components/select-catogory'
 import { CategoryModel } from '../../types/category'
 import * as s from './index.styl'
 import * as duckCategory from '../../ducks/category-duck'
-
-
-type Category = { editable?: boolean } & CategoryModel
+import { Map } from 'immutable'
 
 
 export interface StateProps {
@@ -24,13 +22,19 @@ interface State {
     validateStatus: FormItemProps['validateStatus']
     errMsg: string
   },
-  cacheData: Category[]
+  cacheData: Map<string, CategoryModel>
 }
 
 class Index extends React.Component<StateProps & DispatchProp<duckCategory.DispatchProps>, State> {
   columns: (
     { title: string; dataIndex: string; key: string; }
     | { title: string; key: string; render: (text: any, record: any) => JSX.Element; })[]
+  
+
+  /**
+   * 大体的编辑思路上就是将编辑项放入 cache 中，然后一直编辑 cache，保存的时候再更新到 store
+   * @param props 
+   */
 
   constructor(props: StateProps & DispatchProp<duckCategory.DispatchProps>) {
     super(props)
@@ -45,12 +49,15 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
         title: 'Icon',
         dataIndex: 'icon',
         key: 'icon',
-        // (_, record: Category) => this.renderColumns(_, record, 'name')
-        render: (_, category: Category) => (
+        render: (_, category: CategoryModel) => (
           <div>
             {
               <SelectCategory
-                icon={process.env.PUBLIC_URL + category.icon}
+                icon={
+                  process.env.PUBLIC_URL + '' + 
+                  (this.hasCache(category._id) ? this.getCache(category._id).icon : category.icon)
+                }
+                disabled={!this.hasCache(category._id)}
                 changeIcon={icon => this.handleChangeColumnIcon(icon, category._id)}
               />
             }
@@ -60,25 +67,29 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
         title: '分类',
         dataIndex: 'name',
         key: 'name',
-        render: (text, category: Category) => (
-          <div>
-            {category.editable
-              ? <Input
-                style={{ margin: '-5px 0' }}
-                value={text}
-                onChange={e => this.handleColumnChange(e.target.value, category._id)}
-              />
-              : text
-            }
-          </div>
-        )
+        render: (text, category: CategoryModel) => {
+          if (this.hasCache(category._id)) {
+            return (
+              <div>
+                <Input
+                  style={{ margin: '-5px 0' }}
+                  value={this.state.cacheData.get(category._id).name}
+                  onChange={e => this.handleColumnChange(e.target.value, category._id)}
+                />
+              </div>
+            )
+          } else {
+            return (<div>{text}</div>)
+          }
+        },
       }, {
         title: '操作',
         key: 'action',
-        render: (_, category: Category) => (
+        render: (_, category: CategoryModel) => (
           <span className={s.tableCellOp}>
             {
-              category.editable ?
+              // category.editable ?
+              this.hasCache(category._id) ?
                 (
                   <span>
                     <Popconfirm title="确定是否保存?" onConfirm={() => this.save(category._id)}>
@@ -89,9 +100,12 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
                     </Popconfirm>
                     <Button icon="close" onClick={() => this.removeCache(category._id)} />
                   </span>) :
-                <Button icon="edit" type="primary" onClick={() => this.edit(category, true)} />
+                <span>
+                  <Button icon="edit" type="primary" onClick={() => this.edit(category)} />
+                  <Button icon="delete" type="danger" />
+                </span>
             }
-            <Button icon="delete" type="danger" />
+
           </span>
         )
       }]
@@ -104,56 +118,47 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
       validateStatus: 'success',
       errMsg: '',
     },
-    cacheData: []
+    cacheData: Map<string, CategoryModel>()
   }
 
-  // 编辑项
-  edit(category: Category, editable: boolean) {
-    const cate = this.props.categorys.find(item => item._id === category._id)
-    if (cate && this.props.dispatch) {
-      // (cate as Category).editable = true
-      if (editable) {
-        (cate as Category).editable = true
-      } else {
-        delete (cate as Category).editable
-        this.removeCache(cate._id)
-      }
-      this.props.dispatch(duckCategory.actions.edit(category._id, cate))
-    }
+  // 一些工具函数
+
+  getCache(categoryId: string) {
+    return this.state.cacheData.get(categoryId)
+  }
+  hasCache(categoryId: string) {
+    return this.state.cacheData.has(categoryId)
+  }
+  updateCache(categoryId: string, catetory: { icon?: string, name?: string }) {
+    this.setState({
+      cacheData: this.state.cacheData.update(
+        categoryId,
+        item => {
+          return Object.assign({}, item, catetory)
+        }
+      ),
+    })
   }
 
-  // 取消编辑
-  chancel(id: string) {
-    const category = this.removeCache(id)
-    const cate = this.props.categorys.find(item => item._id === id)
-    if (cate && this.props.dispatch) {
-      delete (cate as Category).editable
-      this.props.dispatch(duckCategory.actions.edit(id, cate))
-    }
+  // 编辑模式
+  edit(category: CategoryModel) {
+    this.setState({
+      cacheData: this.state.cacheData.set(category._id, category)
+    })
   }
 
   // 移除缓存
-  removeCache(id: string) {
-    const cacheDataIndex = this.state.cacheData.findIndex(item => item._id === id)
-    if (~cacheDataIndex) {
-      const newData = [...this.state.cacheData]
-      const category = newData.splice(cacheDataIndex, 1)
-      this.setState({
-        cacheData: newData
-      })
-      return category[0]
-    }
-    return null
+  removeCache(categoryId: string) {
+    this.setState({
+      cacheData: this.state.cacheData.remove(categoryId)
+    })
   }
-
   // 保存编辑
-  save(id: string) {
-    const cate = this.props.categorys.find(item => item._id === id)
-    if (cate && this.props.dispatch) {
-      const category = { ...cate } as Category
-      Object.assign(category, this.state.cacheData.find(item => id === item._id))
-      this.removeCache(id)
-      this.props.dispatch(duckCategory.actions.edit(id, cate))
+  save(categoryId: string) {
+    const category = this.state.cacheData.get(categoryId)
+    if (this.props.dispatch) {
+      this.removeCache(categoryId)
+      this.props.dispatch(duckCategory.actions.edit(categoryId, category))
     }
   }
 
@@ -174,30 +179,13 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
   }
 
 
-
-
-  handleColumnChange(value: string, id: string) {
-    // const category =  this.props.categorys.find()
-    const newData = [...this.state.cacheData]
-    const cate = newData.find(item => item._id === id)
-    if (cate) {
-      cate.name = value
-      this.setState({
-        cacheData: newData,
-      })
-    }
+  handleColumnChange(value: string, categoryId: string) {
+    this.updateCache(categoryId, { name: value })
   }
 
 
-  handleChangeColumnIcon(icon: string, id: string) {
-    const newData = [...this.state.cacheData]
-    const cate = newData.find(item => item._id === id)
-    if (cate) {
-      cate.icon = icon
-      this.setState({
-        cacheData: newData,
-      })
-    }
+  handleChangeColumnIcon(icon: string, categoryId: string) {
+    this.updateCache(categoryId, { icon })
   }
 
   handleCancel = (e) => {
