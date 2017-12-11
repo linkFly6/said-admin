@@ -9,12 +9,6 @@ interface PrevState {
   images: string[]
 }
 
-interface EventTarget1 {
-  target: {
-    result: string
-  }
-}
-
 export default class ImageManager extends React.Component<StateProps> {
   state = {
     images: ['http://t2.hddhhn.com/uploads/tu/201607/176/efqomc0rcmu.jpg']
@@ -29,20 +23,22 @@ export default class ImageManager extends React.Component<StateProps> {
     if (fileList.length === 0) {
       return
     }
-    if (!fileList[0].type.includes('image')) {
-      message.error('拖图片！')
-    }
-    const previewList = [] as string[]
-    const reader = new FileReader()
-    reader.readAsDataURL(fileList[0])
-    reader.onload = (event) => {
-      const target = event.target as any
-      previewList.push(target.result)
-      this.setState((prevState: PrevState) => ({images: [...prevState.images, ...previewList]}))
-    }
+    this.previewImages(fileList)
     e.stopPropagation()
     e.preventDefault()
     return false
+  }
+
+  previewImages = files => {
+    Array.from(files as any[]).filter(file => file.type.includes('image')).forEach(img => {
+      const reader = new FileReader()
+      reader.readAsDataURL(img)
+      reader.onload = e => {
+        const target = e.target as any
+        const { result } = target
+        this.setState((prevState: PrevState) => ({images: [...prevState.images, result]}) )
+      }
+    })
   }
 
   handleDragOver = e => {
@@ -70,7 +66,6 @@ export default class ImageManager extends React.Component<StateProps> {
         <Card hoverable={false} title="图片管理" bodyStyle={{ padding: 0 }}>
           {this.renderImageList()}
         </Card>
-
       </Layout>
     )
   }
