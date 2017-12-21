@@ -7,9 +7,7 @@ interface StateProps {
     src: string,
     name: string
   },
-  showPreview: {
-    (): never
-  }
+  showPreview: () => never
 }
 
 interface PrevState {
