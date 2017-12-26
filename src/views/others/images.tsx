@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Card, Collapse, Icon, Modal } from 'antd'
+import { Card, Collapse, Icon, Modal, Upload } from 'antd'
 import * as s from './index.styl'
 
 interface StateProps {
@@ -69,11 +69,11 @@ const { Panel } = Collapse
 }*/
 
 class Grid extends React.Component<StateProps> {
-  handlePreview = () => {
+  handlePreview = e => {
     const { img: { src }, showPreview } = this.props as any
     showPreview({
       previewVisible: true,
-      previewImage: src
+      previewImage  : src
     })
   }
 
@@ -87,6 +87,8 @@ class Grid extends React.Component<StateProps> {
         <div className={s.gridMask}>
         <span className={s.gridIcons}>
           <Icon type="eye-o" style={{ color: '#fff' }} onClick={this.handlePreview} />
+          &nbsp;&nbsp;
+          <Icon type="delete" style={{ color: '#fff' }} onClick={this.handlePreview} />
         </span>
         </div>
       </Card.Grid>
@@ -96,9 +98,9 @@ class Grid extends React.Component<StateProps> {
 
 export default class ImageManager extends React.Component<StateProps> {
   state = {
-    imageList: [],
+    imageList     : [],
     previewVisible: false,
-    previewImage: ''
+    previewImage  : ''
   }
 
   componentDidMount() {
@@ -115,6 +117,12 @@ export default class ImageManager extends React.Component<StateProps> {
 
   render() {
     const { imageList, previewVisible, previewImage } = this.state
+    const uploadButton = (
+      <div className={s.upload}>
+        <Icon type="plus" />
+        <div className="ant-upload-text">Upload</div>
+      </div>
+    )
     return (
       <div>
         <Collapse activeKey={['1', '2', '3', '4']}>
@@ -125,13 +133,22 @@ export default class ImageManager extends React.Component<StateProps> {
                   <Grid key={Math.random()} img={i} showPreview={this.setState.bind(this)} />
                 )
               }
+              <Card.Grid className={s.cardGrid}>
+                <Upload
+                  name="avatar"
+                  showUploadList={false}
+                  action="//jsonplaceholder.typicode.com/posts/"
+                >
+                  {uploadButton}
+                </Upload>
+              </Card.Grid>
             </Card>
           </Panel>
           <Panel header="生活" key="2">11</Panel>
           <Panel header="生活" key="3">11</Panel>
           <Panel header="生活" key="4">11</Panel>
         </Collapse>
-        <Modal visible={previewVisible} footer={null} onCancel={() => {this.setState({previewVisible: false})}}>
+        <Modal visible={previewVisible} footer={null} onCancel={() => {this.setState({ previewVisible: false })}}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
       </div>
