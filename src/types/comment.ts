@@ -20,5 +20,10 @@ export interface CommentModel {
   /**
    * 针对评论的回复
    */
-  replys: ReplyModel[]
+  replys: ReplyModel[],
+
+  /**
+   * 创建时间
+   */
+  createTime: number,
 }

@@ -73,6 +73,14 @@ export interface BlogModel {
      * 评论数
      */
     commentCount?: number,
+    /**
+     * 创建时间
+     */
+    createTime: number,
+    /**
+     * 最后一次更新时间
+     */
+    updateTime: number,
   }
   /**
    * 配置

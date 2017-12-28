@@ -21,4 +21,8 @@ export interface ReplyModel {
    * 回复 HTML
    */
   contextHTML: string
+  /**
+   * 创建时间
+   */
+  createTime: number
 }
