@@ -13,6 +13,10 @@ export interface BlogModel {
    */
   _id: string,
   /**
+   * 日志标题
+   */
+  title: string,
+  /**
    * 标记，可以自定义，也可以自动生成，url 中使用
    */
   urlKey: string,
@@ -36,6 +40,10 @@ export interface BlogModel {
    * 分类
    */
   category: CategoryModel,
+  /**
+   * 发布时间时间戳
+   */
+  createTime: number,
   /**
    * 处理过后的资源
    */
@@ -64,7 +72,7 @@ export interface BlogModel {
     /**
      * 访问量
      */
-    pv: number,
+    pv?: number,
     /**
      * 喜欢数
      */
@@ -101,14 +109,14 @@ export interface BlogModel {
     /**
      * script 脚本
      */
-    script: string,
+    script?: string,
     /**
      * css 脚本
      */
-    css: string,
+    css?: string,
     /**
      * 访问密码
      */
-    password: string,
+    password?: string,
   }
 }

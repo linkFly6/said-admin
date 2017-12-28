@@ -48,9 +48,6 @@ const options: any = [
 
 class AddBlog extends React.Component<FormComponentProps & StateProps> {
 
-  // tslint:disable-next-line:no-empty
-  onToggleCustom(checked: boolean) { }
-
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
     return (
