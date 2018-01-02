@@ -4,7 +4,7 @@
 */
 // import Promise from 'Promise'
 // actionTypes
-import { SaidDemoModel } from '../types/said'
+import { SaidDemoModel } from '../types/article'
 import { Dispatch, DispatchProp } from 'react-redux'
 
 

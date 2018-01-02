@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Table, Button } from 'antd'
 import { connect } from 'react-redux'
-import { SaidDemoModel } from '../../types/said'
+import { SaidDemoModel } from '../../types/article'
 import store from '../../ducks'
 import * as duckSaid from '../../ducks/said-duck'
 

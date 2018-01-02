@@ -112,5 +112,9 @@ export interface SaidModel {
      * css 脚本
      */
     css?: string,
+    /**
+     * 访问密码
+     */
+    password: string,
   }
 }

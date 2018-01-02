@@ -5,7 +5,7 @@ import { actions, ActionAdd, constants } from '../../ducks/said-duck'
 // import { saidType }  from  '../../constants'
 import Index from '../../views/said'
 import { bindActionCreators, Dispatch } from 'redux'
-import { SaidDemoModel } from '../../types/said'
+import { SaidDemoModel } from '../../types/article'
 
 
 export interface StateProps {
