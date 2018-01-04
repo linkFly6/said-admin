@@ -7,10 +7,11 @@ import zhCN from 'antd/lib/locale-provider/zh_CN'
 import App from './views/App'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, HashRouter } from 'react-router-dom'
-import { Router } from 'react-router'
+import { Router, Switch } from 'react-router'
 import history from './assets/js/history'
 import store from './ducks'
 import { RouteComponentProps } from 'react-router-dom'
+import Login from './containers/home/login'
 
 ReactDOM.render(
   <LocaleProvider locale={zhCN}>
@@ -23,7 +24,11 @@ ReactDOM.render(
     </BrowserRouter> */}
       <BrowserRouter>
         <Router history={history}>
-          <App { ...({} as RouteComponentProps<any>) } />
+          <Switch>
+            {/* <App { ...({} as RouteComponentProps<any>) } /> */}
+            <Route path="/login" component={Login} exact/>
+            <Route path="/" component={App} exact/>
+          </Switch>
         </Router>
       </BrowserRouter>
     </Provider>
