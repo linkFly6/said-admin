@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Button, Row, Col, Table, Icon } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import * as s from './index.styl'
-
+import { inject, observer } from 'mobx-react'
 
 
 const columns = [{
@@ -39,7 +39,8 @@ const columns = [{
 
 export interface StateProps { }
 
-
+@observer
+@inject('store')
 class Index extends React.Component<FormComponentProps & StateProps> {
   render() {
     return (

@@ -5,12 +5,14 @@ import './assets/fonts/iconfont.css'
 import { LocaleProvider } from 'antd'
 import zhCN from 'antd/lib/locale-provider/zh_CN'
 import App from './views/App'
-import { Provider } from 'react-redux'
+// import { Provider } from 'react-redux'
 import { BrowserRouter, Route, HashRouter } from 'react-router-dom'
 import { Router, Switch } from 'react-router'
 import history from './assets/js/history'
-import store from './ducks'
-import Login from './containers/home/login'
+// import store from './ducks'
+import Login from './views/home/login'
+import store from './store'
+import { Provider } from 'mobx-react'
 
 ReactDOM.render(
   <LocaleProvider locale={zhCN}>
@@ -25,8 +27,8 @@ ReactDOM.render(
         <Router history={history}>
           <Switch>
             {/* <App { ...({} as RouteComponentProps<any>) } /> */}
-            <Route path="/login" component={Login}/>
-            <Route path="/" component={App}/>
+            <Route path="/login" component={Login} />
+            <Route path="/" component={App} />
           </Switch>
         </Router>
       </BrowserRouter>

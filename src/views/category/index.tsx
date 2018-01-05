@@ -1,16 +1,16 @@
 import * as React from 'react'
-import { DispatchProp } from 'react-redux'
 import { Button, Row, Col, Table, Icon, Modal, Form, Input, Popconfirm } from 'antd'
 import { FormItemProps } from 'antd/lib/form/FormItem'
 import SelectCategory from '../../components/select-catogory'
 import { CategoryModel } from '../../types/category'
 import * as s from './index.styl'
-import * as duckCategory from '../../ducks/category-duck'
 import { Map } from 'immutable'
+import { inject, observer } from 'mobx-react'
+import { CategoryStore } from '../../store/category'
 
 
 export interface StateProps {
-  categorys: CategoryModel[],
+  category: CategoryStore
 }
 
 
@@ -25,18 +25,20 @@ interface State {
   cacheData: Map<string, CategoryModel>
 }
 
-class Index extends React.Component<StateProps & DispatchProp<duckCategory.DispatchProps>, State> {
+@inject((allStores: any) => ({
+  category: allStores.store.category
+}))
+@observer
+export default class Index extends React.Component<StateProps, State> {
   columns: (
     { title: string; dataIndex: string; key: string; }
     | { title: string; key: string; render: (text: any, record: any) => JSX.Element; })[]
-  
-
   /**
    * 大体的编辑思路上就是将编辑项放入 cache 中，然后一直编辑 cache，保存的时候再更新到 store
    * @param props 
    */
 
-  constructor(props: StateProps & DispatchProp<duckCategory.DispatchProps>) {
+  constructor(props: StateProps) {
     super(props)
     this.columns = [
       // {
@@ -54,7 +56,7 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
             {
               <SelectCategory
                 icon={
-                  process.env.PUBLIC_URL + '' + 
+                  process.env.PUBLIC_URL + '' +
                   (this.hasCache(category._id) ? this.getCache(category._id).icon : category.icon)
                 }
                 disabled={!this.hasCache(category._id)}
@@ -156,10 +158,8 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
   // 保存编辑
   save(categoryId: string) {
     const category = this.state.cacheData.get(categoryId)
-    if (this.props.dispatch) {
-      this.removeCache(categoryId)
-      this.props.dispatch(duckCategory.actions.edit(categoryId, category))
-    }
+    this.removeCache(categoryId)
+    this.props.category.edit(category)
   }
 
   setEditModel = (editModel: {
@@ -236,13 +236,11 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
 
   handleAddCategory = () => {
     if (!this.validateAddCategory()) return
-    if (this.props.dispatch) {
-      this.props.dispatch(duckCategory.actions.add({
-        _id: Math.random().toString(),
-        name: this.state.editModel.name,
-        icon: this.state.editModel.icon,
-      }))
-    }
+    this.props.category.add({
+      _id: Math.random().toString(),
+      name: this.state.editModel.name,
+      icon: this.state.editModel.icon,
+    })
   }
 
   render() {
@@ -288,7 +286,8 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
             <Table
               rowKey="_id"
               columns={this.columns}
-              dataSource={this.props.categorys}
+              // 因为 mbox 将 array 进行包装(模拟 array)，所以如果使用 Array.isArray 判断肯定是 false，所以可以将它转换成真正的数组
+              dataSource={this.props.category.categorys.slice()}
               bordered={true}
             />
           </Col>
@@ -298,4 +297,3 @@ class Index extends React.Component<StateProps & DispatchProp<duckCategory.Dispa
   }
 }
 
-export default Index

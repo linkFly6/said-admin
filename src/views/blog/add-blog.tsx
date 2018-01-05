@@ -4,7 +4,7 @@ import { Button, Form, Input, Row, Col, AutoComplete, Switch, Collapse } from 'a
 import SaidEditor from '../../components/said-editor/editor'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import * as s from './add-blog.styl'
-
+import { inject, observer } from 'mobx-react'
 
 
 class FormItem extends React.Component<{}> {
@@ -46,6 +46,9 @@ const options: any = [
   )
 ]
 
+
+@inject('store')
+@observer
 class AddBlog extends React.Component<FormComponentProps & StateProps> {
 
   render() {

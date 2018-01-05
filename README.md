@@ -36,8 +36,59 @@ npm start
   - 分类管理 (标签待定开发)
   - 首页
 
+### mbox
 
-### redux
+考虑到 `redux` 太恶心...使用了 `mbox`，使用起来非常方便。
+
+1. 编写 `store` (src/store/xxx.ts)
+
+```ts
+import { observable, computed, observe, action } from 'mobx'
+import { CategoryModel } from '../types/category'
+
+
+export class CategoryStore {
+  @observable categorys: CategoryModel[] = []
+
+  @action.bound
+  add(category: CategoryModel) {
+    this.categorys.push(category)
+  }
+}
+```
+
+2. 在组件中引入 (src/view/xxx.tsx)：
+
+```tsx
+import { inject, observer } from 'mobx-react'
+
+export interface StateProps {
+  category: CategoryStore
+}
+
+
+@inject((allStores: any) => ({
+  category: allStores.store.category
+}))
+@observer
+export default class Index extends React.Component<StateProps> {
+  constructor(props: StateProps) {
+    super(props)
+    // props.category => 指向的 category store
+  }
+}
+```
+
+无状态组件可以这样引入：
+
+```tsx
+// 无状态组件用这种方式绑定
+export default inject('store')(observer(function ({ articles }: StateProps) {
+}
+```
+
+
+### ~~redux(已废弃)~~
 
 想要在 `view` 引入 `redux` 目前关联项比较多（虽然引入 `ducks` 已经统一了很多关联项），后续会持续优化这个环节，先踩坑再跳坑。
 

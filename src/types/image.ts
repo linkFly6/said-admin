@@ -15,9 +15,9 @@ export enum ImageType {
    */
   Music = 2,
   /**
-   * Said图片
+   * 文章图片
    */
-  Said = 3,
+  Article = 3,
   /**
    * Icon
    */

@@ -9,11 +9,11 @@ import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps }
 import Home from './home'
 import { Images } from './others'
 // import Said from './said'
-import Said from '../containers/said'
-import SaidAdd from '../containers/said/add'
-import Blog from '../containers/blog'
-import BlogAdd from '../containers/blog/add'
-import Category from '../containers/category'
+import Said from '../views/said'
+import SaidAdd from '../views/said/add-said'
+import Blog from '../views/blog'
+import BlogAdd from '../views/blog/add-blog'
+import Category from '../views/category'
 
 
 const { SubMenu } = Menu

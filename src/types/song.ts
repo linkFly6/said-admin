@@ -14,7 +14,7 @@ export interface SongModel {
     /**
      * 文件类型
      */
-    fileType: number,
+    fileType: string,
     /**
      * 大小（kb）
      */
@@ -30,7 +30,7 @@ export interface SongModel {
     /**
      * 发行日期
      */
-    releaseDate: Date,
+    releaseDate: number,
     /**
      * 时长（ms）
      */

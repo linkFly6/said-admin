@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { Card, Collapse, Icon, Modal, Upload } from 'antd'
 import * as s from './index.styl'
+import { inject, observer } from 'mobx-react'
+
 
 interface StateProps {
   img: {
@@ -73,7 +75,7 @@ class Grid extends React.Component<StateProps> {
     const { img: { src }, showPreview } = this.props as any
     showPreview({
       previewVisible: true,
-      previewImage  : src
+      previewImage: src
     })
   }
 
@@ -85,31 +87,33 @@ class Grid extends React.Component<StateProps> {
           <img src={src} alt={name} />
         </div>
         <div className={s.gridMask}>
-        <span className={s.gridIcons}>
-          <Icon type="eye-o" style={{ color: '#fff' }} onClick={this.handlePreview} />
-          &nbsp;&nbsp;
+          <span className={s.gridIcons}>
+            <Icon type="eye-o" style={{ color: '#fff' }} onClick={this.handlePreview} />
+            &nbsp;&nbsp;
           <Icon type="delete" style={{ color: '#fff' }} onClick={this.handlePreview} />
-        </span>
+          </span>
         </div>
       </Card.Grid>
     )
   }
 }
 
+@observer
+@inject('store')
 export default class ImageManager extends React.Component<StateProps> {
   state = {
-    imageList     : [],
+    imageList: [],
     previewVisible: false,
-    previewImage  : ''
+    previewImage: ''
   }
 
   componentDidMount() {
     this.setState({
       imageList: [{
-        src : 'http://t2.hddhhn.com/uploads/tu/201607/176/efqomc0rcmu.jpg',
+        src: 'http://t2.hddhhn.com/uploads/tu/201607/176/efqomc0rcmu.jpg',
         name: '404'
       }, {
-        src : 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        src: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
         name: 'tea'
       }]
     })
@@ -148,7 +152,7 @@ export default class ImageManager extends React.Component<StateProps> {
           <Panel header="生活" key="3">11</Panel>
           <Panel header="生活" key="4">11</Panel>
         </Collapse>
-        <Modal visible={previewVisible} footer={null} onCancel={() => {this.setState({ previewVisible: false })}}>
+        <Modal visible={previewVisible} footer={null} onCancel={() => { this.setState({ previewVisible: false }) }}>
           <img alt="example" style={{ width: '100%' }} src={previewImage} />
         </Modal>
       </div>
