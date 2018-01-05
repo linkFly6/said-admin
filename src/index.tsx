@@ -10,7 +10,6 @@ import { BrowserRouter, Route, HashRouter } from 'react-router-dom'
 import { Router, Switch } from 'react-router'
 import history from './assets/js/history'
 import store from './ducks'
-import { RouteComponentProps } from 'react-router-dom'
 import Login from './containers/home/login'
 
 ReactDOM.render(
@@ -26,8 +25,8 @@ ReactDOM.render(
         <Router history={history}>
           <Switch>
             {/* <App { ...({} as RouteComponentProps<any>) } /> */}
-            <Route path="/login" component={Login} exact/>
-            <Route path="/" component={App} exact/>
+            <Route path="/login" component={Login}/>
+            <Route path="/" component={App}/>
           </Switch>
         </Router>
       </BrowserRouter>

@@ -3,3 +3,4 @@ export const login: string;
 export const container: string;
 export const loginConteainer: string;
 export const center: string;
+export const logo: string;

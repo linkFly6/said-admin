@@ -13,8 +13,8 @@ import { bindActionCreators } from 'redux'
  */
 
 // 建立一个从（外部的）state对象到（UI 组件的）props对象的映射关系
-const mapStateToProps = (state: StateProps) => ({
-})
+// const mapStateToProps = (state: StateProps) => ({
+// })
 
 
 
@@ -37,4 +37,4 @@ const mapStateToProps = (state: StateProps) => ({
 //   };
 // }
 
-export default connect(mapStateToProps)(Login)
+export default connect()(Login)

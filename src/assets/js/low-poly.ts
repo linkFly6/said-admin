@@ -17,19 +17,20 @@ let polygonCache: {
   }
 } = {}
 
-const createKey = () => {
-  return `${(Math.random() * 10) | 0}${Date.now()}`
-}
-
-
+const createKey = (() => {
+  let index = 0
+  return () => {
+    return index++
+  }
+})()
 
 export function draw(container: Element, refreshDuration: number = 10000) {
-  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
   svg.setAttribute('width', container.clientWidth + '')
   svg.setAttribute('height', container.clientHeight + '')
   container.appendChild(svg)
 
-  var unitSize = (container.clientWidth + container.clientHeight) / 20
+  let unitSize = (container.clientWidth + container.clientHeight) / 20
   numPointsX = Math.ceil(container.clientWidth / unitSize) + 1
   numPointsY = Math.ceil(container.clientHeight / unitSize) + 1
   unitWidth = Math.ceil(container.clientWidth / (numPointsX - 1))
@@ -48,21 +49,23 @@ export function draw(container: Element, refreshDuration: number = 10000) {
 
   for (let i = 0; i < points.length; i++) {
     if (points[i].originX !== unitWidth * (numPointsX - 1) && points[i].originY !== unitHeight * (numPointsY - 1)) {
-      var topLeftX = points[i].x
-      var topLeftY = points[i].y
-      var topRightX = points[i + 1].x
-      var topRightY = points[i + 1].y
-      var bottomLeftX = points[i + numPointsX].x
-      var bottomLeftY = points[i + numPointsX].y
-      var bottomRightX = points[i + numPointsX + 1].x
-      var bottomRightY = points[i + numPointsX + 1].y
+      let topLeftX = points[i].x
+      let topLeftY = points[i].y
+      let topRightX = points[i + 1].x
+      let topRightY = points[i + 1].y
+      let bottomLeftX = points[i + numPointsX].x
+      let bottomLeftY = points[i + numPointsX].y
+      let bottomRightX = points[i + numPointsX + 1].x
+      let bottomRightY = points[i + numPointsX + 1].y
 
-      var rando = Math.floor(Math.random() * 2)
+      let rando = Math.floor(Math.random() * 2)
 
-      for (let n = 0; n < 2; n++) {
+      for (var n = 0; n < 2; n++) {
         let polygon = document.createElementNS(svg.namespaceURI, 'polygon') as any
+
         let key = createKey()
         polygon.setAttribute('key', key)
+
         if (rando === 0) {
           if (n === 0) {
             polygonCache[key] = {
@@ -70,22 +73,15 @@ export function draw(container: Element, refreshDuration: number = 10000) {
               point2: i + numPointsX,
               point3: i + numPointsX + 1
             }
-            polygon.point1 = i
-            polygon.point2 = i + numPointsX
-            polygon.point3 = i + numPointsX + 1
             polygon.setAttribute(
               'points',
               `${topLeftX},${topLeftY} ${bottomLeftX},${bottomLeftY} ${bottomRightX},${bottomRightY}`)
-
           } else if (n === 1) {
             polygonCache[key] = {
               point1: i,
               point2: i + 1,
               point3: i + numPointsX + 1
             }
-            polygon.point1 = i
-            polygon.point2 = i + 1
-            polygon.point3 = i + numPointsX + 1
             polygon.setAttribute(
               'points',
               `${topLeftX},${topLeftY} ${topRightX},${topRightY} ${bottomRightX},${bottomRightY}`)
@@ -97,9 +93,6 @@ export function draw(container: Element, refreshDuration: number = 10000) {
               point2: i + numPointsX,
               point3: i + 1
             }
-            polygon.point1 = i
-            polygon.point2 = i + numPointsX
-            polygon.point3 = i + 1
             polygon.setAttribute(
               'points',
               `${topLeftX},${topLeftY} ${bottomLeftX},${bottomLeftY} ${topRightX},${topRightY}`)
@@ -109,9 +102,6 @@ export function draw(container: Element, refreshDuration: number = 10000) {
               point2: i + 1,
               point3: i + numPointsX + 1
             }
-            polygon.point1 = i + numPointsX
-            polygon.point2 = i + 1
-            polygon.point3 = i + numPointsX + 1
             polygon.setAttribute(
               'points',
               `${bottomLeftX},${bottomLeftY} ${topRightX},${topRightY} ${bottomRightX},${bottomRightY}`)
@@ -134,7 +124,7 @@ export function draw(container: Element, refreshDuration: number = 10000) {
 }
 
 function randomize() {
-  for (var i = 0; i < points!.length; i++) {
+  for (let i = 0; i < points!.length; i++) {
     if (points[i].originX !== 0 && points[i].originX !== unitWidth * (numPointsX - 1)) {
       points[i].x = points[i].originX + Math.random() * unitWidth - unitWidth / 2
     }
@@ -144,27 +134,20 @@ function randomize() {
   }
 }
 
-function refresh(container: Element, refreshDuration: number = 10000) {
+function refresh(container: Element, refreshDuration: number) {
   randomize()
   for (var i = 0; i < container.querySelector('svg')!.childNodes.length; i++) {
-    var polygon = container.querySelector('svg')!.childNodes[i] as any
+    var polygon = container.querySelector('svg')!.childNodes[i] as SVGElement
     var animate = polygon.childNodes[0] as any
     if (animate.getAttribute('to')) {
-      animate.setAttribute('from', animate.getAttribute('to') + '')
+      animate.setAttribute('from', animate.getAttribute('to'))
     }
-    // if (!polygon.getAttribute('key')) continue
-    // let point = polygonCache[polygon.getAttribute('key')!]
-    // animate.setAttribute(
-    //   'to',
-    //   // tslint:disable-next-line:max-line-length
-    //   `${points[point.point1].x},${points[point.point1].y} ${
-    // points[point.point2].x},${points[point.point2].y} ${points[point.point3].x},${points[point.point3].y}`);
-    const wtf = points[polygon.point1].x + ',' + points[polygon.point1].y
-    + ' ' + points[polygon.point2].x + ',' + points[polygon.point2].y + ' ' +
-    points[polygon.point3].x + ',' + points[polygon.point3].y
-    console.log(animate.setAttribute)
-    animate.setAttribute('to', wtf)
-    (animate as any).beginElement()
+    let point = polygonCache[polygon.getAttribute('key')!]
+    animate.setAttribute(
+      'to',
+      `${points[point.point1].x},${points[point.point1].y} ${
+      points[point.point2].x},${points[point.point2].y} ${points[point.point3].x},${points[point.point3].y}`)
+    animate.beginElement()
   }
   refreshTimeout = window.setTimeout(
     function () { refresh(container, refreshDuration) },

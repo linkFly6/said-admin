@@ -13,6 +13,10 @@
 - [stylus](http://stylus-lang.com/)
 
 
+- markdown 解析引擎 - [marked](https://github.com/chjj/marked)/[remarkable](https://github.com/jonschlinkert/remarkable)/[remark](https://github.com/gnab/remark/wiki)
+- 代码高亮引擎 - [prism](https://github.com/PrismJS/prism)/[highlight](https://github.com/isagalaev/highlight.js)
+- 编辑器引擎 - [react-codemirror](https://github.com/JedWatson/react-codemirror)
+
 ## 开发
 
 ```bash
