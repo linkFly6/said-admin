@@ -1,8 +1,14 @@
-import { Returns } from '../models/Returns'
+import { Returns, ReturnsError } from '../models/Returns'
+import { isLoginFailCode } from './user'
 
 
 
-
+function getQueryString(params: object) {
+  var esc = encodeURIComponent
+  return Object.keys(params)
+    .map(k => esc(k) + '=' + esc(params[k]))
+    .join('&')
+}
 /**
  *  通用请求，底层使用 ajax()，对返回结果使用 Promise<Returns> 封装，业务建议使用 fetch
  * @param  {string} [uri] 请求 uri
@@ -15,18 +21,34 @@ import { Returns } from '../models/Returns'
  */
 export const innerFetch = <T>(
   uri: string,
-  data: object,
+  data?: object,
   method = 'get',
-  headers = {},
-  isFormData = false,
-  timeout?: number): Promise<Returns<T>> => {
+  headers = {}): Promise<Returns<T>> => {
   const requestData = data || {}
+  // let url = new URL(uri)
+  // if (data && method === 'get') {
+  //   Object.keys(data).forEach(key => url.searchParams.append(key, data[key]))
+  // }
 
-  return window.fetch(uri, {
+  let options: { method: string, headers: any, body?: string } = {
     method,
-    headers: { 'Content-Type': 'application/json' } as any,
-  }).then(response => {
-    return response.json()
+    headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
+  }
+  if (data) {
+    if (data && method === 'get') {
+      uri = `${~uri.indexOf('?') ? '' : '?'}${getQueryString(data)}`
+    } else {
+      options.body = JSON.stringify(data)
+    }
+  }
+  return window.fetch(uri, options).then(response => {
+    if (response.status >= 200 && response.status < 300) {
+      return response.json()
+    } else {
+      var error = new Error(response.statusText)
+      throw error
+    }
+
   }).then(json => {
     return new Returns<T>(null, json)
   }).catch(err => {
@@ -41,7 +63,6 @@ export const innerFetch = <T>(
  * @param  {string} [data={}] 请求数据
  * @param  {string} [method='get'] http method
  * @param  {object} [headers={}] 请求头
- * @param  {boolean} [isFormData=false] 是否是 FormData（二进制数据）
  * @param  {number} [timeout] 超时时间
  * @return Promise<Returns>
  */
@@ -49,12 +70,10 @@ export function fetch<T>(
   uri: string,
   data: object,
   method: string = 'get',
-  headers: object = {},
-  isFormData: boolean = false,
-  timeout?: number): Promise<Returns<T>> {
+  headers: object = {}): Promise<Returns<T>> {
   // const channelId = window.$store.state['business/user'].channelId
-  return innerFetch<T>(uri, data, method, headers, isFormData, timeout).then((returns: Returns<T>) => {
-    if (!returns.success && (returns.code === 10001 || returns.code === 10000)) {
+  return innerFetch<T>(uri, data, method, headers).then((returns: Returns<T>) => {
+    if (!returns.success && isLoginFailCode(returns.code)) {
       // return new Promise<Returns<T>>((resolve, reject) => {
       //   login(2).then((returns: Returns<Models.State>) => {
       //     // 重试请求，如果还失败的话就只能返回错误了
@@ -86,8 +105,5 @@ export function fetch<T>(
  * @return Promise<Returns>
  */
 export function post<T>(uri: string, data: object, headers?: object) {
-  return fetch<T>(uri, data, 'post', {
-    { 'Content-Type': 'application/json' },
-    ...headers,
-  })
+  return fetch<T>(uri, data, 'post', headers)
 }

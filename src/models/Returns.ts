@@ -1,4 +1,29 @@
 
+export class ReturnsError extends Error {
+  private _code: number
+  public get code(): number {
+    return this._code
+  }
+
+  private _data: any
+  public get data(): any {
+    return this._data
+  }
+
+  private _message: string
+  public get message(): string {
+    return this._message
+  }
+
+  constructor(code: number = -1, message: string = '', data: any) {
+    super(message)
+    this._code = code
+    this._message = message
+    this._data = data
+  }
+}
+
+
 export class Returns<T> {
 
   private _success: boolean
@@ -9,11 +34,11 @@ export class Returns<T> {
     return this._success
   }
 
-  private _error: Error
+  private _error: ReturnsError
   /**
    * 错误对象
    */
-  public get error(): Error {
+  public get error(): ReturnsError {
     return this._error
   }
 
@@ -41,12 +66,13 @@ export class Returns<T> {
     return this._data
   }
   // 将后端返回的数据结果封装为对象
-  constructor(error: any, data: any) {
+  constructor(error: ReturnsError | null, data: any) {
     if (error) {
       this._success = false
       this._code = error.code
       this._message = error.message
       this._error = error
+      this._data = data
     } else {
       this._success = true
     }
