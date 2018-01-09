@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { LogFileModel } from '../../types/dashboard'
-import { Dispatch } from 'redux'
 import { inject, observer } from 'mobx-react'
 
 interface StateProps {

@@ -3,7 +3,6 @@ import { Layout, Menu, Breadcrumb } from 'antd'
 import * as s from './App.styl'
 import Icon from '../components/icon/icon'
 import { ClickParam } from 'antd/lib/menu'
-import { connect } from 'react-redux'
 import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps } from 'react-router-dom'
 
 import Home from './home'
