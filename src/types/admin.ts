@@ -27,11 +27,7 @@ export interface AdminModel {
   /**
    * 用户名
    */
-  userName: string
-  /**
-   * pwd 根据 said 私有公匙和私有私匙进行 RSA 加密
-   */
-  pwd: string
+  username: string
   /**
    * 昵称
    */

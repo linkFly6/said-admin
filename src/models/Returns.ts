@@ -1,25 +1,12 @@
 
 export class ReturnsError extends Error {
-  private _code: number
-  public get code(): number {
-    return this._code
-  }
+  public code: number
+  public data: any
 
-  private _data: any
-  public get data(): any {
-    return this._data
-  }
-
-  private _message: string
-  public get message(): string {
-    return this._message
-  }
-
-  constructor(code: number = -1, message: string = '', data: any) {
+  constructor(code: number = -1, message: string = '', data?: any) {
     super(message)
-    this._code = code
-    this._message = message
-    this._data = data
+    this.code = code
+    this.data = data
   }
 }
 
@@ -66,17 +53,16 @@ export class Returns<T> {
     return this._data
   }
   // 将后端返回的数据结果封装为对象
-  constructor(error: ReturnsError | null, data: any) {
-    if (error) {
+  constructor(obj: { code: number, message: string, data?: any } | ReturnsError) {
+    this._code = obj.code
+    this._data = obj.data
+    this._message = obj.message
+    if (obj instanceof Error) {
+      this._error = obj
       this._success = false
-      this._code = error.code
-      this._message = error.message
-      this._error = error
-      this._data = data
     } else {
-      this._success = true
+      this._success = obj.code === 0
     }
-    this._data = data
   }
   /**
    * 和 success 不同，check() 检查返回正确性(errorCode)之后还会检查数据源是否为空(null\undefined)

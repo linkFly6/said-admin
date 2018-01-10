@@ -2,6 +2,12 @@
   "name": "tasaid",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "node scripts/start.js --env=development",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test.js --env=jsdom"
+  },
+  "proxy": "http://localhost:4000",
   "devDependencies": {
     "@types/immutable": "^3.8.7",
     "@types/js-cookie": "^2.1.0",
@@ -55,11 +61,6 @@
     "webpack-dev-server": "2.7.1",
     "webpack-manifest-plugin": "1.2.1",
     "whatwg-fetch": "2.0.3"
-  },
-  "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
   },
   "jest": {
     "mapCoverage": true,

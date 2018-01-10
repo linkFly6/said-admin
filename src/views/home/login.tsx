@@ -1,27 +1,30 @@
 import * as React from 'react'
 import * as s from './login.styl'
-import { Button, Form, Input } from 'antd'
+import { Button, Form, Input, message } from 'antd'
 import { draw } from '../../assets/js/low-poly'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import { inject, observer } from 'mobx-react'
+import { AdminStore } from '../../store/admin'
+
 
 
 export interface StateProps {
-
+  admin: AdminStore
 }
 
-@inject('store')
+@inject((allStores: any) => ({
+  admin: allStores.store.admin
+}))
 @observer
 class Login extends React.Component<FormComponentProps & StateProps> {
+
+  state = {
+    loading: false
+  }
+
   componentDidMount() {
     const elem = this.refs.container as HTMLDivElement
     draw(elem)
-    // mbox 太爽
-    setInterval(
-      () => {
-        (this.props as any).store.common.demo++
-      },
-      1000)
   }
 
   handleChange = (e: React.KeyboardEvent<any>) => {
@@ -31,8 +34,22 @@ class Login extends React.Component<FormComponentProps & StateProps> {
   }
 
   handleSubmit = () => {
-    this.props.form.validateFields((err, value: { name: string, password: string }) => {
+    this.setState({
+      loading: true
+    })
+    this.props.form.validateFields(async (err, field: { username: string, password: string }) => {
       if (err) {
+        this.setState({
+          loading: false
+        })
+        return
+      }
+      const returns = await this.props.admin.login(field.username, field.password)
+      this.setState({
+        loading: false
+      })
+      if (!returns.check()) {
+        message.error(returns.message)
         return
       }
     })
@@ -44,15 +61,17 @@ class Login extends React.Component<FormComponentProps & StateProps> {
         <div ref="container" className={s.container} />
         <div className={s.loginConteainer}>
           <div className={s.logo} />
-          {(this.props as any).store.common.demo}
           <Form>
             <Form.Item>
               {
                 getFieldDecorator(
-                  'name',
+                  'username',
                   {
                     validateTrigger: ['onChange', 'onBlur'],
-                    rules: [{ required: true, message: '请输入用户名' }],
+                    rules: [
+                      { required: true, message: '请输入用户名', },
+                      { min: 0, max: 40, message: '用户名长度不正确' },
+                    ],
                   })(
                   <Input placeholder="用户名" size="large" onKeyDown={this.handleChange} />
                   )
@@ -64,14 +83,24 @@ class Login extends React.Component<FormComponentProps & StateProps> {
                   'password',
                   {
                     validateTrigger: ['onChange', 'onBlur'],
-                    rules: [{ required: true, message: '请输入密码' }],
+                    rules: [
+                      { required: true, message: '请输入密码' },
+                      { min: 0, max: 30, message: '用户长度不正确' },
+                    ],
                   })(
-                  <Input placeholder="密码" size="large" onKeyDown={this.handleChange} />
+                  <Input type="password" placeholder="密码" size="large" onKeyDown={this.handleChange} />
                   )
               }
             </Form.Item>
             <Form.Item className={s.center}>
-              <Button type="primary" size="large" onClick={this.handleSubmit}>进入</Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={this.handleSubmit}
+                loading={this.state.loading}
+              >
+                进入
+              </Button>
             </Form.Item>
           </Form>
         </div>

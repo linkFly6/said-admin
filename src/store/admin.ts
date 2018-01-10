@@ -39,10 +39,10 @@ export class AdminStore implements SimpleAdmin {
   @observable rule: AdminRule = AdminRule.BLOG
 
   @action
-  login(userName: string, pwd: string) {
-    return innerFetch<SimpleAdmin>('/back/api/user/login', {
-      userName,
-      pwd,
+  login(username: string, password: string) {
+    return innerFetch<SimpleAdmin>('/back/api/login', {
+      username,
+      password,
     }).then((returns) => {
       if (returns.check()) {
         runInAction(() => {

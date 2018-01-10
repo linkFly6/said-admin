@@ -1,7 +1,7 @@
-import { Returns, ReturnsError } from '../models/Returns'
+import { Returns, ReturnsError } from '../models/returns'
 import { isLoginFailCode } from './user'
 
-
+// process.env.NODE_ENV
 
 function getQueryString(params: object) {
   var esc = encodeURIComponent
@@ -36,7 +36,7 @@ export const innerFetch = <T>(
   }
   if (data) {
     if (data && method === 'get') {
-      uri = `${~uri.indexOf('?') ? '' : '?'}${getQueryString(data)}`
+      uri = `${uri}${~uri.indexOf('?') ? '' : '?'}${getQueryString(data)}`
     } else {
       options.body = JSON.stringify(data)
     }
@@ -50,9 +50,12 @@ export const innerFetch = <T>(
     }
 
   }).then(json => {
-    return new Returns<T>(null, json)
+    if (json.code !== 0) {
+      return new Returns<T>(new ReturnsError(json.code, json.message))
+    }
+    return new Returns<T>(json)
   }).catch(err => {
-    return new Returns<T>(err, null)
+    return new Returns<T>(err)
   })
 }
 
