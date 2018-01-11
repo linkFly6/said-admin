@@ -5,18 +5,21 @@ import { draw } from '../../assets/js/low-poly'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import { inject, observer } from 'mobx-react'
 import { AdminStore } from '../../store/admin'
-
-
+import history from '../../assets/js/history'
+import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { deserializeUrl } from '../../service/utils'
 
 export interface StateProps {
   admin: AdminStore
 }
 
+@observer
 @inject((allStores: any) => ({
   admin: allStores.store.admin
 }))
-@observer
-class Login extends React.Component<FormComponentProps & StateProps> {
+@withRouter
+class Login extends React.Component<FormComponentProps & RouteComponentProps<{}> & StateProps> {
+  // class Login extends PageComponent<FormComponentProps & StateProps> {
 
   state = {
     loading: false
@@ -34,6 +37,10 @@ class Login extends React.Component<FormComponentProps & StateProps> {
   }
 
   handleSubmit = () => {
+    // this.props.history.push({
+    //   pathname: '/abldjal',
+    //   search: 'src=/login'
+    // })
     this.setState({
       loading: true
     })
@@ -51,6 +58,13 @@ class Login extends React.Component<FormComponentProps & StateProps> {
       if (!returns.check()) {
         message.error(returns.message)
         return
+      }
+      // 跳转
+      const serach = deserializeUrl<{ src: string }>(this.props.location.search)
+      if (serach.src) {
+        this.props.history.replace(serach.src)
+      } else {
+        this.props.history.replace('/')
       }
     })
   }

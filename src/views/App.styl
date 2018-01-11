@@ -2,6 +2,25 @@
   .app-breadcrumb
     margin 1rem 0
     text-transform capitalize
+  .login-loading
+    text-align center
+    padding-top 5rem
+
+:global(.fade-enter)
+  opacity 0.01
+
+
+:global(.fade-enter.fade-enter-active) 
+  opacity 1
+  transition opacity 1000ms ease-in
+
+
+:global(.fade-exit)
+  opacity: 1
+
+:global(.fade-exit.fade-exit-active) 
+  opacity 0.01
+  transition opacity 800ms ease-in
 //   .app-header
 //       background-color #222
 //       height 150px

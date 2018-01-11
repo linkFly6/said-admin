@@ -1,6 +1,9 @@
 import { observable, computed, observe, action, runInAction } from 'mobx'
 import { AdminRule } from '../types/admin'
 import { innerFetch } from '../service/http'
+import { setCookie } from '../service/utils/store'
+import { RouteComponentProps } from 'react-router-dom'
+import { setUserReadyPromise } from '../service/user'
 
 interface SimpleAdmin {
   token: string
@@ -11,6 +14,7 @@ interface SimpleAdmin {
   rule: AdminRule
 }
 
+export const COOKIENAME = 'token'
 
 export class AdminStore implements SimpleAdmin {
   /**
@@ -44,6 +48,26 @@ export class AdminStore implements SimpleAdmin {
       username,
       password,
     }).then((returns) => {
+      if (returns.check()) {
+        runInAction(() => {
+          Object.assign(this, returns.data)
+          setCookie(COOKIENAME, returns.data.token, 45)
+          setUserReadyPromise(Promise.resolve(0))
+        })
+      }
+      return returns
+    })
+  }
+
+  /**
+   * 检查本地是否登录
+   * @returns 0: 已登录, token 可用, 1: 未登录，无 token, returns: 远程用户信息
+   */
+  @action
+  checkUserState(token: string) {
+    return innerFetch<SimpleAdmin>('/back/api/getUserByToken', {
+      token,
+    }).then(returns => {
       if (returns.check()) {
         runInAction(() => {
           Object.assign(this, returns.data)
