@@ -34,30 +34,30 @@ export interface StateProps {
 }
 
 
-const Fade = ({ children, ...props }) => (
-  <CSSTransition
-    {...props}
-    timeout={1000}
-    classNames="fade"
-  >
-    {children}
-  </CSSTransition>
-)
-
-const Routers = (props: { isLogin: boolean }) => {
+const Routers = (props: { isLogin: boolean, pathname: string }) => {
   if (props.isLogin) {
     return (
       <TransitionGroup>
-        <Switch>
-          <Route path="/" component={Home} exact />
-          <Route path="/index" component={Home} exact />
-          <Route path="/said" component={Said} exact />
-          <Route path="/said/add" component={SaidAdd} exact />
-          <Route path="/others/images" component={Images} exact />
-          <Route path="/blog" component={Blog} exact />
-          <Route path="/blog/add" component={BlogAdd} exact />
-          <Route path="/category" component={Category} exact />
-        </Switch>
+        <CSSTransition
+          key={props.pathname}
+          timeout={500}
+          classNames="router-animate-fade"
+          mountOnEnter={true}
+          unmountOnExit={true}
+        >
+          <div className={s.routers}>
+            <Switch>
+              <Route path="/" component={Home} exact />
+              <Route path="/index" component={Home} exact />
+              <Route path="/said" component={Said} exact />
+              <Route path="/said/add" component={SaidAdd} exact />
+              <Route path="/others/images" component={Images} exact />
+              <Route path="/blog" component={Blog} exact />
+              <Route path="/blog/add" component={BlogAdd} exact />
+              <Route path="/category" component={Category} exact />
+            </Switch>
+          </div>
+        </CSSTransition>
       </TransitionGroup>)
   } else {
     return (
@@ -178,9 +178,9 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
                 })
               }
             </Breadcrumb>
-            <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
+            <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280, position: 'relative' }}>
               {
-                <Routers isLogin={this.state.isLogin} />
+                <Routers isLogin={this.state.isLogin} pathname={this.props.location.pathname} />
               }
               {/* </Router> */}
             </Content>

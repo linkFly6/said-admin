@@ -5,22 +5,26 @@
   .login-loading
     text-align center
     padding-top 5rem
+  .routers
+    position relative
 
-:global(.fade-enter)
+// react-transition-group 路由动画  => enter/active/exit/
+:global(.router-animate-fade-enter)
   opacity 0.01
+  transform translate3d(0, 0, 0)
 
-
-:global(.fade-enter.fade-enter-active) 
+:global(.router-animate-fade-enter.router-animate-fade-enter-active) 
   opacity 1
-  transition opacity 1000ms ease-in
+  // transition opacity 1000ms ease-in 1000ms, transform 1000ms ease-in-out 1000ms
+  transition all ease 500ms
 
+:global(.router-animate-fade-exit)
+  opacity 0
+  display none
+  transform translate3d(0, 0, 0)
 
-:global(.fade-exit)
-  opacity: 1
-
-:global(.fade-exit.fade-exit-active) 
-  opacity 0.01
-  transition opacity 800ms ease-in
+:global(.router-animate-fade-exit.router-animate-fade-exit-active) 
+  opacity 0
 //   .app-header
 //       background-color #222
 //       height 150px
