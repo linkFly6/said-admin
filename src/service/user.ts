@@ -34,7 +34,7 @@ export const userReady = () => {
       userReadyPromise = Promise.resolve(1)
     }
     // 远程获取用户信息
-    store.admin.checkUserState(token).then(returns => {
+    userReadyPromise = store.admin.checkUserState(token).then(returns => {
       if (!returns.check()) {
         message.error(returns.message)
         if (returns.code === 6) {
@@ -47,6 +47,7 @@ export const userReady = () => {
       }
       return Promise.resolve(returns.check() ? 0 : 2)
     })
+    return userReadyPromise
   }
   return Promise.resolve(0)
 }

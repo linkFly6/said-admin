@@ -1,5 +1,6 @@
 import { Returns, ReturnsError } from '../models/returns'
 import { isLoginFailCode } from './user'
+import store from '../store'
 
 // process.env.NODE_ENV
 
@@ -60,7 +61,7 @@ export const innerFetch = <T>(
 }
 
 /**
- * 通用请求，底层使用 ajax()，对返回结果使用 Promise<Returns> 封装
+ * 通用请求，底层使用 ajax()，对返回结果使用 Promise<Returns> 封装，同时自动挂载 token
  * 比 innerFetch 多了一层登录业务的包装
  * @param  {string} [uri] 请求 uri
  * @param  {string} [data={}] 请求数据
@@ -71,11 +72,15 @@ export const innerFetch = <T>(
  */
 export function fetch<T>(
   uri: string,
-  data: object,
+  data?: object,
   method: string = 'get',
   headers: object = {}): Promise<Returns<T>> {
   // const channelId = window.$store.state['business/user'].channelId
-  return innerFetch<T>(uri, data, method, headers).then((returns: Returns<T>) => {
+  return innerFetch<T>(
+    uri,
+    Object.assign({ token: store.admin.token }, data),
+    method, headers
+  ).then((returns: Returns<T>) => {
     if (!returns.success && isLoginFailCode(returns.code)) {
       // return new Promise<Returns<T>>((resolve, reject) => {
       //   login(2).then((returns: Returns<Models.State>) => {
@@ -107,6 +112,6 @@ export function fetch<T>(
  * @param  {object} [headers={}] 请求头
  * @return Promise<Returns>
  */
-export function post<T>(uri: string, data: object, headers?: object) {
+export function post<T>(uri: string, data?: object, headers?: object) {
   return fetch<T>(uri, data, 'post', headers)
 }

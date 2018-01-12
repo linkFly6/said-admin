@@ -70,6 +70,7 @@ export class AdminStore implements SimpleAdmin {
     }).then(returns => {
       if (returns.check()) {
         runInAction(() => {
+          this.token = token
           Object.assign(this, returns.data)
         })
       }

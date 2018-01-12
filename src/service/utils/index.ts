@@ -29,3 +29,17 @@ export const serializeUrl = (obj: object) => {
     return res
   }, []).join('&')/*.replace(/%20/g, '+')*/
 }
+
+
+
+/**
+ * 对比 traget 和 obj，target 所有包含的属性和 obj 是否对等
+ * 主要根据 target 的属性进行对比；而 obj 有， target 没有的属性不影响对比
+ * @param target 
+ * @param obj 
+ */
+export const targetDiffInObj = (target: object, obj: object) => {
+  return Object.keys(target).every(key => {
+    return target[key] === obj[key]
+  })
+}

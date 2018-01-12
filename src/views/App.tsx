@@ -178,7 +178,7 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
                 })
               }
             </Breadcrumb>
-            <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280, position: 'relative' }}>
+            <Content style={{ background: '#fff', padding: 24, margin: 0, position: 'relative' }}>
               {
                 <Routers isLogin={this.state.isLogin} pathname={this.props.location.pathname} />
               }

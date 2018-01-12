@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Button, Row, Col, Table, Icon, Modal, Form, Input, Popconfirm } from 'antd'
+import { Button, Row, Col, Table, Icon, Modal, Form, Input, Popconfirm, message } from 'antd'
 import { FormItemProps } from 'antd/lib/form/FormItem'
 import SelectCategory from '../../components/select-catogory'
 import { CategoryModel } from '../../types/category'
@@ -7,6 +7,7 @@ import * as s from './index.styl'
 import { Map } from 'immutable'
 import { inject, observer } from 'mobx-react'
 import { CategoryStore } from '../../store/category'
+import { userReady } from '../../service/user'
 
 
 export interface StateProps {
@@ -31,7 +32,7 @@ interface State {
 @observer
 export default class Index extends React.Component<StateProps, State> {
   columns: (
-    { title: string; dataIndex: string; key: string; }
+    { title: string; dataIndex: string; key: string; width: string | number }
     | { title: string; key: string; render: (text: any, record: any) => JSX.Element; })[]
   /**
    * 大体的编辑思路上就是将编辑项放入 cache 中，然后一直编辑 cache，保存的时候再更新到 store
@@ -41,16 +42,11 @@ export default class Index extends React.Component<StateProps, State> {
   constructor(props: StateProps) {
     super(props)
     this.columns = [
-      // {
-      //   title: 'ID',
-      //   dataIndex: '_id',
-      //   key: '_id',
-      //   colSpan: 0,
-      // }, 
       {
         title: 'Icon',
         dataIndex: 'icon',
         key: 'icon',
+        width: '20%',
         render: (_, category: CategoryModel) => (
           <div>
             {
@@ -60,7 +56,7 @@ export default class Index extends React.Component<StateProps, State> {
                   (this.hasCache(category._id) ? this.getCache(category._id).icon : category.icon)
                 }
                 disabled={!this.hasCache(category._id)}
-                changeIcon={icon => this.handleChangeColumnIcon(icon, category._id)}
+                changeIcon={icon => this.handelChangeColumnIcon(icon, category._id)}
               />
             }
           </div>
@@ -69,6 +65,7 @@ export default class Index extends React.Component<StateProps, State> {
         title: '分类',
         dataIndex: 'name',
         key: 'name',
+        width: '50%',
         render: (text, category: CategoryModel) => {
           if (this.hasCache(category._id)) {
             return (
@@ -76,7 +73,8 @@ export default class Index extends React.Component<StateProps, State> {
                 <Input
                   style={{ margin: '-5px 0' }}
                   value={this.state.cacheData.get(category._id).name}
-                  onChange={e => this.handleColumnChange(e.target.value, category._id)}
+                  maxLength="18"
+                  onChange={e => this.handelColumnChange(e.target.value, category._id)}
                 />
               </div>
             )
@@ -87,6 +85,7 @@ export default class Index extends React.Component<StateProps, State> {
       }, {
         title: '操作',
         key: 'action',
+        width: '30%',
         render: (_, category: CategoryModel) => (
           <span className={s.tableCellOp}>
             {
@@ -95,22 +94,22 @@ export default class Index extends React.Component<StateProps, State> {
                 (
                   <span>
                     <Popconfirm title="确定是否保存?" onConfirm={() => this.save(category._id)}>
-                      {
-                        // onClick={() => this.edit(category, false)}
-                      }
                       <Button icon="save" type="primary" />
                     </Popconfirm>
                     <Button icon="close" onClick={() => this.removeCache(category._id)} />
                   </span>) :
                 <span>
                   <Button icon="edit" type="primary" onClick={() => this.edit(category)} />
-                  <Button icon="delete" type="danger" />
+                  <Popconfirm title="确定是否删除?" onConfirm={() => this.handelRemoveCategory(category._id)}>
+                    <Button icon="delete" type="danger" />
+                  </Popconfirm>
                 </span>
             }
 
           </span>
         )
       }]
+    this.load()
   }
   state: State = {
     visible: false,
@@ -121,6 +120,12 @@ export default class Index extends React.Component<StateProps, State> {
       errMsg: '',
     },
     cacheData: Map<string, CategoryModel>()
+  }
+
+  async load() {
+    const loginValue = await userReady()
+    if (loginValue) return
+    this.props.category.load()
   }
 
   // 一些工具函数
@@ -159,7 +164,14 @@ export default class Index extends React.Component<StateProps, State> {
   save(categoryId: string) {
     const category = this.state.cacheData.get(categoryId)
     this.removeCache(categoryId)
-    this.props.category.edit(category)
+    this.props.category.updateById(categoryId, {
+      icon: category.icon,
+      name: category.name,
+    }).then(returns => {
+      if (!returns.check()) {
+        message.error(returns.message)
+      }
+    })
   }
 
   setEditModel = (editModel: {
@@ -179,29 +191,29 @@ export default class Index extends React.Component<StateProps, State> {
   }
 
 
-  handleColumnChange(value: string, categoryId: string) {
+  handelColumnChange(value: string, categoryId: string) {
     this.updateCache(categoryId, { name: value })
   }
 
 
-  handleChangeColumnIcon(icon: string, categoryId: string) {
+  handelChangeColumnIcon(icon: string, categoryId: string) {
     this.updateCache(categoryId, { icon })
   }
 
-  handleCancel = (e) => {
+  handelCancel = (e) => {
     this.setState({
       visible: false,
     })
   }
 
-  handleInputChange = (e) => {
+  handelInputChange = (e) => {
     this.clearErrorMsg({
       name: e.target.value
     })
   }
 
 
-  handleChangeIcon = (icon: string) => {
+  handelChangeIcon = (icon: string) => {
     this.setEditModel({
       icon,
     })
@@ -234,13 +246,24 @@ export default class Index extends React.Component<StateProps, State> {
     })
   }
 
-  handleAddCategory = () => {
+  handelAddCategory = () => {
     if (!this.validateAddCategory()) return
-    this.props.category.add({
-      _id: Math.random().toString(),
+    this.props.category.create({
       name: this.state.editModel.name,
       icon: this.state.editModel.icon,
+    }).then(returns => {
+      if (!returns.check()) {
+        message.error(returns.message)
+      } else {
+        this.setEditModel({
+          name: ''
+        })
+      }
     })
+  }
+
+  handelRemoveCategory = (id: string) => {
+    this.props.category.remove(id)
   }
 
   render() {
@@ -259,14 +282,14 @@ export default class Index extends React.Component<StateProps, State> {
                       prefix={
                         <SelectCategory
                           icon={this.state.editModel.icon}
-                          changeIcon={this.handleChangeIcon}
+                          changeIcon={this.handelChangeIcon}
                         />
                       }
                       value={this.state.editModel.name}
-                      maxLength="12"
+                      maxLength="18"
                       className={s.prefixInput}
                       placeholder="分类名称"
-                      onChange={this.handleInputChange}
+                      onChange={this.handelInputChange}
                       size="large"
                       autoComplete="off"
                     />
@@ -274,7 +297,7 @@ export default class Index extends React.Component<StateProps, State> {
                 </Form.Item>
               </Col>
               <Col span={8}>
-                <Button size="large" icon="plus" type="primary" onClick={this.handleAddCategory}>新增</Button>
+                <Button size="large" icon="plus" type="primary" onClick={this.handelAddCategory}>新增</Button>
               </Col>
             </Row>
 
