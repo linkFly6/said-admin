@@ -98,8 +98,8 @@ class Grid extends React.Component<StateProps> {
   }
 }
 
-@observer
 @inject('store')
+@observer
 export default class ImageManager extends React.Component<StateProps> {
   state = {
     imageList: [],

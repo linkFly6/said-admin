@@ -17,6 +17,10 @@ function parseData(value: any) {
  */
 export class Store {
   private _namespace: string
+  /**
+   * 指定一个命名空间存储数据 (LocalStorage)
+   * @param namespace 
+   */
   constructor(namespace?: string) {
     // 修正命名空间
     if (namespace && namespace.charAt(namespace.length - 1) !== '.') {
@@ -29,7 +33,12 @@ export class Store {
     return this._namespace + key
   }
 
-  public val(key: string, value: any) {
+  /**
+   * 设置数据
+   * @param key 
+   * @param value 
+   */
+  public val(key: string, value?: any) {
     if (typeof key === 'object') {
       // set
       Object.keys(key).forEach((name) => {
@@ -60,20 +69,37 @@ export class Store {
     }
   }
 
-  public getAllKey() {
+  /**
+   * 或者该 Store 所有的 key
+   * @param [noTrimNamespace=false] 是否保留命名空间(保留命名空间前缀)，如果保留前缀则是 localStorage 中真实存储的 key
+   */
+  public getAllKey(noTrimNamespace: boolean = false) {
     var nameSpace = this._namespace
     const keys: string[] = []
-    const reg = new RegExp('^' + nameSpace)
     for (let i = 0; i < localStorage.length; i++) {
       let name = localStorage.key(i) as string
-      if (reg.test(name)) {
-        keys.push(name)
+      if (name.startsWith(nameSpace)) {
+        keys.push(noTrimNamespace ? name : name.substring(nameSpace.length))
       }
     }
     return keys
   }
 
+  /**
+   * 清空这个 Store 命名空间下的数据，返回被清除的数据
+   */
   public clear() {
+    const res: { [props: string]: any } = {}
+    this.getAllKey().forEach(key => {
+      let localKey = this.getKey(key)
+      res[key] = parseData(localStorage[localKey])
+      try {
+        localStorage.removeItem(localKey)
+      } catch (error) {
+        // no empty
+      }
+    })
+    return res
     // var nameSpace = this._namespace
     // var name, reg = new RegExp('^' + nameSpace), res = Object.create(null)
     // for (var i = 0; i < localStorage.length; i++) {

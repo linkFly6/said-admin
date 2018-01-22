@@ -269,40 +269,42 @@ export default class Index extends React.Component<StateProps, State> {
   render() {
     return (
       <div className={`${s.view} ${s.category}`}>
-        <Row className={s.tableOperations} type="flex" align="middle">
-          <Col span={4}>
-            <Row gutter={12}>
-              <Col span={16}>
-                <Form.Item
-                  validateStatus={this.state.editModel.validateStatus}
-                  help={this.state.editModel.errMsg}
-                >
-                  {
-                    <Input
-                      prefix={
-                        <SelectCategory
-                          icon={this.state.editModel.icon}
-                          changeIcon={this.handelChangeIcon}
-                        />
-                      }
-                      value={this.state.editModel.name}
-                      maxLength="18"
-                      className={s.prefixInput}
-                      placeholder="分类名称"
-                      onChange={this.handelInputChange}
-                      size="large"
-                      autoComplete="off"
+        <Row className={s.tableOperations} type="flex" align="top">
+          <Col>
+            <Form.Item
+              validateStatus={this.state.editModel.validateStatus}
+              help={this.state.editModel.errMsg}
+            >
+              {
+                <Input
+                  prefix={
+                    <SelectCategory
+                      icon={this.state.editModel.icon}
+                      changeIcon={this.handelChangeIcon}
                     />
                   }
-                </Form.Item>
-              </Col>
-              <Col span={8}>
-                <Button size="large" icon="plus" type="primary" onClick={this.handelAddCategory}>新增</Button>
-              </Col>
-            </Row>
-
+                  value={this.state.editModel.name}
+                  maxLength="18"
+                  className={s.prefixInput}
+                  placeholder="分类名称"
+                  onChange={this.handelInputChange}
+                  size="large"
+                  autoComplete="off"
+                />
+              }
+            </Form.Item>
           </Col>
-          <Col span={8} offset={8} />
+          <Col>
+            <Button
+              size="large"
+              icon="plus"
+              type="primary"
+              onClick={this.handelAddCategory}
+              style={{ marginLeft: '1rem' }}
+            >
+              新增
+            </Button>
+          </Col>
         </Row>
         <Row>
           <Col span={24}>

@@ -43,6 +43,24 @@ export class BlogStore {
     })
   }
 
+  /**
+   * 加载 blog 列表
+   */
+  load() {
+    return fetch<Blog[]>('/back/api/user/blog/query').then(returns => {
+      if (returns.check()) {
+        runInAction(() => {
+          this.blogs = returns.data
+        })
+      }
+      return returns
+    })
+  }
+
+  /**
+   * 新增 blog
+   * @param blog 
+   */
   create(blog: {
     title: string,
     summary: string,
@@ -60,6 +78,24 @@ export class BlogStore {
       if (returns.check()) {
         runInAction(() => {
           this.blogs.push(returns.data as any)
+        })
+      }
+      return returns
+    })
+  }
+
+  /**
+   * 删除 blog
+   * @param blogId 
+   */
+  remove(blogId: string) {
+    return post('/back/api/user/blog/remove', { blogId }).then(returns => {
+      if (returns.check()) {
+        runInAction(() => {
+          let index = this.blogs.findIndex(blog => blog._id === blogId)
+          if (~index) {
+            this.blogs.splice(index, 1)
+          }
         })
       }
       return returns

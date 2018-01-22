@@ -1,6 +1,7 @@
 import { Returns, ReturnsError } from '../models/returns'
 import { isLoginFailCode } from './user'
 import store from '../store'
+import history from '../assets/js/history'
 import { message } from 'antd'
 
 // process.env.NODE_ENV
@@ -82,10 +83,17 @@ export function fetch<T>(
     Object.assign({ token: store.admin.token }, data),
     method, headers
   ).then((returns: Returns<T>) => {
-    if (!returns.success && isLoginFailCode(returns.code)) {
-      if (!returns.success) {
-        message.error(`${returns.message}(${returns.code})`)
+    if (!returns.success) {
+      if (isLoginFailCode(returns.code)) {
+        // 登录失败要重新
+        history.replace({
+          pathname: '/login',
+          search: 'src=' + encodeURIComponent(history.location.pathname + history.location.search)
+        })
       }
+      message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
+    }
+    if (!returns.success && isLoginFailCode(returns.code)) {
       // return new Promise<Returns<T>>((resolve, reject) => {
       //   login(2).then((returns: Returns<Models.State>) => {
       //     // 重试请求，如果还失败的话就只能返回错误了

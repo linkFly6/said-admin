@@ -14,7 +14,8 @@ import { Button } from 'antd'
 
 
 interface StateProps {
-  onChange: (text: string) => void
+  onChange: (text: string) => void,
+  value?: string
 }
 
 export default class extends React.Component<StateProps, {}> {
@@ -116,7 +117,8 @@ export default class extends React.Component<StateProps, {}> {
               mode: 'markdown',
               lineWrapping: true,
               dragDrop: true,
-              placeholder: '1. 输入 markdown\n\n2.拖拽上传图片\n\n'
+              placeholder: '1. 输入 markdown\n\n2.拖拽上传图片\n\n',
+              value: this.props.value,
               // theme: 'solarized light'
             }}
           />

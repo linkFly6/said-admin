@@ -10,9 +10,25 @@ import { SelectValue } from 'antd/lib/select'
 import { userReady } from '../../service/user'
 import history from '../../assets/js/history'
 import { Store } from '../../service/utils/store'
+import { debounce } from '../../service/utils/index'
 
 // 本地存储
 const store = new Store('add.blog')
+
+/**
+ * 存储数据到 store，封装为通用方法，针对每个字段的输入做函数节流
+ */
+const setStore = function () {
+  const cacheFunc = {}
+  return (name: string, value: any) => {
+    if (!cacheFunc[name]) {
+      cacheFunc[name] = debounce((n: string, v: any) => {
+        store.val(n, v)
+      }, 300)
+    }
+    cacheFunc[name](name, value)
+  }
+}()
 
 class FormItem extends React.Component<{}> {
   render() {
@@ -41,6 +57,7 @@ export interface StateProps {
   blog: BlogStore
 }
 
+
 @inject((allStores: any) => ({
   blog: allStores.store.blog
 }))
@@ -49,40 +66,86 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
   category: string,
   tags: string[],
   context: string,
+  title: string,
+  summary: string,
+  jsCode: string,
+  cssCode: string,
 }> {
 
   state = {
     category: '',
     tags: [],
     context: '',
+    title: '',
+    summary: '',
+    jsCode: '',
+    cssCode: '',
   }
 
   constructor(props: FormComponentProps & StateProps) {
     super(props)
     this.load()
   }
+  componentDidMount() {
+    this.loadLocalData()
+  }
+  /**
+   * 远程加载数据
+   */
   async load() {
     const loginValue = await userReady()
     if (loginValue) return
     const returns = await this.props.blog.queryCreateBlogBaseInfo()
     if (!returns) return
   }
-
-  handleChangeCategory = (value: SelectValue) => {
-    this.setState({
-      category: value as string
+  /**
+   * 加载本地缓存数据
+   */
+  loadLocalData() {
+    const data: {
+      title: string,
+      context: string,
+      summary: string,
+      category: string,
+      tags: string[],
+      jsCode: string,
+      cssCode: string,
+    } = {
+        title: '',
+        context: '',
+        summary: '',
+        category: '',
+        tags: [],
+        jsCode: '',
+        cssCode: '',
+      }
+    store.getAllKey().forEach((key: string) => {
+      data[key] = store.val(key)
     })
+    this.setState(data)
+  }
+
+  handleChangeCategory = (value: string) => {
+    this.setState({
+      category: value
+    })
+    setStore('category', value)
   }
   handleChangeTags = (values: string[]) => {
     this.setState({
       tags: values
     })
+    setStore('tags', values)
   }
   handleChangeContext = (text: string) => {
     this.setState({
       context: text,
     })
+    setStore('context', text)
   }
+  /**
+   * 提交数据
+   */
   submit = (e: React.FormEvent<any>) => {
     this.props.form.validateFields(async (err, field: {
       category: string,
@@ -109,18 +172,21 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
       })
       if (returns.check()) {
         message.success(`新增文章《${field.title}》成功`)
+        store.clear()
         setTimeout(() => {
           history.push('/blog')
-        }, 2000)
+        }, 1000)
       }
     })
     e.preventDefault()
   }
 
-
+  /**
+   * 保存数据到本地 store
+   */
   createHandelChangeSaveToLocal = (name: string) => {
     return (e: React.ChangeEvent<any>) => {
-      store.val(name, e.target.value)
+      setStore(name, e.target.value)
     }
   }
 
@@ -138,6 +204,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请输入文章标题' }],
+                      initialValue: this.state.title
                     })(
                     <Input
                       placeholder="文章标题"
@@ -160,7 +227,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                 help={this.state.context.length ? void 0 : '请输入文章内容'}
               >
                 {
-                  <SaidEditor onChange={this.handleChangeContext} />
+                  <SaidEditor onChange={this.handleChangeContext} value={this.state.context} />
                 }
               </Form.Item>
             </Col>
@@ -172,10 +239,12 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请输入简述,支持多行' }],
+                      initialValue: this.state.summary
                     })(
                     <Input.TextArea
                       placeholder="简述\n支持多行"
                       autosize={{ minRows: 4, maxRows: 4 }}
+                      onChange={this.createHandelChangeSaveToLocal('summary')}
                     />
                     )
                 }
@@ -187,6 +256,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请输入标签' }],
+                      initialValue: this.state.tags
                     })(
                     <Select
                       mode="tags"
@@ -212,6 +282,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请选择分类' }],
+                      initialValue: this.state.category
                     })(
                     // <AutoComplete
                     //   className="certain-category-search"
@@ -248,19 +319,25 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                 <Collapse.Panel header="高级选项" key="1">
                   <div className={s.marginBootom}>
                     {
-                      getFieldDecorator('jsCode')(
+                      getFieldDecorator('jsCode', {
+                        initialValue: this.state.jsCode
+                      })(
                         <Input.TextArea
                           placeholder="JavaScript 代码\n用于定制文章页代码"
                           autosize={{ minRows: 4, maxRows: 4 }}
+                          onChange={this.createHandelChangeSaveToLocal('jsCode')}
                         />
                       )
                     }
                   </div>
                   {
-                    getFieldDecorator('cssCode')(
+                    getFieldDecorator('cssCode', {
+                      initialValue: this.state.cssCode
+                    })(
                       <Input.TextArea
                         placeholder="css 代码\n用于定制文章页代码"
                         autosize={{ minRows: 4, maxRows: 4 }}
+                        onChange={this.createHandelChangeSaveToLocal('cssCode')}
                       />
                     )
                   }
@@ -269,16 +346,12 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
             </Col>
           </Row>
           <Row type="flex" justify="center">
-            <Col span={2}>
-              <Button loading={false} size="large" onClick={this.submit}>
-                预览
-              </Button>
-            </Col>
-            <Col span={2}>
-              <Button type="primary" size="large" htmlType="submit">
-                发表
-              </Button>
-            </Col>
+            <Button loading={false} size="large" onClick={this.submit}>
+              预览
+            </Button>
+            <Button type="primary" size="large" htmlType="submit" style={{ marginLeft: '2rem' }}>
+              发表
+            </Button>
           </Row>
         </Form>
       </div >

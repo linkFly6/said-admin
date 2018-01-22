@@ -70,10 +70,10 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
 
 
 @withRouter
-@observer
 @inject((allStores: any) => ({
   admin: allStores.store.admin
 }))
+@observer
 export default class App extends React.Component<RouteComponentProps<{}> & StateProps, State> {
   state = {
     current: '1',

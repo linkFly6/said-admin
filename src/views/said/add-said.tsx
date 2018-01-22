@@ -5,9 +5,8 @@ import { inject, observer } from 'mobx-react'
 
 export interface StateProps { }
 
-
-@observer
 @inject('store')
+@observer
 class AddSaid extends React.Component<StateProps> {
   handleChangeContext = (text: string) => {
     console.log(text)

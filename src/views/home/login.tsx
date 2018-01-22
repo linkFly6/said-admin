@@ -13,10 +13,11 @@ export interface StateProps {
   admin: AdminStore
 }
 
-@observer
+
 @inject((allStores: any) => ({
   admin: allStores.store.admin
 }))
+@observer
 @withRouter
 class Login extends React.Component<FormComponentProps & RouteComponentProps<{}> & StateProps> {
   // class Login extends PageComponent<FormComponentProps & StateProps> {
