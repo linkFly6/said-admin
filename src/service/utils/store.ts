@@ -42,7 +42,7 @@ export class Store {
     var objectType
     if (arguments.length > 1) {
       // set
-      objectType = Array.isArray(value) || typeof value === 'string'
+      objectType = Array.isArray(value) || typeof value === 'object'
       try {
         localStorage.setItem(
           this.getKey(key),
@@ -58,6 +58,37 @@ export class Store {
     } catch (e) {
       return null
     }
+  }
+
+  public getAllKey() {
+    var nameSpace = this._namespace
+    const keys: string[] = []
+    const reg = new RegExp('^' + nameSpace)
+    for (let i = 0; i < localStorage.length; i++) {
+      let name = localStorage.key(i) as string
+      if (reg.test(name)) {
+        keys.push(name)
+      }
+    }
+    return keys
+  }
+
+  public clear() {
+    // var nameSpace = this._namespace
+    // var name, reg = new RegExp('^' + nameSpace), res = Object.create(null)
+    // for (var i = 0; i < localStorage.length; i++) {
+    //   name = localStorage.key(i)
+    //   if (reg.test(name)) {
+    //     i-- // removeItem了之后，索引不正确，修正索引
+    //     res[name] = so.parseData(localStorage[name])
+    //     try {
+    //       localStorage.removeItem(name)
+    //     } catch (e) {
+
+    //     }
+    //   }
+    // }
+    // return res
   }
 }
 

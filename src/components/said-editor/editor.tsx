@@ -14,10 +14,11 @@ import { Button } from 'antd'
 
 
 interface StateProps {
+  onChange: (text: string) => void
 }
 
-export default class extends React.Component<{}, StateProps> {
-  constructor(props: {}) {
+export default class extends React.Component<StateProps, {}> {
+  constructor(props: StateProps) {
     super(props)
   }
 
@@ -25,6 +26,7 @@ export default class extends React.Component<{}, StateProps> {
 
   onChange(value: string) {
     this.value = value
+    this.props.onChange(value)
   }
 
   get now() {

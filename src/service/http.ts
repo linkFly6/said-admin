@@ -1,6 +1,7 @@
 import { Returns, ReturnsError } from '../models/returns'
 import { isLoginFailCode } from './user'
 import store from '../store'
+import { message } from 'antd'
 
 // process.env.NODE_ENV
 
@@ -82,6 +83,9 @@ export function fetch<T>(
     method, headers
   ).then((returns: Returns<T>) => {
     if (!returns.success && isLoginFailCode(returns.code)) {
+      if (!returns.success) {
+        message.error(`${returns.message}(${returns.code})`)
+      }
       // return new Promise<Returns<T>>((resolve, reject) => {
       //   login(2).then((returns: Returns<Models.State>) => {
       //     // 重试请求，如果还失败的话就只能返回错误了
@@ -112,6 +116,6 @@ export function fetch<T>(
  * @param  {object} [headers={}] 请求头
  * @return Promise<Returns>
  */
-export function post<T>(uri: string, data?: object, headers?: object) {
+export function post<T>(uri: string, data?: object, headers?: object): Promise<Returns<T>> {
   return fetch<T>(uri, data, 'post', headers)
 }

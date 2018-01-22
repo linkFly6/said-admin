@@ -9,10 +9,13 @@ export interface StateProps { }
 @observer
 @inject('store')
 class AddSaid extends React.Component<StateProps> {
+  handleChangeContext = (text: string) => {
+    console.log(text)
+  }
   render() {
     return (
       <div>
-        <SaidEditor />
+        <SaidEditor onChange={this.handleChangeContext} />
       </div>
     )
   }

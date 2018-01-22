@@ -17,6 +17,10 @@ export interface BlogModel {
    */
   title: string,
   /**
+   * 文章正文
+   */
+  context: string,
+  /**
    * 标记，可以自定义，也可以自动生成，url 中使用
    */
   urlKey: string,
@@ -40,10 +44,6 @@ export interface BlogModel {
    * 分类
    */
   category: CategoryModel,
-  /**
-   * 发布时间时间戳
-   */
-  createTime: number,
   /**
    * 处理过后的资源
    */
@@ -77,10 +77,6 @@ export interface BlogModel {
      * 喜欢数
      */
     likeCount?: number,
-    /**
-     * 评论数
-     */
-    commentCount?: number,
     /**
      * 创建时间
      */
