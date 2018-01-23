@@ -1,4 +1,4 @@
-import Images from './images'
+import Images from '../../components/images/images'
 
 export {
   Images

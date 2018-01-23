@@ -41,6 +41,7 @@ export enum ImageType {
  * 图片 Model
  */
 export interface ImageModel {
+  _id: string,
   /**
    * 图片名称
    */

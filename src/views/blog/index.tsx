@@ -9,6 +9,7 @@ import { userReady } from '../../service/user'
 import { BlogModel } from '../../types/blog'
 import history from '../../assets/js/history'
 import { List } from 'immutable'
+import * as moment from 'moment'
 
 export interface StateProps {
   blog: BlogStore
@@ -70,12 +71,15 @@ class Index extends React.Component<StateProps, { deleteList: List<string> }> {
       key: 'likeCount',
     }, {
       title: '评论',
-      dataIndex: 'info.commentCount',
-      key: 'commentCount',
+      dataIndex: 'comments.length',
+      key: 'comments',
     }, {
       title: '更新时间',
       dataIndex: 'info.updateTime',
       key: 'updateTime',
+      render(updateTime: number) {
+        return moment(updateTime).format('YYYY-MM-DD HH:mm:ss')
+      }
     }, {
       title: '操作',
       key: 'action',

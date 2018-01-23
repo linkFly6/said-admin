@@ -8,7 +8,7 @@ import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { inject, observer } from 'mobx-react'
 import { AdminStore } from '../store/admin'
 import Home from './home'
-import { Images } from './others'
+import ImageManager from './others/images'
 // import Said from './said'
 import Said from '../views/said'
 import SaidAdd from '../views/said/add-said'
@@ -51,7 +51,7 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
               <Route path="/index" component={Home} exact />
               <Route path="/said" component={Said} exact />
               <Route path="/said/add" component={SaidAdd} exact />
-              <Route path="/others/images" component={Images} exact />
+              <Route path="/others/images" component={ImageManager} exact />
               <Route path="/blog" component={Blog} exact />
               <Route path="/blog/add" component={BlogAdd} exact />
               <Route path="/category" component={Category} exact />

@@ -1,0 +1,59 @@
+.image-components
+  .image-card-box
+    position relative
+    width 100%
+    display flex
+    flex-wrap wrap
+    .upload-grid
+      margin 1rem
+      width 17rem
+      height 13rem
+      :global(.ant-upload)
+        width 100%
+        height 100%
+      .icon-upload
+        font-size 30px
+    .card-grid
+      border 1px solid #d9d9d9
+      border-radius 4px
+      padding .5rem
+      margin 1rem
+    .card
+      background #fafafa
+      position relative
+      width 16rem
+      height 12rem
+      .image
+        width 100%
+        height 100%
+      &::before
+        content ''
+        display block
+        position absolute
+        z-index 1
+        top 0
+        left 0
+        width 100%
+        height 100%
+        background rgba(0, 0, 0, 0.5)
+        transition all .3s
+        opacity 0
+      .buttons
+        position absolute
+        z-index 2
+        top 50%
+        left 50%
+        transform translate(-50%, -50%)
+        transition all .3s
+        opacity 0
+        :global(.anticon)
+          font-size 1.1rem
+          cursor pointer
+          &:first-child
+            margin-right 1rem
+      &:hover
+        &::before
+          opacity 1
+        .buttons
+          opacity 1
+

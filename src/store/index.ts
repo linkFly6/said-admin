@@ -3,6 +3,7 @@ import { BlogStore } from './blog'
 import { CategoryStore } from './category'
 import { ArticleStore } from './article'
 import { AdminStore } from './admin'
+import { ImageStore } from './image'
 
 export default {
   common: new CommonStore(),
@@ -10,4 +11,5 @@ export default {
   category: new CategoryStore(),
   article: new ArticleStore(),
   admin: new AdminStore(),
+  image: new ImageStore(),
 }

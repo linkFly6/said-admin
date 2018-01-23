@@ -27,19 +27,23 @@ export const innerFetch = <T>(
   data?: object,
   method = 'get',
   headers = {}): Promise<Returns<T>> => {
-  const requestData = data || {}
+  // const requestData = data || {}
   // let url = new URL(uri)
   // if (data && method === 'get') {
   //   Object.keys(data).forEach(key => url.searchParams.append(key, data[key]))
   // }
 
-  let options: { method: string, headers: any, body?: string } = {
+  let options: { method: string, headers: any, body?: any } = {
     method,
     headers: Object.assign({ 'Content-Type': 'application/json' }, headers),
   }
   if (data) {
     if (data && method === 'get') {
       uri = `${uri}${~uri.indexOf('?') ? '' : '?'}${getQueryString(data)}`
+    } else if (data instanceof FormData) {
+      // formdata
+      options.body = data
+      options.headers = Object.assign({ 'Content-Type': 'multipart/form-data' }, headers)
     } else {
       options.body = JSON.stringify(data)
     }
@@ -92,23 +96,6 @@ export function fetch<T>(
         })
       }
       message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
-    }
-    if (!returns.success && isLoginFailCode(returns.code)) {
-      // return new Promise<Returns<T>>((resolve, reject) => {
-      //   login(2).then((returns: Returns<Models.State>) => {
-      //     // 重试请求，如果还失败的话就只能返回错误了
-      //     return innerFetch<T>(uri, data, method, headers, isFormData, timeout).then((ret: Returns<T>) => {
-      //       resolve(ret)
-      //     })
-      //   }).catch(err => {
-      //     const router = window.$router
-      //     router.replace({
-      //       path: '/error',
-      //       query: { text: '服务器出了点小差~ (10000)' },
-      //     })
-      //     resolve(returns)
-      //   })
-      // })
     }
     return returns
   })

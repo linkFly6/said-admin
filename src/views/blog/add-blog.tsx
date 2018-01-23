@@ -63,6 +63,8 @@ export interface StateProps {
 }))
 @observer
 class AddBlog extends React.Component<FormComponentProps & StateProps, {
+  firstActiveContext: boolean,
+  initContext: string,
   category: string,
   tags: string[],
   context: string,
@@ -73,6 +75,10 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
 }> {
 
   state = {
+    // 是否激活操作过 context 输入框，如果操作过就进行校验，校验不通过就显示错误
+    firstActiveContext: false,
+    // context 初始值
+    initContext: '',
     category: '',
     tags: [],
     context: '',
@@ -123,6 +129,11 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
       data[key] = store.val(key)
     })
     this.setState(data)
+    if (store.val('context')) {
+      this.setState({
+        initContext: store.val('context')
+      })
+    }
   }
 
   handleChangeCategory = (value: string) => {
@@ -140,6 +151,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
   handleChangeContext = (text: string) => {
     this.setState({
       context: text,
+      // firstActiveContext: true,
     })
     setStore('context', text)
   }
@@ -156,6 +168,9 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
       cssCode: string | void,
     }) => {
       if (err) return
+      this.setState({
+        firstActiveContext: true,
+      })
       if (!this.state.context.length) {
         return
       }
@@ -209,6 +224,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     <Input
                       placeholder="文章标题"
                       size="large"
+                      autoComplete="off"
                       onChange={this.createHandelChangeSaveToLocal('title')}
                     />
                     )
@@ -223,11 +239,11 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                   xs: { span: 24 },
                   sm: { span: 24 }
                 }}
-                validateStatus={this.state.context.length ? void 0 : 'error'}
-                help={this.state.context.length ? void 0 : '请输入文章内容'}
+                validateStatus={!this.state.firstActiveContext || this.state.context.length ? void 0 : 'error'}
+                help={!this.state.firstActiveContext || this.state.context.length ? void 0 : '请输入文章内容'}
               >
                 {
-                  <SaidEditor onChange={this.handleChangeContext} value={this.state.context} />
+                  <SaidEditor onChange={this.handleChangeContext} value={this.state.initContext} />
                 }
               </Form.Item>
             </Col>
@@ -243,6 +259,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     })(
                     <Input.TextArea
                       placeholder="简述\n支持多行"
+                      autoComplete="off"
                       autosize={{ minRows: 4, maxRows: 4 }}
                       onChange={this.createHandelChangeSaveToLocal('summary')}
                     />
@@ -324,6 +341,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                       })(
                         <Input.TextArea
                           placeholder="JavaScript 代码\n用于定制文章页代码"
+                          autoComplete="off"
                           autosize={{ minRows: 4, maxRows: 4 }}
                           onChange={this.createHandelChangeSaveToLocal('jsCode')}
                         />
@@ -336,6 +354,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                     })(
                       <Input.TextArea
                         placeholder="css 代码\n用于定制文章页代码"
+                        autoComplete="off"
                         autosize={{ minRows: 4, maxRows: 4 }}
                         onChange={this.createHandelChangeSaveToLocal('cssCode')}
                       />
