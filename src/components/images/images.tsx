@@ -82,7 +82,7 @@ export default class ImageComponents extends React.Component<StateProp, {
               />
             </Modal>
             <Upload
-              name="avatar"
+              name="img"
               accept="image/*"
               listType="picture-card"
               showUploadList={false}
