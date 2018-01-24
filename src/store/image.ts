@@ -1,8 +1,7 @@
 import { observable, computed, observe, runInAction } from 'mobx'
-import { fetch, post } from '../service/http'
-import { ImageType } from '../types/image'
+import { fetch, post, postForm } from '../service/http'
+import { ImageType, ImageModel } from '../types/image'
 import { CategoryModel } from '../types/category'
-import { BlogModel } from '../types/blog'
 
 
 export class Image {
@@ -32,17 +31,20 @@ export class ImageStore {
   upload(params: {
     img: Blob,
     imageType: ImageType,
-  }) {
+  }, option: {
+    onProgress?: (this: XMLHttpRequest, ev: ProgressEvent) => any,
+  } = {}) {
     let data = new FormData()
     data.append('img', params.img)
     data.append('imageType', params.imageType + '')
-    return post<Image>('/back/api/user/image/upload', data).then(returns => {
-      if (returns.check()) {
-        runInAction(() => {
-          this.images.push(returns.data)
-        })
-      }
-      return returns
-    })
+    return postForm<ImageModel>('/back/api/user/image/upload', data, option)
+      .then(returns => {
+        if (returns.check()) {
+          runInAction(() => {
+            this.images.unshift(returns.data)
+          })
+        }
+        return returns
+      })
   }
 }
