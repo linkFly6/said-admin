@@ -6,6 +6,7 @@ import { UploadChangeParam } from 'antd/lib/upload'
 
 interface StateProp {
   imageType: ImageType,
+  token: string,
 }
 
 
@@ -30,8 +31,6 @@ const ImageGrid = (props: {
     </div>
   )
 }
-
-let i = 0
 
 export default class ImageComponents extends React.Component<StateProp, {
   loading: boolean,
@@ -59,7 +58,7 @@ export default class ImageComponents extends React.Component<StateProp, {
    */
   handleUploaderMixinData = (file: File) => {
     console.log(this.props.imageType)
-    return { imageType: this.props.imageType }
+    return { imageType: this.props.imageType, token: this.props.token }
   }
   // 删除图片
   handleClickDeleteImage = (image: ImageModel) => {
