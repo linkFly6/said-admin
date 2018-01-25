@@ -25,7 +25,11 @@ export default class ImageManager extends React.Component<StateProps> {
   render() {
     return (
       <div>
-        <ImagesView imageType={0} token={this.props.admin.token} image={this.props.image} />
+        <ImagesView
+          imageType={0}
+          token={this.props.admin.token}
+          image={void 0 as any}
+        />
       </div>
     )
   }

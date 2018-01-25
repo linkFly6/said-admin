@@ -133,7 +133,6 @@ export function postForm<T>(uri: string, data: FormData,
     resolve,
   ) => {
     xhr.onload = (ev) => {
-      console.log(ev)
       // 如果后面有下载的需求，请重写一个新方法
       let json: any = null
       try {
