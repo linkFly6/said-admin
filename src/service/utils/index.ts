@@ -126,3 +126,12 @@ export const debounce = function (func: any, wait: number, immediate: boolean = 
     return result
   }
 }
+
+
+/**
+ * 判断是否为空对象 => {}
+ * @param obj 
+ */
+export const isEmptyObject = (obj: any) => {
+  return !Object.keys(obj).length
+}

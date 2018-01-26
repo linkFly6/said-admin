@@ -38,7 +38,7 @@ export class Store {
    * @param key 
    * @param value 
    */
-  public val(key: string, value?: any) {
+  public val<T = any>(key: string, value?: any) {
     if (typeof key === 'object') {
       // set
       Object.keys(key).forEach((name) => {
@@ -63,7 +63,7 @@ export class Store {
     }
     // get
     try {
-      return parseData(localStorage.getItem(this.getKey(key)))
+      return parseData(localStorage.getItem(this.getKey(key))) as T
     } catch (e) {
       return null
     }
@@ -86,14 +86,38 @@ export class Store {
   }
 
   /**
+   * 检查是否存在某个 key
+   * @param key 
+   */
+  public has(key: string) {
+    try {
+      return localStorage[this.getKey(key)] !== undefined
+    } catch (error) {
+      return false
+    }
+  }
+
+  /**
+   * 删除指定 key 的数据
+   * @param key 
+   */
+  public delete(key: string) {
+    try {
+      return localStorage.removeItem(this.getKey(key))
+    } catch (error) { 
+      // empty
+    }
+  }
+
+  /**
    * 清空这个 Store 命名空间下的数据，返回被清除的数据
    */
   public clear() {
     const res: { [props: string]: any } = {}
     this.getAllKey().forEach(key => {
       let localKey = this.getKey(key)
-      res[key] = parseData(localStorage[localKey])
       try {
+        res[key] = parseData(localStorage[localKey])
         localStorage.removeItem(localKey)
       } catch (error) {
         // no empty

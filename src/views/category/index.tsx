@@ -7,7 +7,6 @@ import * as s from './index.styl'
 import { Map } from 'immutable'
 import { inject, observer } from 'mobx-react'
 import { CategoryStore } from '../../store/category'
-import { userReady } from '../../service/user'
 
 
 export interface StateProps {
@@ -109,7 +108,7 @@ export default class Index extends React.Component<StateProps, State> {
           </span>
         )
       }]
-    this.load()
+    
   }
   state: State = {
     visible: false,
@@ -122,9 +121,10 @@ export default class Index extends React.Component<StateProps, State> {
     cacheData: Map<string, CategoryModel>()
   }
 
+  componentWillMount () {
+    this.load()
+  }
   async load() {
-    const loginValue = await userReady()
-    if (loginValue) return
     this.props.category.load()
   }
 

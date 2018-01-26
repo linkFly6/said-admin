@@ -7,7 +7,6 @@ import * as s from './add-blog.styl'
 import { inject, observer } from 'mobx-react'
 import { BlogStore } from '../../store/blog'
 import { SelectValue } from 'antd/lib/select'
-import { userReady } from '../../service/user'
 import history from '../../assets/js/history'
 import { Store } from '../../service/utils/store'
 import { debounce } from '../../service/utils/index'
@@ -88,19 +87,14 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
     cssCode: '',
   }
 
-  constructor(props: FormComponentProps & StateProps) {
-    super(props)
-    this.load()
-  }
   componentDidMount() {
+    this.load()
     this.loadLocalData()
   }
   /**
    * 远程加载数据
    */
   async load() {
-    const loginValue = await userReady()
-    if (loginValue) return
     const returns = await this.props.blog.queryCreateBlogBaseInfo()
     if (!returns) return
   }

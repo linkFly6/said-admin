@@ -84,7 +84,7 @@ export class ImageStore {
    * 删除图片，并且删除 store 中对应的图片资源
    */
   deleteImageToList(imageId: string) {
-    this.deleteImage(imageId).then(returns => {
+    return this.deleteImage(imageId).then(returns => {
       if (returns.success) {
         const index = this.images.findIndex(img => img._id === imageId)
         if (~index) {
@@ -93,6 +93,7 @@ export class ImageStore {
           })
         }
       }
+      return returns
     })
   }
 }

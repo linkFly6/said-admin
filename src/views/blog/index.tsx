@@ -24,8 +24,11 @@ class Index extends React.Component<StateProps, { deleteList: List<string> }> {
   state = {
     deleteList: List<string>()
   }
-  constructor(props: StateProps) {
-    super(props)
+
+  /**
+   * constructor 中不允许操作 state
+   */
+  componentWillMount() {
     this.load()
   }
 

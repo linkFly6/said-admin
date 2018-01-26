@@ -1,3 +1,4 @@
+import { AdminRule } from './admin'
 /**
  * 图片类型枚举
  */
@@ -36,6 +37,52 @@ export enum ImageType {
   Other = 7
 }
 
+export interface InterfaceImageTypeText {
+    [prop: number]: string
+}
+
+/**
+ * 每个图片类型对应的文字
+ */
+export const ImageTypeText: InterfaceImageTypeText = {
+  [ImageType.System]: '系统',
+  [ImageType.Blog]: '日志',
+  [ImageType.Music]: '音乐',
+  [ImageType.Article]: '听说',
+  [ImageType.Icon]: '图标',
+  [ImageType.Page]: '页面',
+  [ImageType.Lab]: '实验室',
+  [ImageType.Other]: '其他',
+}
+
+/**
+ * 校验图片类型是否正确
+ * @param imagetype 
+ * @param imagetypes 也可以指定自己的图片类型列表
+ */
+export const hasImageType = (imagetype: number | string, imagetypes: InterfaceImageTypeText = ImageTypeText) => {
+  return !!ImageTypeText[imagetype]
+}
+
+/**
+ * 获取对应用户角色可操作的图片类型
+ */
+export const getUserImageTypeTexts = (rule: AdminRule): InterfaceImageTypeText | null => {
+  switch (rule) {
+    case AdminRule.GLOBAL:
+      return ImageTypeText
+    case AdminRule.BLOG:
+      return {
+        [ImageType.Blog]: ImageTypeText[ImageType.Blog],
+      }
+    case AdminRule.SAID:
+      return {
+        [ImageType.Article]: ImageTypeText[ImageType.Article],
+      }
+    default:
+      return null
+  }
+}
 
 /**
  * 图片 Model

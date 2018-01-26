@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { Icon, Popconfirm, Upload, Modal, message, Progress, Spin } from 'antd'
 import * as s from './images.styl'
-import { ImageModel, ImageType } from '../../types/image'
+import { ImageModel, ImageType, hasImageType } from '../../types/image'
 import { UploadChangeParam } from 'antd/lib/upload'
 import { ImageStore } from '../../store/image'
 import { userReady } from '../../service/user'
 import { inject, observer } from 'mobx-react'
+import { List } from 'immutable'
 
-interface StateProp {
+interface StateProps {
   image: ImageStore,
   imageType: ImageType,
   token: string,
@@ -42,28 +43,42 @@ const UploadProgress = (props: {
 
 const ImageGrid = (props: {
   iamge: ImageModel,
+  deleteting: boolean,
   handleClickPreview: (image: ImageModel) => void,
   handleClickDelete: (image: ImageModel) => void
 }) => {
+  const content = props.deleteting ?
+    (
+      <div className={s.deleteBox}>
+        <Spin size="large" />
+        <div>删除中</div>
+      </div>
+    ) :
+    (
+      <div className={s.buttons}>
+        <span>
+          <Icon type="eye-o" style={{ color: '#fff' }} onClick={() => props.handleClickPreview(props.iamge)} />
+          <Popconfirm
+            title="确认是否删除？"
+            onConfirm={() => props.handleClickDelete(props.iamge)}
+            okText="是"
+            cancelText="否"
+          >
+            <Icon type="delete" style={{ color: '#fff' }} />
+          </Popconfirm>
+        </span>
+      </div>
+    )
+
   return (
     <div className={s.cardGrid}>
-      <div className={s.card}>
+      <div className={[s.card, props.deleteting ? s.deleteing : ''].join(' ')}>
         <div className={s.image} style={{ backgroundImage: `url(${props.iamge.thumb})` }}>
           {/* <img src={props.iamge.thumb} /> */}
         </div>
-        <div className={s.buttons}>
-          <span>
-            <Icon type="eye-o" style={{ color: '#fff' }} onClick={() => props.handleClickPreview(props.iamge)} />
-            <Popconfirm
-              title="确认是否删除？"
-              onConfirm={() => props.handleClickDelete(props.iamge)}
-              okText="是"
-              cancelText="否"
-            >
-              <Icon type="delete" style={{ color: '#fff' }} />
-            </Popconfirm>
-          </span>
-        </div>
+        {
+          content
+        }
       </div>
     </div>
   )
@@ -73,11 +88,15 @@ const ImageGrid = (props: {
   image: allStores.store.image,
 }))
 @observer
-export default class ImageComponents extends React.Component<StateProp, {
+export default class ImageComponents extends React.Component<StateProps, {
   uploading: boolean,
   percent: number,
   previewVisible: boolean,
   previewImage: ImageModel | null,
+  loadingList: boolean,
+  deleteList: List<string>,
+  // 是否有文件被拖拽进来
+  drag: boolean,
 }> {
   state = {
     // 是否正在上传
@@ -86,17 +105,37 @@ export default class ImageComponents extends React.Component<StateProp, {
     percent: 0,
     previewVisible: false,
     previewImage: null,
+    deleteList: List<string>(),
+    loadingList: false,
+    drag: false,
   }
 
-  constructor(props: StateProp) {
-    super(props)
-    this.load()
+  /**
+   * constructor 中不允许操作 state
+   */
+  componentWillMount() {
+    this.load(this.props.imageType)
   }
 
-  async load() {
-    const loginValue = await userReady()
-    if (loginValue) return
-    this.props.image.query(this.props.imageType)
+  /**
+   * props 改变，会触发的生命周期
+   * @param nextProps 
+   */
+  componentWillReceiveProps(nextProps: StateProps) {
+    this.load(nextProps.imageType)
+  }
+
+  async load(imageType: ImageType) {
+    if (hasImageType(imageType)) {
+      this.setState({
+        loadingList: true
+      })
+      this.props.image.query(imageType).then(() => {
+        this.setState({
+          loadingList: false,
+        })
+      })
+    }
   }
 
   handleRequest = (option: any) => {
@@ -140,6 +179,8 @@ export default class ImageComponents extends React.Component<StateProp, {
         })
         if (!returns.check()) {
           message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
+        } else {
+          message.success('上传成功')
         }
       })
   }
@@ -152,15 +193,61 @@ export default class ImageComponents extends React.Component<StateProp, {
   }
   // 删除图片
   handleClickDeleteImage = (image: ImageModel) => {
-    this.props.image.deleteImageToList(image._id)
+    this.setState({
+      deleteList: this.state.deleteList.push(image._id),
+    })
+    this.props.image.deleteImageToList(image._id).then(returns => {
+      if (returns.success) {
+        const index = this.state.deleteList.indexOf(image._id)
+        this.setState({
+          deleteList: this.state.deleteList.remove(index),
+        })
+        message.success('删除成功')
+      }
+    })
   }
   // 预览图片
   hanleClickPreviewImage = (image: ImageModel) => this.setState({ previewImage: image, previewVisible: true })
   // 关闭预览图片
-  handlePreviewModalClose = () => this.setState({ previewVisible: false, previewImage: null })
+  handlePreviewModalClose = () => this.setState({ previewVisible: false })
+  // 拖拽
+  handleShowDragger = (e: React.DragEvent<HTMLDivElement>) => {
+    this.setState({ drag: true })
+    e.preventDefault()
+  }
+  handleHiddenDragger = (e: React.DragEvent<HTMLDivElement>) => {
+    this.setState({ drag: false })
+    e.preventDefault()
+  }
   render() {
+    if (this.state.loadingList) {
+      return (
+        <div className={`${s.imageComponents} ${s.loading}`}>
+          <Spin size="large" />
+        </div>
+      )
+    }
     return (
-      <div className={s.imageComponents}>
+      <div
+        className={s.imageComponents}
+        onDragEnter={this.handleShowDragger}
+        onDrop={this.handleHiddenDragger}
+        // 和 Upload.Dragger 冲突了，这里没办法再处理了
+        // onDragLeave={(e: any) => this.eventlog('leave', e)}
+      >
+        <div className={s.dropBox} style={{ display: this.state.drag ? 'block' : 'none' }}>
+          <Upload.Dragger
+            name="img"
+            accept="image/gif,image/jpeg,image/png"
+            showUploadList={false}
+            customRequest={this.handleRequest}
+          >
+            <p className="ant-upload-drag-icon">
+              <Icon type="inbox" />
+            </p>
+            <p className="ant-upload-text">拖拽文件上传</p>
+          </Upload.Dragger>
+        </div>
         <div className={s.imageCardBox}>
           <div className={s.uploadGrid}>
             <Modal visible={this.state.previewVisible} footer={null} onCancel={this.handlePreviewModalClose}>
@@ -178,7 +265,6 @@ export default class ImageComponents extends React.Component<StateProp, {
               showUploadList={false}
               disabled={this.state.uploading}
               data={this.handleUploaderMixinData}
-              action="/back/api/user/image/upload"
             >
               <UploadProgress percent={this.state.percent} isUploading={this.state.uploading} />
             </Upload>
@@ -188,6 +274,7 @@ export default class ImageComponents extends React.Component<StateProp, {
               <ImageGrid
                 key={image._id}
                 iamge={image}
+                deleteting={this.state.deleteList.contains(image._id)}
                 handleClickDelete={this.handleClickDeleteImage}
                 handleClickPreview={this.hanleClickPreviewImage}
               />
