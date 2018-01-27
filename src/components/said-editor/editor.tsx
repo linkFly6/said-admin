@@ -15,6 +15,25 @@ import { Button } from 'antd'
 
 interface StateProps {
   onChange: (text: string) => void,
+  /**
+   * 拖拽事件，如果返回 false 则阻止拖拽默认事件(浏览器打开被拖拽的文件)
+   */
+  onDrag?: (
+    /**
+     * 拖拽事件
+     */
+    e: DragEvent,
+    /**
+     * 如果调用，则必须在 next() 之前调用
+     * 调用后会插入临时上传占位符文本
+     * 参数 success 标识是否插入占位符
+     */
+    inserUploadingFlag: (success: boolean) => void,
+    /**
+     * 如果调用，则必须在调用之前先调用 inserText
+     * 调用后会用 text 替换掉临时上传文本
+     */
+    next: (text: string) => void) => boolean,
   value?: string
 }
 
@@ -80,30 +99,42 @@ export default class extends React.Component<StateProps, {}> {
   }
 
   componentDidMount() {
-    this.codeMirror.on('drop', (instance: CodeMirror.Editor, e: DragEvent) => {
-      const markText = `![uploding](${this.now})`
-      this.inserTextInNewLine(
-        instance, {
-          left: e.x,
-          top: e.y,
-        },
-        markText)
-      setTimeout(() => { instance.focus() }, 0)
+    if (typeof this.props.onDrag === 'function') {
+      this.codeMirror.on('drop', (instance: CodeMirror.Editor, e: DragEvent) => {
+        // console.log(e)
+        const markText = `![uploding](${this.now})`
 
-      setTimeout(() => {
-        const doc = instance.getDoc()
-        const lastLine = doc.lastLine()
-        // 找到标记数据
-        const searchResult = doc.getSearchCursor(markText)
-        // 进行一次查找
-        if (searchResult.findNext()) {
-          // 替换查到的数据
-          searchResult.replace('![图片名称](上传成功!!)')
+
+        // setTimeout(() => {
+        if (this.props.onDrag!(
+          e,
+          (success: boolean = true) => {
+            if (success) {
+              // 插入临时占位文本
+              this.inserTextInNewLine(
+                instance, {
+                  left: e.x,
+                  top: e.y,
+                },
+                markText)
+            }
+            setTimeout(() => { instance.focus() }, 0)
+          },
+          (text: string) => {
+            const doc = instance.getDoc()
+            const lastLine = doc.lastLine()
+            // 找到标记数据
+            const searchResult = doc.getSearchCursor(markText)
+            // 进行一次查找
+            if (searchResult.findNext()) {
+              // 替换查到的数据
+              searchResult.replace(text)
+            }
+          }) === false) {
+          e.preventDefault()
         }
-        // tslint:disable-next-line:align
-      }, 1000)
-      e.preventDefault()
-    })
+      })
+    }
   }
 
   render() {
@@ -117,7 +148,7 @@ export default class extends React.Component<StateProps, {}> {
               mode: 'markdown',
               lineWrapping: true,
               dragDrop: true,
-              placeholder: '1. 输入 markdown\n\n2.拖拽上传图片\n\n',
+              placeholder: '1. 输入 markdown\n\n2. 拖拽上传图片\n\n',
               value: this.props.value,
               // theme: 'solarized light'
             }}

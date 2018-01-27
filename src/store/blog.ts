@@ -29,10 +29,17 @@ export class BlogStore {
   @observable tags: TagModel[] = []
 
   /**
-   * 新增 blog 需要查询的基础数据信息
+   * 查询 Blog 新增/编辑页面需要的基础数据
+   * 如果有参数 blogId，则为新增模式查询
+   * 如果没有参数 blogId，则为编辑模式查询（会查询得到要编辑的 Blog 对象）
+   * @param blogId 
    */
-  queryCreateBlogBaseInfo() {
-    return fetch<{ tags: TagModel[], categorys: CategoryModel[] }>('/back/api/user/blog/base').then(returns => {
+  queryBlogBaseInfo(blogId?: string) {
+    return fetch<{
+      tags: TagModel[],
+      categorys: CategoryModel[],
+      blog?: BlogModel
+    }>('/back/api/user/blog/base', blogId ? { blogId } : undefined).then(returns => {
       if (returns.check()) {
         runInAction(() => {
           this.categorys = returns.data.categorys
@@ -61,7 +68,8 @@ export class BlogStore {
    * 新增 blog
    * @param blog 
    */
-  create(blog: {
+  save(blog: {
+    _id?: string,
     title: string,
     summary: string,
     context: string,
@@ -72,16 +80,23 @@ export class BlogStore {
       script: string | void,
     }
   }) {
-    return post<BlogModel>('/back/api/user/blog/create', {
-      entity: blog,
-    }).then(returns => {
-      if (returns.check()) {
-        runInAction(() => {
-          this.blogs.push(returns.data as any)
-        })
-      }
-      return returns
-    })
+    return post<BlogModel>(
+      blog._id ?
+        '/back/api/user/blog/update' :
+        '/back/api/user/blog/create'
+      , {
+        entity: blog,
+      }).then(returns => {
+        if (returns.check()) {
+          // 新增模式下把数据 push 到 store 中
+          if (!blog._id) {
+            runInAction(() => {
+              this.blogs.push(returns.data as any)
+            })
+          }
+        }
+        return returns
+      })
   }
 
   /**

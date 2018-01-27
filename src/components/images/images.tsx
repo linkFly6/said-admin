@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { Icon, Popconfirm, Upload, Modal, message, Progress, Spin } from 'antd'
 import * as s from './images.styl'
-import { ImageModel, ImageType, hasImageType } from '../../types/image'
+import { ImageModel, ImageType, hasImageType, acceptMimetypes } from '../../types/image'
 import { UploadChangeParam } from 'antd/lib/upload'
 import { ImageStore } from '../../store/image'
 import { userReady } from '../../service/user'
 import { inject, observer } from 'mobx-react'
 import { List } from 'immutable'
+
 
 interface StateProps {
   image: ImageStore,
@@ -232,13 +233,13 @@ export default class ImageComponents extends React.Component<StateProps, {
         className={s.imageComponents}
         onDragEnter={this.handleShowDragger}
         onDrop={this.handleHiddenDragger}
-        // 和 Upload.Dragger 冲突了，这里没办法再处理了
-        // onDragLeave={(e: any) => this.eventlog('leave', e)}
+      // 和 Upload.Dragger 冲突了，这里没办法再处理了
+      // onDragLeave={(e: any) => this.eventlog('leave', e)}
       >
         <div className={s.dropBox} style={{ display: this.state.drag ? 'block' : 'none' }}>
           <Upload.Dragger
             name="img"
-            accept="image/gif,image/jpeg,image/png"
+            accept={acceptMimetypes.join(',')}
             showUploadList={false}
             customRequest={this.handleRequest}
           >

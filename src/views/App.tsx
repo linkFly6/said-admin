@@ -13,7 +13,7 @@ import ImageManager from './others/images'
 import Said from '../views/said'
 import SaidAdd from '../views/said/add-said'
 import Blog from '../views/blog'
-import BlogAdd from '../views/blog/add-blog'
+import BlogEdit from '../views/blog/edit'
 import Category from '../views/category'
 import { Returns } from '../models/returns'
 import { userReady } from '../service/user'
@@ -36,29 +36,46 @@ export interface StateProps {
 
 const Routers = (props: { isLogin: boolean, pathname: string }) => {
   if (props.isLogin) {
+    // 加这个动画就会导致所有 Route 的 componentDidMount/componentWillMount 执行两次
+    // 详情参见这里：https://github.com/reactjs/react-transition-group/issues/79
+    // return (
+    //   <TransitionGroup>
+    //     <CSSTransition
+    //       key={props.pathname}
+    //       timeout={{ enter: 500, exit: 0 }}
+    //       exit={false}
+    //       classNames="router-animate-fade"
+    //     >
+    //       <div className={s.routers}>
+    //         <Switch>
+    //           <Route path="/" component={Home} exact />
+    //           <Route path="/index" component={Home} exact />
+    //           <Route path="/said" component={Said} exact />
+    //           <Route path="/said/add" component={SaidAdd} exact />
+    //           <Route path="/others/images" component={ImageManager} exact />
+    //           <Route path="/blog" component={Blog} exact />
+    //           <Route path="/blog/edit/:id" component={BlogEdit} exact />
+    //           <Route path="/blog/add" component={BlogEdit} exact />
+    //           <Route path="/category" component={Category} exact />
+    //         </Switch>
+    //       </div>
+    //     </CSSTransition>
+    //   </TransitionGroup>)
     return (
-      <TransitionGroup>
-        <CSSTransition
-          key={props.pathname}
-          timeout={500}
-          classNames="router-animate-fade"
-          mountOnEnter={true}
-          unmountOnExit={true}
-        >
-          <div className={s.routers}>
-            <Switch>
-              <Route path="/" component={Home} exact />
-              <Route path="/index" component={Home} exact />
-              <Route path="/said" component={Said} exact />
-              <Route path="/said/add" component={SaidAdd} exact />
-              <Route path="/others/images" component={ImageManager} exact />
-              <Route path="/blog" component={Blog} exact />
-              <Route path="/blog/add" component={BlogAdd} exact />
-              <Route path="/category" component={Category} exact />
-            </Switch>
-          </div>
-        </CSSTransition>
-      </TransitionGroup>)
+      <div className={s.routers}>
+        <Switch>
+          <Route path="/" component={Home} exact />
+          <Route path="/index" component={Home} exact />
+          <Route path="/said" component={Said} exact />
+          <Route path="/said/add" component={SaidAdd} exact />
+          <Route path="/others/images" component={ImageManager} exact />
+          <Route path="/blog" component={Blog} exact />
+          <Route path="/blog/edit/:id" component={BlogEdit} exact />
+          <Route path="/blog/add" component={BlogEdit} exact />
+          <Route path="/category" component={Category} exact />
+        </Switch>
+      </div>
+    )
   } else {
     return (
       <div className={s.loginLoading}>
@@ -84,12 +101,15 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
 
   constructor(props: RouteComponentProps<{}> & StateProps) {
     super(props)
-    this.login()
     // setTimeout(() => {
     //   this.setState({
     //     isLogin: true
     //   })
     // }, 2000)
+  }
+
+  componentWillMount() {
+    this.login()
   }
 
 
@@ -180,7 +200,7 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
             </Breadcrumb>
             <Content style={{ background: '#fff', padding: 24, margin: 0, position: 'relative' }}>
               {
-                <Routers isLogin={this.state.isLogin} pathname={this.props.location.pathname} />
+                <Routers isLogin={this.state.isLogin} pathname={this.props.location.key as any} />
               }
               {/* </Router> */}
             </Content>

@@ -3,21 +3,23 @@ import * as React from 'react'
 import { Button, Form, Input, Row, Col, AutoComplete, Switch, Collapse, Select, message } from 'antd'
 import SaidEditor from '../../components/said-editor/editor'
 import { FormComponentProps } from 'antd/lib/form/Form'
-import * as s from './add-blog.styl'
+import * as s from './edit.styl'
 import { inject, observer } from 'mobx-react'
 import { BlogStore } from '../../store/blog'
 import { SelectValue } from 'antd/lib/select'
 import history from '../../assets/js/history'
 import { Store } from '../../service/utils/store'
 import { debounce } from '../../service/utils/index'
+import { acceptMimetypes, ImageType } from '../../types/image'
+import { ImageStore } from '../../store/image'
+import { RouteComponentProps } from 'react-router'
 
-// 本地存储
-const store = new Store('add.blog')
 
 /**
+ * 创建一个存储到 Store 的方法：
  * 存储数据到 store，封装为通用方法，针对每个字段的输入做函数节流
  */
-const setStore = function () {
+const createSetStoreFn = function (store: Store) {
   const cacheFunc = {}
   return (name: string, value: any) => {
     if (!cacheFunc[name]) {
@@ -27,7 +29,7 @@ const setStore = function () {
     }
     cacheFunc[name](name, value)
   }
-}()
+}
 
 class FormItem extends React.Component<{}> {
   render() {
@@ -53,15 +55,15 @@ class FormItem extends React.Component<{}> {
 }
 
 export interface StateProps {
-  blog: BlogStore
+  blog: BlogStore,
+  image: ImageStore,
 }
 
-
-@inject((allStores: any) => ({
-  blog: allStores.store.blog
-}))
-@observer
-class AddBlog extends React.Component<FormComponentProps & StateProps, {
+interface ComponentState {
+  /**
+   * 本地 Store 存储
+   */
+  store: Store
   firstActiveContext: boolean,
   initContext: string,
   category: string,
@@ -71,32 +73,97 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
   summary: string,
   jsCode: string,
   cssCode: string,
-}> {
+  /**
+   * 如果包含 blogId，则为编辑模式，否则为新增模式
+   */
+  blogId?: string,
+}
 
-  state = {
+
+@inject((allStores: any) => ({
+  blog: allStores.store.blog,
+  image: allStores.store.image
+}))
+@observer
+class BlogDetail extends React.Component<
+RouteComponentProps<{ id: string }>
+& FormComponentProps
+& StateProps, ComponentState> {
+
+  state: ComponentState = {
+    store: null!,
     // 是否激活操作过 context 输入框，如果操作过就进行校验，校验不通过就显示错误
     firstActiveContext: false,
     // context 初始值
     initContext: '',
+    /**
+     * 分类 ID
+     */
     category: '',
+    /**
+     * 以标签名称组成的标签列表（注意不是 ID）
+     * 提交给后端的时候是提交 name 而不是 id
+     */
     tags: [],
     context: '',
     title: '',
     summary: '',
     jsCode: '',
     cssCode: '',
+    blogId: undefined,
   }
 
   componentDidMount() {
-    this.load()
-    this.loadLocalData()
+    this.load(this.props.match.params.id)
+    // 编辑模式
+    if (this.props.match.params.id) {
+      const store = new Store('blog.edit')
+      this.setState({
+        store,
+      })
+      // 编辑模式不会存储数据到 store
+      this.setStore = () => {
+        // empty
+      }
+    } else {
+      const store = new Store('blog.add')
+      // 新增模式
+      this.setState({
+        store,
+      })
+      this.setStore = createSetStoreFn(store)
+
+      setTimeout(() => {
+        // 这样里面就可以访问到更新后的 store 了
+        this.loadLocalData()
+      }, 0)
+    }
+
   }
   /**
-   * 远程加载数据
+   * 远程加载数据，如果有 blog 则为编辑模式，否则为新增模式
+   * @param blogId 
    */
-  async load() {
-    const returns = await this.props.blog.queryCreateBlogBaseInfo()
-    if (!returns) return
+  async load(blogId: string) {
+    const returns = await this.props.blog.queryBlogBaseInfo(blogId)
+    // 编辑模式
+    if (returns.check() && blogId && returns.data.blog) {
+      // TODO 编辑模式下要还原数据
+      this.setState({
+        blogId: blogId,
+        title: returns.data.blog.title,
+        initContext: returns.data.blog.context,
+        context: returns.data.blog.context,
+        /**
+         * tag 保存的时候是以名字保存的
+         */
+        tags: returns.data.blog.tags.map(tag => tag.name),
+        category: returns.data.blog.category._id,
+        summary: returns.data.blog.summary,
+        jsCode: returns.data.blog.config.script || '',
+        cssCode: returns.data.blog.config.css || '',
+      })
+    }
   }
   /**
    * 加载本地缓存数据
@@ -119,35 +186,39 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
         jsCode: '',
         cssCode: '',
       }
-    store.getAllKey().forEach((key: string) => {
-      data[key] = store.val(key)
+    this.state.store.getAllKey().forEach((key: string) => {
+      data[key] = this.state.store.val(key)
     })
     this.setState(data)
-    if (store.val('context')) {
+    if (this.state.store.val('context')) {
       this.setState({
-        initContext: store.val('context')
+        initContext: this.state.store.val('context')
       })
     }
+  }
+
+  setStore = (name: string, value: any) => {
+    // empty，该方法会在 store 确认下来之后被重写
   }
 
   handleChangeCategory = (value: string) => {
     this.setState({
       category: value
     })
-    setStore('category', value)
+    this.setStore('category', value)
   }
   handleChangeTags = (values: string[]) => {
     this.setState({
       tags: values
     })
-    setStore('tags', values)
+    this.setStore('tags', values)
   }
   handleChangeContext = (text: string) => {
     this.setState({
       context: text,
       // firstActiveContext: true,
     })
-    setStore('context', text)
+    this.setStore('context', text)
   }
   /**
    * 提交数据
@@ -168,7 +239,8 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
       if (!this.state.context.length) {
         return
       }
-      const returns = await this.props.blog.create({
+      const returns = await this.props.blog.save({
+        _id: this.state.blogId,
         title: field.title,
         summary: field.summary,
         context: this.state.context,
@@ -180,8 +252,12 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
         }
       })
       if (returns.check()) {
-        message.success(`新增文章《${field.title}》成功`)
-        store.clear()
+        if (this.state.blogId) {
+          message.success(`编辑文章《${field.title}》成功`)
+        } else {
+          message.success(`新增文章《${field.title}》成功`)
+        }
+        this.state.store.clear()
         setTimeout(() => {
           history.push('/blog')
         }, 1000)
@@ -195,8 +271,59 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
    */
   createHandelChangeSaveToLocal = (name: string) => {
     return (e: React.ChangeEvent<any>) => {
-      setStore(name, e.target.value)
+      this.setStore(name, e.target.value)
     }
+  }
+
+  /**
+   * 编辑器拖拽事件
+   */
+  handleOnDrag = (
+    /**
+     * 拖拽事件
+     */
+    e: DragEvent,
+    /**
+     * 调用后会插入临时上传文本
+     * 参数 success 标识是否插入文本
+     */
+    inserUploadingFlag: (success: boolean) => void,
+    /**
+     * 调用后会用 text 替换掉临时上传文本
+     */
+    next: (text: string) => void
+  ) => {
+    if (e.dataTransfer.files.length) {
+      // 只处理第一个文件
+      const file = e.dataTransfer.files[0]
+      if (~acceptMimetypes.indexOf(file.type)) {
+        // 在编辑器插入占位符
+        inserUploadingFlag(true)
+        // 上传图片
+        this.uploadImage(file).then(returns => {
+          if (!returns.check()) {
+            message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
+            // 清掉占位符
+            next('')
+          } else {
+            // 插入替换占位符后的 markdown 文本
+            next(`![alt](${returns.data.url})`)
+          }
+        })
+      } else {
+        // 表示不支持该文件，不要在编辑器插入占位符
+        inserUploadingFlag(false)
+      }
+    }
+    return false
+  }
+
+  // 上传文件
+  uploadImage = (file: File) => {
+    return this.props.image.upload({
+      imageType: ImageType.Blog,
+      img: file,
+    })
   }
 
   render() {
@@ -237,7 +364,11 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                 help={!this.state.firstActiveContext || this.state.context.length ? void 0 : '请输入文章内容'}
               >
                 {
-                  <SaidEditor onChange={this.handleChangeContext} value={this.state.initContext} />
+                  <SaidEditor
+                    onChange={this.handleChangeContext}
+                    value={this.state.initContext}
+                    onDrag={this.handleOnDrag}
+                  />
                 }
               </Form.Item>
             </Col>
@@ -339,7 +470,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                           autosize={{ minRows: 4, maxRows: 4 }}
                           onChange={this.createHandelChangeSaveToLocal('jsCode')}
                         />
-                      )
+                        )
                     }
                   </div>
                   {
@@ -352,7 +483,7 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
                         autosize={{ minRows: 4, maxRows: 4 }}
                         onChange={this.createHandelChangeSaveToLocal('cssCode')}
                       />
-                    )
+                      )
                   }
                 </Collapse.Panel>
               </Collapse>
@@ -363,7 +494,9 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
               预览
             </Button>
             <Button type="primary" size="large" htmlType="submit" style={{ marginLeft: '2rem' }}>
-              发表
+              {
+                this.state.blogId ? '保存' : '发表'
+              }
             </Button>
           </Row>
         </Form>
@@ -372,4 +505,4 @@ class AddBlog extends React.Component<FormComponentProps & StateProps, {
   }
 }
 
-export default Form.create()(AddBlog)
+export default Form.create()(BlogDetail)

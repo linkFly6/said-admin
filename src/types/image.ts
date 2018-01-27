@@ -1,4 +1,13 @@
 import { AdminRule } from './admin'
+
+/**
+ * 支持上传的图片 mimeType 列表
+ */
+export const acceptMimetypes = [
+  'image/gif',
+  'image/jpeg',
+  'image/png'
+]
 /**
  * 图片类型枚举
  */
@@ -121,3 +130,5 @@ export interface ImageModel {
    */
   thumb: string
 }
+
+
