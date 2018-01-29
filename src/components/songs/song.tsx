@@ -12,8 +12,10 @@ import {
   Row,
   Col,
   Input,
+  Button,
 } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
+import ImagesComponent from '../../components/images/images'
 import * as s from './song.styl'
 import { acceptMimetypes } from '../../types/song'
 import { UploadChangeParam } from 'antd/lib/upload'
@@ -23,6 +25,7 @@ import { List } from 'immutable'
 import { SongStore } from '../../store/song'
 import { SongModel } from '../../types/song'
 import { Store } from '../../service/utils/store'
+import { ImageModel, ImageType } from '../../types/image'
 
 
 const store = new Store('other.view.song')
@@ -150,60 +153,160 @@ const SongGrid = (props: {
   )
 }
 
-class ImageFormComponent extends React.Component<FormComponentProps & {}> {
+
+class FormItem extends React.Component<{
+  label: string
+}> {
+  render() {
+    return (
+      <Form.Item>
+        {
+          this.props.children
+        }
+      </Form.Item>
+    )
+  }
+}
+
+interface ImageFormProps extends FormComponentProps {
+  image?: ImageModel,
+  onSelectImage: () => void
+}
+/**
+ * 新增音乐组件
+ */
+class SongFormComponent extends React.Component<ImageFormProps> {
+
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
     return (
       <Form layout="vertical">
-        <Row>
-          <Col>
-            <Form.Item>
+        <Row gutter={24}>
+          <Col
+            span={12}
+          >
+            <div
+              className={`${s.formImageBox} ${this.props.image ? '' : s.error}`}
+              onClick={() => { this.props.onSelectImage() }}
+            >
+              <Icon
+                type="picture"
+                className={s.iconLarge}
+              >
+                点击选择歌曲封面
+              </Icon>
+              <div className={s.formImage} />
+            </div>
+          </Col>
+          <Col
+            span={12}
+          >
+            <FormItem
+              label="歌曲名称"
+            >
               {
                 getFieldDecorator(
                   'title',
                   {
                     validateTrigger: ['onChange', 'onBlur'],
-                    rules: [{ required: true, message: '请输入文章标题' }],
+                    rules: [{ required: true, message: '请输入歌曲名称' }],
+                    // initialValue
                   })(
                   <Input
-                    placeholder="文章标题"
-                    size="large"
+                    placeholder="歌曲名称"
                     autoComplete="off"
                   // onChange={this.createHandelChangeSaveToLocal('title')}
                   />
                   )
               }
-            </Form.Item>
+            </FormItem>
+            <FormItem label="歌手名称">
+              {
+                getFieldDecorator(
+                  'artist',
+                  {
+                    validateTrigger: ['onChange', 'onBlur'],
+                    rules: [{ required: true, message: '请输入歌手名称' }],
+                    // initialValue
+                  })(
+                  <Input
+                    placeholder="歌手名称"
+                    autoComplete="off"
+                  // onChange={this.createHandelChangeSaveToLocal('title')}
+                  />
+                  )
+              }
+            </FormItem>
+            <FormItem label="专辑名称">
+              {
+                getFieldDecorator(
+                  'album',
+                  {
+                    validateTrigger: ['onChange', 'onBlur'],
+                    rules: [{ required: true, message: '请输入专辑名称' }],
+                    // initialValue
+                  })(
+                  <Input
+                    placeholder="专辑名称"
+                    autoComplete="off"
+                  // onChange={this.createHandelChangeSaveToLocal('title')}
+                  />
+                  )
+              }
+            </FormItem>
+            <FormItem label="歌曲时长">
+              <Input
+                placeholder="歌曲时长"
+                autoComplete="off"
+                disabled
+              // onChange={this.createHandelChangeSaveToLocal('title')}
+              />
+            </FormItem>
           </Col>
         </Row>
-      </Form>
+      </Form >
     )
   }
 }
 
-const FormImage = Form.create()(ImageFormComponent)
+const FormAddSong = Form.create()(SongFormComponent)
 
+
+interface ComponentState {
+  uploading: boolean,
+  percent: number,
+  addModalVisible: boolean,
+  loadingList: boolean,
+  deleteList: List<string>,
+  submiting: boolean,
+  // 是否有文件被拖拽进来
+  drag: boolean,
+  /**
+   * 选择图片弹窗
+   */
+  selectImageMoalVisible: boolean,
+}
 
 @inject((allStores: any) => ({
   admin: allStores.store.admin,
   songStore: allStores.store.song,
 }))
 @observer
-export default class ImageComponents extends React.Component<StateProps, {
-  uploading: boolean,
-  percent: number,
-  addModalVisible: boolean,
-  loadingList: boolean,
-  deleteList: List<string>,
-  // 是否有文件被拖拽进来
-  drag: boolean,
-}> {
+export default class ImageComponents extends React.Component<StateProps, ComponentState> {
   state = {
     // 是否正在上传
     uploading: false,
     // 上传进度
     percent: 0,
+    /**
+     * 表单是否正在提交
+     */
+    submiting: false,
     addModalVisible: false,
+    /**
+     * 选择图片弹窗
+     */
+    selectImageMoalVisible: false,
     previewImage: null,
     deleteList: List<string>(),
     loadingList: false,
@@ -251,6 +354,28 @@ export default class ImageComponents extends React.Component<StateProps, {
       store.val(SONGCACHENAME, returns.data)
     })
   }
+
+  /**
+   * 提交
+   */
+  handleSubmit = () => {
+    const form = this.refs.formImage as any
+
+    form.validateFields(async (err, field: {
+      title: string,
+      artist: string[],
+      album: string,
+    }) => {
+      console.log(err)
+    })
+  }
+
+  handleSelectImage = () => {
+    this.setState({
+      selectImageMoalVisible: true
+    })
+  }
+
   render() {
     if (this.state.loadingList) {
       return (
@@ -280,12 +405,33 @@ export default class ImageComponents extends React.Component<StateProps, {
         <div className={s.cardBox}>
           <div className={s.uploadGrid}>
             <Modal
-              title="新增歌曲"
-              visible={this.state.addModalVisible}
-            // onOk={this.handleOk}
-            // onCancel={this.handleCancel}
+              title="选择歌曲封面"
+              width={'80%'}
+              closable={false}
+              maskClosable={false}
+              visible={this.state.selectImageMoalVisible}
             >
-              <FormImage />
+              <ImagesComponent
+                imageType={ImageType.Music}
+                image={void 0 as any}
+              />
+            </Modal>
+            <Modal
+              title="新增歌曲"
+              closable={false}
+              maskClosable={false}
+              visible={this.state.addModalVisible}
+              footer={
+                <div>
+                  <Button type="danger">取消</Button>
+                  <Button type="primary" onClick={this.handleSubmit}>确定</Button>
+                </div>
+              }
+            >
+              <FormAddSong
+                ref="formImage"
+                onSelectImage={this.handleSelectImage}
+              />
             </Modal>
             <Upload
               name="img"

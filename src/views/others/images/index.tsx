@@ -97,7 +97,6 @@ export default class ImageManage extends React.Component<StateProps, ComponentSt
         <div>
           <ImagesComponent
             imageType={this.state.selectImageType as any}
-            token={this.props.admin.token}
             image={void 0 as any}
           />
         </div>

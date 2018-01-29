@@ -16,3 +16,7 @@ export const ellipsis: string;
 export const deleteing: string;
 export const deleteBox: string;
 export const deleteText: string;
+export const formImageBox: string;
+export const error: string;
+export const iconLarge: string;
+export const formImage: string;

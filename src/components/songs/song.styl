@@ -85,4 +85,29 @@
           text-shadow 1px 1px 1px rgba(0,0,0,.6)
           .delete-text
             margin-top 1rem
-
+.form-image-box
+  border 1px dashed #d9d9d9
+  border-radius 4px
+  cursor pointer
+  background #fafafa
+  height 14rem
+  width 14rem
+  padding .5rem
+  position relative
+  &.error
+    border-color #f5222d!important
+    .icon-large
+      color #f5222d!important
+  .icon-large
+    position absolute
+    left 50%
+    top 50%
+    transform translate(-50%,-50%)
+    min-width 8rem
+    &::before
+      font-size 3rem
+      padding-bottom .5rem
+  &:hover
+    border-color #1890ff
+  .form-image
+    background no-repeat

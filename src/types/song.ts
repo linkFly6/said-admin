@@ -4,8 +4,8 @@ import { ImageModel } from './image'
  * 支持的音乐文件列表
  */
 export const acceptMimetypes = [
-  'mp3',
-  'ogg'
+  'audio/mpeg',
+  'audio/ogg'
 ]
 /**
  * 歌曲 Model
@@ -17,7 +17,7 @@ export interface SongModel {
    */
   url: string,
   /**
-   * 名称
+   * 名称，md5
    */
   name: string,
   /**

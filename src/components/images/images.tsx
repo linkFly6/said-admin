@@ -12,7 +12,6 @@ import { List } from 'immutable'
 interface StateProps {
   image: ImageStore,
   imageType: ImageType,
-  token: string,
 }
 
 
@@ -189,9 +188,9 @@ export default class ImageComponents extends React.Component<StateProps, {
   /**
    * 上传前附加数据
    */
-  handleUploaderMixinData = (file: File) => {
-    return { imageType: this.props.imageType, token: this.props.token }
-  }
+  // handleUploaderMixinData = (file: File) => {
+  //   return { imageType: this.props.imageType, token: this.props.token }
+  // }
   // 删除图片
   handleClickDeleteImage = (image: ImageModel) => {
     this.setState({
@@ -265,7 +264,7 @@ export default class ImageComponents extends React.Component<StateProps, {
               listType="picture-card"
               showUploadList={false}
               disabled={this.state.uploading}
-              data={this.handleUploaderMixinData}
+              // data={this.handleUploaderMixinData}
             >
               <UploadProgress percent={this.state.percent} isUploading={this.state.uploading} />
             </Upload>
