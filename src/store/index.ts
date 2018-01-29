@@ -4,6 +4,7 @@ import { CategoryStore } from './category'
 import { ArticleStore } from './article'
 import { AdminStore } from './admin'
 import { ImageStore } from './image'
+import { SongStore } from './song'
 
 export default {
   common: new CommonStore(),
@@ -12,4 +13,5 @@ export default {
   article: new ArticleStore(),
   admin: new AdminStore(),
   image: new ImageStore(),
+  song: new SongStore(),
 }

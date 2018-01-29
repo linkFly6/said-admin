@@ -14,8 +14,10 @@ import Said from '../views/said'
 import SaidAdd from '../views/said/add-said'
 import Blog from '../views/blog'
 import BlogEdit from '../views/blog/edit'
-import Category from '../views/category'
+import Category from '../views/others/category'
+import Song from '../views/others/song'
 import { Returns } from '../models/returns'
+
 import { userReady } from '../service/user'
 
 
@@ -73,6 +75,7 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
           <Route path="/blog/edit/:id" component={BlogEdit} exact />
           <Route path="/blog/add" component={BlogEdit} exact />
           <Route path="/category" component={Category} exact />
+          <Route path="/song" component={Song} exact />
         </Switch>
       </div>
     )
@@ -181,7 +184,7 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
               </SubMenu>
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
                 <Menu.Item key="/others/images"><Icon type="tupian" />图片管理</Menu.Item>
-                <Menu.Item key="6"><Icon type="icon14" />音乐管理</Menu.Item>
+                <Menu.Item key="/song"><Icon type="icon14" />音乐管理</Menu.Item>
                 <Menu.Item key="/category"><Icon type="biaoqian" />分类管理</Menu.Item>
               </SubMenu>
               <SubMenu key="site" title={<span><Icon type="diannao" />站点管理</span>}>

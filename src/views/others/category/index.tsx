@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { Button, Row, Col, Table, Icon, Modal, Form, Input, Popconfirm, message } from 'antd'
 import { FormItemProps } from 'antd/lib/form/FormItem'
-import SelectCategory from '../../components/select-catogory'
-import { CategoryModel } from '../../types/category'
-import * as s from './index.styl'
+import SelectCategory from '../../../components/select-catogory'
+import { CategoryModel } from '../../../types/category'
+import * as s from './category.styl'
 import { Map } from 'immutable'
 import { inject, observer } from 'mobx-react'
-import { CategoryStore } from '../../store/category'
+import { CategoryStore } from '../../../store/category'
 
 
 export interface StateProps {
@@ -29,7 +29,7 @@ interface State {
   category: allStores.store.category
 }))
 @observer
-export default class Index extends React.Component<StateProps, State> {
+export default class CategoryManage extends React.Component<StateProps, State> {
   columns: (
     { title: string; dataIndex: string; key: string; width: string | number }
     | { title: string; key: string; render: (text: any, record: any) => JSX.Element; })[]

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node scripts/start.js --env=development",
+    "dev": "node scripts/start.js --env=development",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom"
   },

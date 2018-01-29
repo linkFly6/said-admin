@@ -260,7 +260,7 @@ export default class ImageComponents extends React.Component<StateProps, {
             </Modal>
             <Upload
               name="img"
-              accept="image/gif,image/jpeg,image/png"
+              accept={acceptMimetypes.join(',')}
               customRequest={this.handleRequest}
               listType="picture-card"
               showUploadList={false}

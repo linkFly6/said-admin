@@ -77,4 +77,13 @@ export class AdminStore implements SimpleAdmin {
       return returns
     })
   }
+
+
+  /**
+   * 检测当前用户是否拥有操作某个模块的权限
+   * @param rule 
+   */
+  hasRule(rule: AdminRule) {
+    return this.rule === AdminRule.GLOBAL || this.rule === rule
+  }
 }

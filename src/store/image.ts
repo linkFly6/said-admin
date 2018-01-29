@@ -3,32 +3,14 @@ import { fetch, post, postForm } from '../service/http'
 import { ImageType, ImageModel } from '../types/image'
 import { CategoryModel } from '../types/category'
 
-
-export class Image {
-  _id: string = ''
-  name: string = ''
-  fileName: string = ''
-  size: number = 0
-  key: string = ''
-  type: ImageType = ImageType.System
-  /**
-   * 前端属性，数据库没有，访问 url
-   */
-  url: string = ''
-  /**
-   * 前端属性，数据库没有，缩略图 url
-   */
-  thumb: string = ''
-}
-
 export class ImageStore {
-  @observable images: Image[] = []
+  @observable images: ImageModel[] = []
   /**
    * 查询列表
    */
   @action
   query(imageType: ImageType) {
-    return fetch<Image[]>('/back/api/user/image/query', { imageType: imageType }).then(returns => {
+    return fetch<ImageModel[]>('/back/api/user/image/query', { imageType: imageType }).then(returns => {
       if (returns.check()) {
         runInAction(() => {
           this.images = returns.data

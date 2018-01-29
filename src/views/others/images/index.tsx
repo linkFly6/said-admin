@@ -2,13 +2,13 @@ import * as React from 'react'
 import { Icon, Modal, Radio } from 'antd'
 import * as s from './image.styl'
 import { inject, observer } from 'mobx-react'
-import ImagesView from '../../components/images/images'
-import { userReady } from '../../service/user'
-import { AdminStore } from '../../store/admin'
-import { ImageStore } from '../../store/image'
-import { ImageType, getUserImageTypeTexts, hasImageType } from '../../types/image'
-import { Store } from '../../service/utils/store'
-import { isEmptyObject } from '../../service/utils'
+import ImagesComponent from '../../../components/images/images'
+import { userReady } from '../../../service/user'
+import { AdminStore } from '../../../store/admin'
+import { ImageStore } from '../../../store/image'
+import { ImageType, getUserImageTypeTexts, hasImageType } from '../../../types/image'
+import { Store } from '../../../service/utils/store'
+import { isEmptyObject } from '../../../service/utils'
 
 const store = new Store('other.view.image')
 
@@ -33,7 +33,7 @@ interface ComponentState {
   image: allStores.store.image,
 }))
 @observer
-export default class ImageManager extends React.Component<StateProps, ComponentState> {
+export default class ImageManage extends React.Component<StateProps, ComponentState> {
   state: ComponentState = {
     imageTypes: {},
     selectImageType: void 0,
@@ -95,7 +95,7 @@ export default class ImageManager extends React.Component<StateProps, ComponentS
           </Radio.Group>
         </div>
         <div>
-          <ImagesView
+          <ImagesComponent
             imageType={this.state.selectImageType as any}
             token={this.props.admin.token}
             image={void 0 as any}

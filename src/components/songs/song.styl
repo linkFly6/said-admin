@@ -1,0 +1,88 @@
+.song-components
+  position relative
+  &.loading
+    text-align center
+    padding-top 2rem
+  .drop-box
+    position absolute
+    left 0
+    top 0
+    width 100%
+    height 100%
+    z-index 3
+  .card-box
+    position relative
+    width 100%
+    display flex
+    flex-wrap wrap
+    .upload-grid
+      margin .5rem
+      width 16rem
+      height 11rem
+      :global(.ant-upload)
+        width 100%
+        height 100%
+      .icon-upload
+        font-size 30px
+    .card-grid
+      border 1px solid #d9d9d9
+      border-radius 4px
+      padding .5rem
+      margin .5rem
+    .card
+      $cardWidth = 15rem
+      width $cardWidth
+      background #fafafa
+      position relative
+      .image
+        width 100%
+        height $cardWidth
+        background center center no-repeat #f4f4f4
+        background-size cover
+        border-radius 0
+        transition border-radius linear .5s
+        &.player
+          border-radius 100%
+          animation payler linear 30s infinite
+          @keyframes payler
+            0%
+              transform rotate(0deg)
+            100%
+              transform rotate(360deg)
+      .delete-button
+          color #e82548
+      .detail
+        p
+          margin-bottom 0
+          width 100%
+          word-break break-all
+          span
+            cursor help
+        .flex
+          display flex
+          justify-content space-between
+        .ellipsis
+            text-overflow ellipsis
+            white-space nowrap
+            overflow hidden
+      .deleteing
+        position absolute
+        top 0
+        left 0
+        width 100%
+        height 100%
+        background rgba(0, 0, 0, 0.5)
+        transition all .3s
+        z-index 1
+        .delete-box
+          text-align center
+          position absolute
+          top 50%
+          left 50%
+          transform translate(-50%, -50%)
+          z-index 2
+          color #fff
+          text-shadow 1px 1px 1px rgba(0,0,0,.6)
+          .delete-text
+            margin-top 1rem
+
