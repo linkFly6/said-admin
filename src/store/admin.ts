@@ -86,4 +86,11 @@ export class AdminStore implements SimpleAdmin {
   hasRule(rule: AdminRule) {
     return this.rule === AdminRule.GLOBAL || this.rule === rule
   }
+
+  /**
+   * 检测当前用户是否是超级管理员
+   */
+  isRoot() {
+    return this.rule === AdminRule.GLOBAL
+  }
 }

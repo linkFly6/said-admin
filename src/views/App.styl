@@ -2,9 +2,6 @@
   .app-breadcrumb
     margin 1rem 0
     text-transform capitalize
-  .login-loading
-    text-align center
-    padding-top 5rem
   .routers
     position relative
 
@@ -25,6 +22,11 @@
 
 :global(.router-animate-fade-exit.router-animate-fade-exit-active) 
   opacity 0
+
+// 每个页面通用的页面级 loading，页面加载数据的时候可以使用这个 class
+:global(.page-loading)
+  text-align center
+  padding-top 5rem
 //   .app-header
 //       background-color #222
 //       height 150px

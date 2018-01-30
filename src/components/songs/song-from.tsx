@@ -66,7 +66,12 @@ class FormItem extends React.Component<{
 interface StateProps extends FormComponentProps {
   songStore: SongStore,
   onSuccess?: (song: SongModel) => void,
-  onCancel?: () => void
+  onCancel?: () => void,
+  /**
+   * 可以指定除 store 之外的对象
+   * 也可以通过它来让组件重置
+   */
+  song?: SongModel | null
 }
 
 interface ComponentState {
@@ -144,6 +149,16 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
       this.setStore(name, e.target.value)
     }
   }
+  componentWillReceiveProps(nextProps: StateProps) {
+    // 重置数据
+    if (nextProps.song) {
+      this.setState({
+        cache: nextProps.song,
+        image: nextProps.song.image ? nextProps.song.image : null,
+        selectImage: nextProps.song.image ? nextProps.song.image : null
+      })
+    }
+  }
 
   /**
    * 关闭或取消选择图片
@@ -215,15 +230,15 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
       btnCancelIsLoading: true
     })
     this.props.songStore.removeSongFile(this.state.cache.name).then(returns => {
+      if (this.props.onCancel) {
+        this.props.onCancel()
+      }
       this.setState({
         btnCancelIsLoading: false
       })
       if (returns.success) {
         message.warn('已取消')
         this.reset()
-        if (this.props.onCancel) {
-          this.props.onCancel()
-        }
       }
     })
   }
@@ -263,15 +278,15 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
         album: field.album,
         image,
       }).then(returns => {
+        if (this.props.onSuccess) {
+          this.props.onSuccess(returns.data)
+        }
         this.setState({
           btnSaveIsLoading: false,
         })
         if (returns.success) {
           message.success('添加成功')
           this.reset()
-          if (this.props.onSuccess) {
-            this.props.onSuccess(returns.data)
-          }
         }
       })
     })

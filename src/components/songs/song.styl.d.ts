@@ -1,6 +1,4 @@
 export const songComponents: string;
-export const loading: string;
-export const dropBox: string;
 export const cardBox: string;
 export const uploadGrid: string;
 export const iconUpload: string;
@@ -11,8 +9,9 @@ export const player: string;
 export const payler: string;
 export const deleteButton: string;
 export const detail: string;
+export const content: string;
 export const flex: string;
-export const ellipsis: string;
+export const actions: string;
 export const deleteing: string;
 export const deleteBox: string;
 export const deleteText: string;

@@ -4,6 +4,7 @@ import { ImageModel } from './image'
  * 支持的音乐文件列表
  */
 export const acceptMimetypes = [
+  'audio/mp3',
   'audio/mpeg',
   'audio/ogg'
 ]

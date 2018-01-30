@@ -7,6 +7,7 @@ import { ImageStore } from '../../store/image'
 import { userReady } from '../../service/user'
 import { inject, observer } from 'mobx-react'
 import { List } from 'immutable'
+import { PageLoading } from '../common'
 
 
 interface StateProps {
@@ -222,7 +223,8 @@ export default class ImageComponents extends React.Component<StateProps, Compone
      * 2. 拖拽上传
      */
     this.setState({
-      uploading: true
+      uploading: true,
+      percent: 0,
     })
     // const intervalId = setInterval(() => {
     //   if (this.state.percent === 100) {
@@ -310,11 +312,7 @@ export default class ImageComponents extends React.Component<StateProps, Compone
 
   render() {
     if (this.state.loadingList) {
-      return (
-        <div className={`${s.imageComponents} ${s.loading}`}>
-          <Spin size="large" />
-        </div>
-      )
+      return <PageLoading />
     }
     return (
       <div

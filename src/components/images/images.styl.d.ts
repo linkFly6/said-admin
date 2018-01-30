@@ -1,5 +1,4 @@
 export const imageComponents: string;
-export const loading: string;
 export const dropBox: string;
 export const imageCardBox: string;
 export const uploadGrid: string;

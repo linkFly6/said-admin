@@ -1,24 +1,16 @@
 .song-components
+  $cardWidth = 10rem
   position relative
-  &.loading
-    text-align center
-    padding-top 2rem
-  .drop-box
-    position absolute
-    left 0
-    top 0
-    width 100%
-    height 100%
-    z-index 3
   .card-box
     position relative
     width 100%
     display flex
+    justify-content space-evenly
     flex-wrap wrap
     .upload-grid
       margin .5rem
-      width 16rem
-      height 11rem
+      width $cardWidth * 2 + 1
+      height $cardWidth + 1
       :global(.ant-upload)
         width 100%
         height 100%
@@ -30,17 +22,16 @@
       padding .5rem
       margin .5rem
     .card
-      $cardWidth = 15rem
-      width $cardWidth
       background #fafafa
       position relative
       .image
-        width 100%
+        width $cardWidth
         height $cardWidth
         background center center no-repeat #f4f4f4
         background-size cover
         border-radius 2px
-        transition border-radius linear .5s
+        transform rotate(0deg)
+        transition border-radius linear .5s, transform linear .5s
         &.player
           border-radius 100%
           animation payler linear 30s infinite
@@ -52,19 +43,46 @@
       .delete-button
           color #e82548
       .detail
-        p
-          margin-bottom 0
-          width 100%
-          word-break break-all
-          span
-            cursor help
-        .flex
+        width $cardWidth
+        padding 0 .5rem
+        ellipsis()
+          text-overflow ellipsis
+          white-space nowrap
+          overflow hidden
+        .content
           display flex
-          justify-content space-between
-        .ellipsis
-            text-overflow ellipsis
-            white-space nowrap
-            overflow hidden
+          flex-direction column
+          height $cardWidth - 2.2
+          h3
+            ellipsis()
+            margin .3rem 0
+          p
+            ellipsis()
+            flex 1
+            cursor default
+            margin-bottom 0
+            width 100%
+            word-break break-all
+            color rgba(0, 0, 0, 0.45)
+            &:last-child
+              margin-bottom .3rem
+          .flex
+            display flex
+            justify-content space-between
+        .actions
+          display flex
+          border-top 1px solid #e8e8e8
+          div
+            text-align center
+            margin .4rem 0
+            color rgba(0, 0, 0, 0.45)
+            backdround #fafafa
+            i
+              cursor pointer
+            flex 1
+            &:not(:last-child)
+              border-right 1px solid #e8e8e8
+
       .deleteing
         position absolute
         top 0

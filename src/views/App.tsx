@@ -19,6 +19,7 @@ import Song from '../views/others/song'
 import { Returns } from '../models/returns'
 
 import { userReady } from '../service/user'
+import { PageLoading } from '../components/common'
 
 
 const { SubMenu } = Menu
@@ -81,9 +82,7 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
     )
   } else {
     return (
-      <div className={s.loginLoading}>
-        <Spin size="large" />
-      </div>
+      <PageLoading />
     )
   }
 }

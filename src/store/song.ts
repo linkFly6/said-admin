@@ -72,7 +72,7 @@ export class SongStore {
   /**
    * 删除歌曲，并且删除 store 中对应的图片资源
    */
-  deleteImageToList(songId: string) {
+  deleteSongToList(songId: string) {
     return this.deleteSong(songId).then(returns => {
       if (returns.success) {
         const index = this.songs.findIndex(song => song._id === songId)

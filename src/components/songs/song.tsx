@@ -26,12 +26,16 @@ import { SongModel } from '../../types/song'
 import { Store } from '../../service/utils/store'
 import { ImageModel, ImageType } from '../../types/image'
 import SongForm, { saveCache, hasCache } from './song-from'
+import { PageLoading } from '../common'
+import { AdminStore } from '../../store/admin'
+import { parseTime, parseBit } from '../../service/utils/format'
 
 
 
 
 interface StateProps {
   songStore: SongStore,
+  adminStore: AdminStore,
 }
 
 
@@ -56,7 +60,7 @@ const UploadProgress = (props: {
   return (
     <div>
       <Icon type={'plus'} className={s.iconUpload} />
-      <div className="ant-upload-text">点击上传</div>
+      <div className="ant-upload-text">点击或拖拽音频文件上传</div>
     </div>
   )
 }
@@ -78,15 +82,15 @@ const SongGrid = (props: {
   /**
    * 点播放触发
    */
-  onPlay: () => void
+  onPlay: (song: SongModel) => void
   /**
    * 点暂停触发
    */
-  onPause: () => void
+  onPause: (song: SongModel) => void
   /**
    * 删除触发
    */
-  onDelete: () => void
+  onDelete?: (song: SongModel) => void
 }) => {
   const deleteContent = props.isDeleteting ?
     (
@@ -99,49 +103,68 @@ const SongGrid = (props: {
     ) : ''
   const buttonsContent: Array<React.ReactNode> = []
 
-  if (props.isPlay) {
-    // 播放中，显示暂停按钮
-    buttonsContent.push(<Icon type="pause-circle-o" title="点击暂停" />)
-  } else {
-    buttonsContent.push(<Icon type="play-circle-o" title="点击播放" />)
-  }
-
-  // 检测是否有删除权限
-  if (props.isShowDelete) {
-    buttonsContent.push(
-      <Popconfirm
-        title="确认是否删除？"
-        okText="是"
-        cancelText="否"
-      >
-        <Icon className={s.deleteButton} type="delete" />
-      </Popconfirm>
-    )
-  }
-
   return (
     <div className={s.cardGrid}>
       <div className={s.card}>
         {deleteContent}
-        <Card
-          cover={
+        <Row>
+          <Col span={12}>
             <div
-              className={`${s.image} ${s.player}`}
-              style={{ backgroundImage: `url(${props.song.url})` }}
+              className={`${s.image} ${props.isPlay ? s.player : ''}`}
+              style={{ backgroundImage: `url(${props.song.image.thumb})` }}
             />
-          }
-          actions={buttonsContent}
-        >
-          <Card.Meta
-            title="Favours"
-            description={
-              <div className={s.detail}>
-                <p><span title="歌手">{props.song.artist}</span> -<span title="专辑">《{props.song.album}》</span></p>
-                <p className={s.flex}><span title="时长">03:222222312</span><span title="大小">10000T</span></p>
+          </Col>
+          <Col span={12}>
+            <div className={s.detail}>
+              <div className={s.content}>
+                <h3>{props.song.title}</h3>
+                <p><span title="歌手">{props.song.artist}</span></p>
+                <p><span title="专辑">{props.song.album}</span></p>
+                <p className={s.flex}>
+                  <span title="时长">{parseTime(Math.round(props.song.duration))}</span>
+                  <span title="大小">{parseBit(props.song.size)}</span>
+                </p>
               </div>
-            }
-          />
-        </Card>
+              <div className={s.actions}>
+                {
+                  props.isPlay ?
+                    // 播放中，显示暂停按钮
+                    (
+                      <div>
+                        <Icon type="pause-circle-o" title="点击暂停" onClick={() => props.onPause(props.song)} />
+                      </div>
+                    ) : (
+                      <div>
+                        <Icon type="play-circle-o" title="点击播放" onClick={() => props.onPlay(props.song)} />
+                      </div>
+                    )
+                  // buttonsContent
+                }
+                {
+                  // 检测是否有删除权限
+                  props.isShowDelete ?
+                    (
+                      <Popconfirm
+                        title="确认是否删除？"
+                        okText="是"
+                        cancelText="否"
+                        onConfirm={
+                          () => props.onDelete ? props.onDelete(props.song) : null
+                        }
+                      >
+                        <div>
+                          <Icon
+                            className={s.deleteButton}
+                            type="delete"
+                          />
+                        </div>
+                      </Popconfirm>
+                    ) : null
+                }
+              </div>
+            </div>
+          </Col>
+        </Row>
       </div>
     </div>
   )
@@ -151,34 +174,38 @@ const SongGrid = (props: {
 interface ComponentState {
   uploading: boolean,
   percent: number,
+  /**
+   * 添加音乐详情信息的表单弹窗是否显示
+   */
   addModalVisible: boolean,
   loadingList: boolean,
+  /**
+   * 正在播放中的音乐
+   */
+  playSong: SongModel | null,
   deleteList: List<string>,
-  submiting: boolean,
-  // 是否有文件被拖拽进来
-  drag: boolean,
+  /**
+   * 正在（添加）的歌曲对象
+   */
+  song: SongModel | null,
 }
 
 @inject((allStores: any) => ({
-  admin: allStores.store.admin,
+  adminStore: allStores.store.admin,
   songStore: allStores.store.song,
 }))
 @observer
 export default class ImageComponents extends React.Component<StateProps, ComponentState> {
-  state = {
+  state: ComponentState = {
     // 是否正在上传
     uploading: false,
     // 上传进度
     percent: 0,
-    /**
-     * 表单是否正在提交
-     */
-    submiting: false,
     addModalVisible: false,
-    previewImage: null,
+    playSong: null,
     deleteList: List<string>(),
     loadingList: false,
-    drag: false,
+    song: null,
   }
 
   /**
@@ -196,35 +223,109 @@ export default class ImageComponents extends React.Component<StateProps, Compone
     // this.load()
   }
 
-  async load() {
+  load() {
+    // 如果有待编辑的歌曲，就弹窗让继续编辑
     if (hasCache()) {
       this.setState({
         addModalVisible: true,
       })
     }
-    // TODO 如果正在 loading 应该有 loading 动画
-    this.props.songStore.query()
-    // this.setState({
-    //   loadingList: true
-    // })
+    this.setState({
+      loadingList: true
+    })
+    this.props.songStore.query().then(returns => {
+      this.setState({
+        loadingList: false,
+      })
+    })
   }
 
   /**
    * 上传功能
    */
   handleRequest = (option: any) => {
+    this.setState({
+      uploading: true,
+      percent: 0,
+    })
+    // const intervalId = setInterval(() => {
+    //   if (this.state.percent === 100) {
+    //     clearInterval(intervalId)
+    //   }
+    //   this.setState({
+    //     percent: this.state.percent + 10
+    //   })
+    // }, 1000)
+    // if (1 === 1) return
     this.props.songStore.upload({
       file: option.file,
-    }).then(returns => {
-      if (!returns.check()) {
-        message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
-      }
-      message.success('上传成功')
-      saveCache(returns.data)
-      this.setState({
-        addModalVisible: true,
+    }, {
+        onProgress: (e) => {
+          // 表示上传进度是否可用
+          if (e.lengthComputable) {
+            // loaded 表示已上传字节， total 为总数
+            this.setState({
+              percent: e.loaded / e.total * 100
+            })
+          }
+        }
+      }).then(returns => {
+        this.setState({
+          uploading: false,
+          percent: 0,
+        })
+        if (!returns.check()) {
+          message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
+          return
+        }
+        message.success('上传成功')
+        saveCache(returns.data)
+        this.setState({
+          addModalVisible: true,
+          song: returns.data,
+        })
       })
+  }
+
+  /**
+   * 播放音乐
+   */
+  handleSongPlay = (song: SongModel) => {
+    this.setState({
+      playSong: song,
     })
+  }
+  /**
+   * 音乐暂停播放
+   */
+  handleSongPause = (song: SongModel) => {
+    this.setState({
+      playSong: null
+    })
+  }
+
+  /**
+   * 删除音乐
+   */
+  handleSongDelete = (song: SongModel) => {
+    const update: any = {
+      deleteList: this.state.deleteList.push(song._id)
+    }
+    // 如果被删除的歌曲正在播放，则停止播放
+    if (this.state.playSong && this.state.playSong._id === song._id) {
+      update.playSong = null
+    }
+    this.setState(update)
+    // TODO 校验后端逻辑
+    // this.props.songStore.deleteSongToList(song._id).then(returns => {
+    //   if (returns.success) {
+    //     const index = this.state.deleteList.indexOf(song._id)
+    //     this.setState({
+    //       deleteList: this.state.deleteList.remove(index),
+    //     })
+    //     message.success('删除成功')
+    //   }
+    // })
   }
 
   /**
@@ -233,35 +334,18 @@ export default class ImageComponents extends React.Component<StateProps, Compone
   closeForm = () => {
     this.setState({
       addModalVisible: false,
+      song: null,
     })
   }
 
   render() {
     if (this.state.loadingList) {
-      return (
-        <div className={`${s} ${s.loading}`}>
-          <Spin size="large" />
-        </div>
-      )
+      return <PageLoading />
     }
     return (
       <div
         className={s.songComponents}
-      // 和 Upload.Dragger 冲突了，这里没办法再处理了
-      // onDragLeave={(e: any) => this.eventlog('leave', e)}
       >
-        <div className={s.dropBox} style={{ display: this.state.drag ? 'block' : 'none' }}>
-          <Upload.Dragger
-            name="img"
-            accept={acceptMimetypes.join(',')}
-            showUploadList={false}
-          >
-            <p className="ant-upload-drag-icon">
-              <Icon type="inbox" />
-            </p>
-            <p className="ant-upload-text">拖拽文件上传</p>
-          </Upload.Dragger>
-        </div>
         <div className={s.cardBox}>
           <div className={s.uploadGrid}>
             <Modal
@@ -276,6 +360,7 @@ export default class ImageComponents extends React.Component<StateProps, Compone
                 songStore={void 0 as any}
                 onCancel={this.closeForm}
                 onSuccess={this.closeForm}
+                song={this.state.song}
               />
             </Modal>
             <Upload
@@ -290,7 +375,22 @@ export default class ImageComponents extends React.Component<StateProps, Compone
             </Upload>
           </div>
           {
-
+            this.props.songStore.songs.map(song => {
+              return (
+                <SongGrid
+                  key={song._id}
+                  song={song}
+                  isPlay={
+                    this.state.playSong
+                      ? this.state.playSong._id === song._id : false}
+                  isShowDelete={this.props.adminStore.isRoot()}
+                  onPlay={this.handleSongPlay}
+                  onPause={this.handleSongPlay}
+                  onDelete={this.handleSongDelete}
+                  isDeleteting={this.state.deleteList.contains(song._id)}
+                />
+              )
+            })
           }
         </div>
       </div>

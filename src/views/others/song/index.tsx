@@ -77,7 +77,8 @@ export default class SongManage extends React.Component<StateProps, ComponentSta
       <div className={`${s.view} ${s.imageManage}`}>
         <div>
           <SongComponent
-            songStore={void 0 as any}
+            songStore={undefined as any}
+            adminStore={undefined as any}
           />
         </div>
       </div>
