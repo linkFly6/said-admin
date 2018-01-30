@@ -95,7 +95,7 @@ export const throttle = function (
  * @param {object} immediate = false - 表示是否逆转调用时机，为true表示：wait毫秒内的多次调用，仅第一次生效
  * @returns {function}
  */
-export const debounce = function (func: any, wait: number, immediate: boolean = false) {
+export const debounce = function <T extends Function>(func: any, wait: number, immediate: boolean = false): T {
   var timeout, args, context, timestamp, result
 
   var later = function () {
@@ -122,9 +122,8 @@ export const debounce = function (func: any, wait: number, immediate: boolean = 
       result = func.apply(context, args)
       context = args = null
     }
-
     return result
-  }
+  } as any
 }
 
 

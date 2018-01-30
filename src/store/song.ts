@@ -19,6 +19,11 @@ export class SongStore {
       return returns
     })
   }
+  /**
+   * 上传文件，返回解析文件后得到的歌曲信息
+   * @param params 
+   * @param option 
+   */
   @action
   upload(params: {
     file: Blob,
@@ -30,17 +35,23 @@ export class SongStore {
     return postForm<SongModel>('/back/api/user/song/upload', data, option)
   }
 
+
+  /**
+   * 上传歌曲
+   * @param params 
+   */
+  save(params: SongModel) {
+    return post<SongModel>('/back/api/user/song/save', {
+      entity: params
+    })
+  }
+
   /**
    * 上传歌曲并追加到 store 的 song list 中
    * @param params 
-   * @param option 
    */
-  uploadToLists(params: {
-    file: Blob,
-  }, option: {
-    onProgress?: (this: XMLHttpRequest, ev: ProgressEvent) => any,
-  } = {}) {
-    return this.upload(params, option).then(returns => {
+  saveToList(params: SongModel) {
+    return this.save(params).then(returns => {
       if (returns.check()) {
         runInAction(() => {
           this.songs.unshift(returns.data)
@@ -48,6 +59,10 @@ export class SongStore {
       }
       return returns
     })
+  }
+
+  removeSongFile(md5: string) {
+    return post<null>('/back/api/user/song/removeFile', { md5 })
   }
 
   deleteSong(songId: string) {

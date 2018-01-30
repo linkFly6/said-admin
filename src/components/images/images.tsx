@@ -12,6 +12,16 @@ import { List } from 'immutable'
 interface StateProps {
   image: ImageStore,
   imageType: ImageType,
+  /**
+   * 模式，默认 "view" 是普通页面模式，支持上传和删除相关图片，点击图片会放大
+   * "select" 模式只支持上传图片图片，点击图片会选中图片，且每次点击图片都会触发 onSelect 事件
+   */
+  mode?: 'view' | 'select',
+  onSelect?: (image: ImageModel) => void,
+  /**
+   * "select" 模式下，默认选中的图片(ID)
+   */
+  selectImage?: ImageModel | null
 }
 
 
@@ -44,61 +54,104 @@ const UploadProgress = (props: {
 const ImageGrid = (props: {
   iamge: ImageModel,
   deleteting: boolean,
-  handleClickPreview: (image: ImageModel) => void,
-  handleClickDelete: (image: ImageModel) => void
+  onClickPreview: (image: ImageModel) => void,
+  onClickDelete: (image: ImageModel) => void,
+  /**
+   * 模式，默认 "view" 是普通页面模式，支持上传和删除相关图片，点击图片会放大
+   * "select" 模式只支持上传图片图片，点击图片会选中图片，且每次点击图片都会触发 onSelect 事件
+   */
+  mode: 'view' | 'select',
+  /**
+   * 是否被选择
+   */
+  actived?: boolean
+  /**
+   * 选择图片触发的事件
+   */
+  onSelect: (image: ImageModel) => void
 }) => {
-  const content = props.deleteting ?
-    (
-      <div className={s.deleteBox}>
-        <Spin size="large" />
-        <div>删除中</div>
-      </div>
-    ) :
-    (
-      <div className={s.buttons}>
-        <span>
-          <Icon type="eye-o" style={{ color: '#fff' }} onClick={() => props.handleClickPreview(props.iamge)} />
-          <Popconfirm
-            title="确认是否删除？"
-            onConfirm={() => props.handleClickDelete(props.iamge)}
-            okText="是"
-            cancelText="否"
-          >
-            <Icon type="delete" style={{ color: '#fff' }} />
-          </Popconfirm>
-        </span>
-      </div>
-    )
-
+  // select 模式下不允许删除图片
+  let mask: React.ReactNode = null
+  if (props.mode !== 'select') {
+    mask = props.deleteting ?
+      (
+        <div className={s.deleteBox}>
+          <Spin size="large" />
+          <div>删除中</div>
+        </div>
+      ) :
+      (
+        <div className={s.buttons}>
+          <span>
+            <Icon type="eye-o" style={{ color: '#fff' }} onClick={() => props.onClickPreview(props.iamge)} />
+            <Popconfirm
+              title="确认是否删除？"
+              onConfirm={() => props.onClickDelete(props.iamge)}
+              okText="是"
+              cancelText="否"
+            >
+              <Icon type="delete" style={{ color: '#fff' }} />
+            </Popconfirm>
+          </span>
+        </div>
+      )
+  }
   return (
-    <div className={s.cardGrid}>
-      <div className={[s.card, props.deleteting ? s.deleteing : ''].join(' ')}>
+    <div
+      className={
+        // 选择模式下要有特殊的选择样式
+        `${s.cardGrid} ${props.mode === 'select' ? s.modeSelect : ''} ${props.actived ? s.actived : ''}`
+      }
+      onClick={() => props.onSelect(props.iamge)}
+    >
+      <div
+        className={
+          [s.card,
+          props.deleteting ? s.deleteting : ''].join(' ')}
+      >
         <div className={s.image} style={{ backgroundImage: `url(${props.iamge.thumb})` }}>
           {/* <img src={props.iamge.thumb} /> */}
         </div>
         {
-          content
+          mask
         }
       </div>
     </div>
   )
 }
+
+interface ComponentState {
+  /**
+   * 上传相关
+   */
+  // 是否正在上传
+  uploading: boolean,
+  // 上传进度
+  percent: number,
+  /**
+   * 预览相关
+   */
+  // 预览的 modal 是否展现
+  previewVisible: boolean,
+  // 被预览的对象
+  previewImage: ImageModel | null,
+  // 是否正在加载列表
+  loadingList: boolean,
+  // 正在删除的内容
+  deleteList: List<string>,
+  // 在选择模式下，初始默认选择的 image
+  selectImage: ImageModel | null,
+  // 是否有文件被拖拽进来
+  drag: boolean,
+}
+
 @inject((allStores: any) => ({
   admin: allStores.store.admin,
   image: allStores.store.image,
 }))
 @observer
-export default class ImageComponents extends React.Component<StateProps, {
-  uploading: boolean,
-  percent: number,
-  previewVisible: boolean,
-  previewImage: ImageModel | null,
-  loadingList: boolean,
-  deleteList: List<string>,
-  // 是否有文件被拖拽进来
-  drag: boolean,
-}> {
-  state = {
+export default class ImageComponents extends React.Component<StateProps, ComponentState> {
+  state: ComponentState = {
     // 是否正在上传
     uploading: false,
     // 上传进度
@@ -107,6 +160,7 @@ export default class ImageComponents extends React.Component<StateProps, {
     previewImage: null,
     deleteList: List<string>(),
     loadingList: false,
+    selectImage: null,
     drag: false,
   }
 
@@ -118,11 +172,31 @@ export default class ImageComponents extends React.Component<StateProps, {
   }
 
   /**
+   * 尽量晚一点判断 props，防止 props 没有 ready
+   */
+  componentDidMount() {
+    // 如果用 props 则对渲染性能影响太大，所以自己监听 props 再设置 state
+    if (this.props.selectImage) {
+      this.setState({
+        selectImage: this.props.selectImage,
+      })
+    }
+  }
+
+  /**
    * props 改变，会触发的生命周期
    * @param nextProps 
    */
   componentWillReceiveProps(nextProps: StateProps) {
     this.load(nextProps.imageType)
+    /**
+     * 如果传入了初始默认被选择的 image，则更新这个默认值
+     */
+    if (nextProps.selectImage) {
+      this.setState({
+        selectImage: nextProps.selectImage,
+      })
+    }
   }
 
   async load(imageType: ImageType) {
@@ -219,6 +293,21 @@ export default class ImageComponents extends React.Component<StateProps, {
     this.setState({ drag: false })
     e.preventDefault()
   }
+
+  /**
+   * 选择图片
+   */
+  handleSelectImage = (image: ImageModel) => {
+    if (this.props.mode === 'select') {
+      this.setState({
+        selectImage: image
+      })
+      if (this.props.onSelect) {
+        this.props.onSelect(image)
+      }
+    }
+  }
+
   render() {
     if (this.state.loadingList) {
       return (
@@ -264,7 +353,7 @@ export default class ImageComponents extends React.Component<StateProps, {
               listType="picture-card"
               showUploadList={false}
               disabled={this.state.uploading}
-              // data={this.handleUploaderMixinData}
+            // data={this.handleUploaderMixinData}
             >
               <UploadProgress percent={this.state.percent} isUploading={this.state.uploading} />
             </Upload>
@@ -275,8 +364,11 @@ export default class ImageComponents extends React.Component<StateProps, {
                 key={image._id}
                 iamge={image}
                 deleteting={this.state.deleteList.contains(image._id)}
-                handleClickDelete={this.handleClickDeleteImage}
-                handleClickPreview={this.hanleClickPreviewImage}
+                onClickDelete={this.handleClickDeleteImage}
+                onClickPreview={this.hanleClickPreviewImage}
+                onSelect={this.handleSelectImage}
+                mode={this.props.mode || 'view'}
+                actived={this.state.selectImage ? this.state.selectImage._id === image._id : false}
               />
             )
           }

@@ -26,9 +26,41 @@
         font-size 30px
     .card-grid
       border 1px solid #d9d9d9
+      transition border .3s, background .3s
       border-radius 4px
       padding .5rem
       margin .5rem
+      // 选择模式下，注入选择模式的样式
+      &.mode-select
+        &:hover, &.actived
+          border-color #1890ff
+          background-color #fafafa
+        &:hover
+          cursor pointer
+        &.actived
+          cursor default
+          background #e3e3e3
+      // 非选择模式下，显示鼠标悬浮的蒙版
+      &:not(.mode-select)
+        border 1px solid red!important
+        .card
+          &::before
+            content ''
+            display block
+            position absolute
+            z-index 1
+            top 0
+            left 0
+            width 100%
+            height 100%
+            background rgba(0, 0, 0, 0.5)
+            transition all .3s
+            opacity 0
+          &:hover
+            &::before
+              opacity 1
+            &.buttons
+              opacity 1
     .card
       background #fafafa
       position relative
@@ -39,19 +71,9 @@
         height 100%
         background center center no-repeat #f4f4f4
         background-size cover
-      &::before
-        content ''
-        display block
-        position absolute
-        z-index 1
-        top 0
-        left 0
-        width 100%
-        height 100%
-        background rgba(0, 0, 0, 0.5)
-        transition all .3s
-        opacity 0
-      &.deleteing
+        border-radius 2px
+      // 在选择模式下，不会显示这些删除和编辑的样式
+      &.deleteting
         .delete-box
           position absolute
           top 50%
@@ -75,9 +97,4 @@
           cursor pointer
           &:first-child
             margin-right 1rem
-      &:hover
-        &::before
-          opacity 1
-        .buttons
-          opacity 1
 

@@ -20,3 +20,4 @@ export const formImageBox: string;
 export const error: string;
 export const iconLarge: string;
 export const formImage: string;
+export const formSongContent: string;
