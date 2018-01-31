@@ -5,7 +5,7 @@ import { ImageType } from '../types/image'
 export class Article {
   _id: string = ''
   title: string = ''
-  urlKey: string = ''
+  key: string = ''
   author: string = ''
   summary: string = ''
   fileName: string = ''

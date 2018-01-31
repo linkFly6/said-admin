@@ -20,6 +20,16 @@
       border-radius 4px
       padding .5rem
       margin .5rem
+      transition border .3s, background .3s
+      &.mode-select
+        &:hover, &.actived
+          border-color #1890ff
+          background-color #ebf5ff
+        &:hover
+          cursor pointer
+        &.actived
+          cursor default
+          background #93cbff
     .card
       background #fafafa
       position relative
@@ -136,3 +146,6 @@
   text-align right
   button:last-child
     margin-left 1rem
+.remote-fail-modal
+  ul
+    padding-left 1.2rem
