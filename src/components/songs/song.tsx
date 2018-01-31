@@ -29,6 +29,7 @@ import SongForm, { saveCache, hasCache } from './song-from'
 import { PageLoading } from '../common'
 import { AdminStore } from '../../store/admin'
 import { parseTime, parseBit } from '../../service/utils/format'
+import { Player } from '../../models/player'
 
 
 
@@ -188,6 +189,10 @@ interface ComponentState {
    * 正在（添加）的歌曲对象
    */
   song: SongModel | null,
+  /**
+   * 音乐播放器对象
+   */
+  readonly player: Player
 }
 
 @inject((allStores: any) => ({
@@ -206,12 +211,20 @@ export default class ImageComponents extends React.Component<StateProps, Compone
     deleteList: List<string>(),
     loadingList: false,
     song: null,
+    // 音乐播放器对象
+    player: new Player()
   }
 
   /**
    * constructor 中不允许操作 state
    */
   componentWillMount() {
+    // 试听的歌曲播放完毕后清掉播放状态
+    this.state.player.onEnded(() => {
+      this.setState({
+        playSong: null
+      })
+    })
     this.load()
   }
 
@@ -291,6 +304,7 @@ export default class ImageComponents extends React.Component<StateProps, Compone
    * 播放音乐
    */
   handleSongPlay = (song: SongModel) => {
+    this.state.player.play(song.url)
     this.setState({
       playSong: song,
     })
@@ -299,6 +313,7 @@ export default class ImageComponents extends React.Component<StateProps, Compone
    * 音乐暂停播放
    */
   handleSongPause = (song: SongModel) => {
+    this.state.player.stop()
     this.setState({
       playSong: null
     })
@@ -317,15 +332,15 @@ export default class ImageComponents extends React.Component<StateProps, Compone
     }
     this.setState(update)
     // TODO 校验后端逻辑
-    // this.props.songStore.deleteSongToList(song._id).then(returns => {
-    //   if (returns.success) {
-    //     const index = this.state.deleteList.indexOf(song._id)
-    //     this.setState({
-    //       deleteList: this.state.deleteList.remove(index),
-    //     })
-    //     message.success('删除成功')
-    //   }
-    // })
+    this.props.songStore.deleteSongToList(song._id).then(returns => {
+      if (returns.success) {
+        const index = this.state.deleteList.indexOf(song._id)
+        this.setState({
+          deleteList: this.state.deleteList.remove(index),
+        })
+        message.success('删除成功')
+      }
+    })
   }
 
   /**
@@ -385,7 +400,7 @@ export default class ImageComponents extends React.Component<StateProps, Compone
                       ? this.state.playSong._id === song._id : false}
                   isShowDelete={this.props.adminStore.isRoot()}
                   onPlay={this.handleSongPlay}
-                  onPause={this.handleSongPlay}
+                  onPause={this.handleSongPause}
                   onDelete={this.handleSongDelete}
                   isDeleteting={this.state.deleteList.contains(song._id)}
                 />
