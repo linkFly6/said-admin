@@ -32,8 +32,8 @@ export default class SongManage extends React.Component<StateProps, ComponentSta
           <SongComponent
             songStore={undefined as any}
             adminStore={undefined as any}
-            mode="select"
-            onSelect={this.handleSelect}
+            // mode="select"
+            // onSelect={this.handleSelect}
           />
         </div>
       </div>
