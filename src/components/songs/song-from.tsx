@@ -12,7 +12,7 @@ import {
 } from 'antd'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import { ImageModel, ImageType } from '../../types/image'
-import ImagesComponent from '../images/images'
+import { ImageComponent } from '../images/images'
 import * as s from './song.styl'
 import { observer, inject } from 'mobx-react'
 import { SongStore } from '../../store/song'
@@ -20,6 +20,7 @@ import { Store } from '../../service/utils/store'
 import { debounce } from '../../service/utils/index'
 import { SongModel } from '../../types/song'
 import { parseTime } from '../../service/utils/format'
+import { createFormItem } from '../../components/common'
 
 const songStore = new Store('other.view.song')
 
@@ -47,20 +48,7 @@ export const hasCache = () => {
 }
 
 
-
-class FormItem extends React.Component<{
-  label: string
-}> {
-  render() {
-    return (
-      <Form.Item>
-        {
-          this.props.children
-        }
-      </Form.Item>
-    )
-  }
-}
+const FormItem = createFormItem({})
 
 
 interface StateProps extends FormComponentProps {
@@ -329,7 +317,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
               okText="确定"
               cancelText="取消"
             >
-              <ImagesComponent
+              <ImageComponent
                 imageType={ImageType.Music}
                 image={void 0 as any}
                 mode="select"
@@ -349,9 +337,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
           <Col
             span={12}
           >
-            <FormItem
-              label="歌曲名称"
-            >
+            <FormItem>
               {
                 getFieldDecorator(
                   'title',
@@ -368,7 +354,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                   )
               }
             </FormItem>
-            <FormItem label="歌手名称">
+            <FormItem>
               {
                 getFieldDecorator(
                   'artist',
@@ -385,7 +371,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                   )
               }
             </FormItem>
-            <FormItem label="专辑名称">
+            <FormItem>
               {
                 getFieldDecorator(
                   'album',
@@ -402,7 +388,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                   )
               }
             </FormItem>
-            <FormItem label="歌曲时长">
+            <FormItem>
               <Input
                 placeholder="歌曲时长"
                 autoComplete="off"

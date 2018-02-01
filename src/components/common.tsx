@@ -1,5 +1,28 @@
 import * as React from 'react'
-import { Spin } from 'antd'
+import { Spin, Form } from 'antd'
+import { FormItemProps } from 'antd/lib/form'
+
+
+/**
+ * 工厂函数
+ * 根据默认配置创建一个 Form.Item 的表单项函数，这些 Form.Item 都拥有同样的默认配置
+ * 用于整个页面表单风格的统一
+ * @param factoryProps 
+ */
+export const createFormItem = (factoryProps: FormItemProps) => {
+  return (props: Readonly<{ children?: React.ReactNode }> & FormItemProps) => {
+    const p = { ...factoryProps, ...props }
+    return (
+      <Form.Item {...p}>
+        {
+          props.children
+        }
+      </Form.Item>
+    )
+  }
+}
+
+
 
 /**
  * 每个页面通用的页面级 loading
@@ -13,3 +36,4 @@ export const PageLoading = () => {
     </div>
   )
 }
+

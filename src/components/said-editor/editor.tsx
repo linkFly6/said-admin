@@ -44,7 +44,7 @@ export default class extends React.Component<StateProps, {}> {
 
   value = ''
 
-  onChange(value: string) {
+  onChange = (value: string) => {
     this.value = value
     this.props.onChange(value)
   }
@@ -143,13 +143,13 @@ export default class extends React.Component<StateProps, {}> {
         <div className={s.saidEditorContent}>
           <ReactCodeMirror
             ref="codeMirror"
-            onChange={this.onChange.bind(this)}
+            onChange={this.onChange}
             options={{
               mode: 'markdown',
               lineWrapping: true,
               dragDrop: true,
               placeholder: '1. 输入 markdown\n\n2. 拖拽上传图片\n\n',
-              value: this.props.value,
+              value: this.props.value || '',
               // theme: 'solarized light'
             }}
           />

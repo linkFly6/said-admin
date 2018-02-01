@@ -151,7 +151,7 @@ interface ComponentState {
   image: allStores.store.image,
 }))
 @observer
-export default class ImageComponents extends React.Component<StateProps, ComponentState> {
+export class ImageComponent extends React.Component<StateProps, ComponentState> {
   state: ComponentState = {
     // 是否正在上传
     uploading: false,

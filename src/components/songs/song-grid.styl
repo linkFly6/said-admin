@@ -1,0 +1,99 @@
+.component.song-grid
+  $cardWidth = 10rem
+  border 1px solid #d9d9d9
+  border-radius 4px
+  padding .5rem
+  margin .5rem
+  transition border .3s, background .3s
+  &.mode-select
+    &:hover, &.actived
+      border-color #1890ff
+      background-color #ebf5ff
+    &:hover
+      cursor pointer
+    &.actived
+      cursor default
+      background #93cbff
+  .card
+    background #fafafa
+    position relative
+    .image
+      width $cardWidth
+      height $cardWidth
+      background center center no-repeat #f4f4f4
+      background-size cover
+      border-radius 2px
+      transform rotate(0deg)
+      border-radius 0%
+      transition border-radius linear .5s
+      &.player
+        border-radius 100%
+        animation payler linear 30s infinite
+        @keyframes payler
+          0%
+            transform rotate(0deg)
+          100%
+            transform rotate(360deg)
+    .delete-button
+        color #e82548
+    .detail
+      width $cardWidth
+      padding 0 .5rem
+      ellipsis()
+        text-overflow ellipsis
+        white-space nowrap
+        overflow hidden
+      .content
+        display flex
+        flex-direction column
+        height $cardWidth - 2.2
+        h3
+          ellipsis()
+          margin .3rem 0
+        p
+          ellipsis()
+          flex 1
+          cursor default
+          margin-bottom 0
+          width 100%
+          word-break break-all
+          color rgba(0, 0, 0, 0.45)
+          &:last-child
+            margin-bottom .3rem
+        .flex
+          display flex
+          justify-content space-between
+      .actions
+        display flex
+        border-top 1px solid #e8e8e8
+        div
+          text-align center
+          margin .4rem 0
+          color rgba(0, 0, 0, 0.45)
+          backdround #fafafa
+          i
+            cursor pointer
+          flex 1
+          &:not(:last-child)
+            border-right 1px solid #e8e8e8
+
+    .deleteing
+      position absolute
+      top 0
+      left 0
+      width 100%
+      height 100%
+      background rgba(0, 0, 0, 0.5)
+      transition all .3s
+      z-index 1
+      .delete-box
+        text-align center
+        position absolute
+        top 50%
+        left 50%
+        transform translate(-50%, -50%)
+        z-index 2
+        color #fff
+        text-shadow 1px 1px 1px rgba(0,0,0,.6)
+        .delete-text
+          margin-top 1rem

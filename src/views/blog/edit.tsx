@@ -1,6 +1,6 @@
 import * as React from 'react'
 // import SaidEditor from '../../components/said-editor'
-import { Button, Form, Input, Row, Col, AutoComplete, Switch, Collapse, Select, message } from 'antd'
+import { Button, Form, Input, Row, Col, Collapse, Select, message } from 'antd'
 import SaidEditor from '../../components/said-editor/editor'
 import { FormComponentProps } from 'antd/lib/form/Form'
 import * as s from './edit.styl'
@@ -13,6 +13,7 @@ import { debounce } from '../../service/utils/index'
 import { acceptMimetypes, ImageType } from '../../types/image'
 import { ImageStore } from '../../store/image'
 import { RouteComponentProps } from 'react-router'
+import { createFormItem } from '../../components/common'
 
 
 /**
@@ -31,28 +32,16 @@ const createSetStoreFn = function (store: Store) {
   }
 }
 
-class FormItem extends React.Component<{}> {
-  render() {
-    return (
-      <Form.Item
-        labelCol={{
-          xs: { span: 24 },
-          sm: { span: 24 },
-        }}
-        wrapperCol={{
-          xs: { span: 24 },
-          sm: { span: 24 }
-        }}
-      // validateStatus="error"
-      // hasFeedback
-      >
-        {
-          this.props.children
-        }
-      </Form.Item>
-    )
+const FormItem = createFormItem({
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 24 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 24 }
   }
-}
+})
 
 export interface StateProps {
   blog: BlogStore,
@@ -351,15 +340,7 @@ RouteComponentProps<{ id: string }>
                     )
                 }
               </FormItem>
-              <Form.Item
-                labelCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 },
-                }}
-                wrapperCol={{
-                  xs: { span: 24 },
-                  sm: { span: 24 }
-                }}
+              <FormItem
                 validateStatus={!this.state.firstActiveContext || this.state.context.length ? void 0 : 'error'}
                 help={!this.state.firstActiveContext || this.state.context.length ? void 0 : '请输入文章内容'}
               >
@@ -370,7 +351,7 @@ RouteComponentProps<{ id: string }>
                     onDrag={this.handleOnDrag}
                   />
                 }
-              </Form.Item>
+              </FormItem>
             </Col>
             <Col span={8} offset={2}>
               <FormItem>

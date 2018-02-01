@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Icon, Modal, Radio } from 'antd'
 import * as s from './image.styl'
 import { inject, observer } from 'mobx-react'
-import ImagesComponent from '../../../components/images/images'
+import { ImageComponent } from '../../../components/images/images'
 import { userReady } from '../../../service/user'
 import { AdminStore } from '../../../store/admin'
 import { ImageStore } from '../../../store/image'
@@ -95,7 +95,7 @@ export default class ImageManage extends React.Component<StateProps, ComponentSt
           </Radio.Group>
         </div>
         <div>
-          <ImagesComponent
+          <ImageComponent
             imageType={this.state.selectImageType as any}
             image={void 0 as any}
           />

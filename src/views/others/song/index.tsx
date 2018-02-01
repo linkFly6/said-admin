@@ -2,7 +2,7 @@ import * as React from 'react'
 import { Icon, Modal, Radio } from 'antd'
 import * as s from './song.styl'
 import { inject, observer } from 'mobx-react'
-import SongComponent from '../../../components/songs/song'
+import { SongComponent } from '../../../components/songs/song'
 import { AdminStore } from '../../../store/admin'
 import { SongModel } from '../../../types/song'
 
@@ -21,10 +21,6 @@ export default class SongManage extends React.Component<StateProps, ComponentSta
   state: ComponentState = {
   }
 
-  handleSelect = (song: SongModel) => {
-    console.log(song)
-  }
-
   render() {
     return (
       <div className={`${s.view} ${s.songManage}`}>
@@ -32,8 +28,8 @@ export default class SongManage extends React.Component<StateProps, ComponentSta
           <SongComponent
             songStore={undefined as any}
             adminStore={undefined as any}
-            // mode="select"
-            // onSelect={this.handleSelect}
+          // mode="select"
+          // onSelect={this.handleSelect}
           />
         </div>
       </div>

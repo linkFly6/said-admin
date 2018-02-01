@@ -9,9 +9,8 @@ import { inject, observer } from 'mobx-react'
 import { AdminStore } from '../store/admin'
 import Home from './home'
 import ImageManager from './others/images'
-// import Said from './said'
-import Said from '../views/said'
-import SaidAdd from '../views/said/add-said'
+import Article from '../views/article'
+import ArticleEdit from '../views/article/edit'
 import Blog from '../views/blog'
 import BlogEdit from '../views/blog/edit'
 import Category from '../views/others/category'
@@ -69,8 +68,9 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
         <Switch>
           <Route path="/" component={Home} exact />
           <Route path="/index" component={Home} exact />
-          <Route path="/said" component={Said} exact />
-          <Route path="/said/add" component={SaidAdd} exact />
+          <Route path="/article" component={Article} exact />
+          <Route path="/article/add" component={ArticleEdit} exact />
+          <Route path="/article/edit/:id" component={ArticleEdit} exact />
           <Route path="/others/images" component={ImageManager} exact />
           <Route path="/blog" component={Blog} exact />
           <Route path="/blog/edit/:id" component={BlogEdit} exact />
@@ -173,13 +173,13 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
               onClick={this.handleClick}
               style={{ height: '100%' }}
             >
-              <SubMenu key="said" title={<span><Icon type="article" />Said 管理</span>}>
-                <Menu.Item key="/said"><Icon type="rizhi11" />Said 概况</Menu.Item>
-                <Menu.Item key="/said/add"><Icon type="bianxie" />添加 Said</Menu.Item>
+              <SubMenu key="said" title={<span><Icon type="article" />听说管理</span>}>
+                <Menu.Item key="/article"><Icon type="rizhi11" />听说概况</Menu.Item>
+                <Menu.Item key="/article/add"><Icon type="bianxie" />添加听说</Menu.Item>
               </SubMenu>
               <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
-                <Menu.Item key="/blog"><Icon type="rizhi11" />Blog 管理</Menu.Item>
-                <Menu.Item key="/blog/add"><Icon type="bianxie" />添加 Blog</Menu.Item>
+                <Menu.Item key="/blog"><Icon type="rizhi11" />日志管理</Menu.Item>
+                <Menu.Item key="/blog/add"><Icon type="bianxie" />添加日志</Menu.Item>
               </SubMenu>
               <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
                 <Menu.Item key="/others/images"><Icon type="tupian" />图片管理</Menu.Item>
