@@ -1,3 +1,5 @@
+import { debounce } from './'
+
 
 let localStorage = window.localStorage
 const rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/ // 检测是否是json对象格式
@@ -104,7 +106,7 @@ export class Store {
   public delete(key: string) {
     try {
       return localStorage.removeItem(this.getKey(key))
-    } catch (error) { 
+    } catch (error) {
       // empty
     }
   }
@@ -190,4 +192,32 @@ export const setCookie = (name: string, value: any, expiredays?: number, path?: 
   path = path || '/'
   domain = domain == null ? document.domain : domain
   document.cookie = [name, '=', encodeURIComponent(value), expiredayStr, ';path=', path, ';domain=', domain].join('')
+}
+
+
+
+/**
+ * 工厂方法：创建一个对象，对象返回 store 和一个保存函数，保存函数具有以下特点：
+ * 1. 保存到 Store 根据指定的 timer 进行函数节流
+ * 2. 保存数据是 mixin 模式，而不是直接覆盖
+ * @param namespace store 命名空间
+ * @param key 在 store 中要保存的 key
+ * @param [timer=300] 函数节流时间阈
+ */
+export const createFactoryStoreSave = <T = any>(namespace: string, key: string, timer = 300) => {
+  const store = new Store(namespace)
+  let data = store.val<T>(key) || {}
+  return {
+    /**
+     * store 对象
+     */
+    store,
+    /**
+     * 保存函数，函数节流和 mixin 保存
+     */
+    save: debounce<(val: [keyof T]) => void>((value: T) => {
+      data = { ...data, ...value as any }
+      store.val(key, data)
+    }, timer)
+  }
 }

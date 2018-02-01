@@ -2,29 +2,7 @@ mask($width, $height)
   position relative
   width $width
   height $height
-  overflow hidden
-  border 1px dashed #bbb0b0
-  border-radius 4px
-  transition border-color .3s
-  &:hover
-    border-color #1890ff
-  .select-mask
-    background #fafafa
-    position absolute
-    top 0
-    left 0
-    width 100%
-    height 100%
-    cursor pointer
-    :global(.anticon)
-      &:before
-        font-size 2rem
-        padding-bottom .5rem
-      position absolute
-      left 50%
-      top 50%
-      transform translate(-50%, -50%)
-      min-width 8rem
+// 页面
 .view.edit-said
   width 80%
   margin 0 auto
@@ -33,8 +11,11 @@ mask($width, $height)
       padding 0
     .margin-bootom
       margin-bottom 1rem
-  .select-image
-    mask(11rem, 11rem)
+  .selector
+    overflow hidden
+    border 1px dashed #bbb0b0
+    border-radius 4px
+    transition border-color .3s
     &.zoom
       .select-mask
         // 渐变蒙版
@@ -44,11 +25,42 @@ mask($width, $height)
         transition opacity .3s ease-in-out 0s
         &:hover
           opacity .7
-    .article-image
+    &:hover
+      border-color #1890ff
+    .select-mask
+      background #fafafa
+      position absolute
+      z-index 1
+      top 0
+      left 0
       width 100%
       height 100%
-      background center center no-repeat #f4f4f4
-      background-size cover
-      border-radius 2px
-  .select-song
-    mask(21rem, 11rem)
+      cursor pointer
+      :global(.anticon)
+        &:before
+          font-size 2rem
+          padding-bottom .5rem
+        position absolute
+        left 50%
+        top 50%
+        transform translate(-50%, -50%)
+        min-width 8rem
+    &.error
+      border-color red
+      color red
+    &.select-image
+      mask(11rem, 11rem)
+      &.zoom
+        border 1px solid #d9d9d9
+      .article-image
+        width 100%
+        height 100%
+        background center center no-repeat #f4f4f4
+        background-size cover
+        border-radius 2px
+    &.select-song
+      mask(21rem, 11.2rem)
+      &.zoom
+        border none
+  .actions
+    padding-top 2rem

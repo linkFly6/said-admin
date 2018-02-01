@@ -9,112 +9,16 @@ import { ArticleStore } from '../../store/article'
 import { SongGrid } from '../../components/songs/song-grid'
 import { ImageComponent } from '../../components/images/images'
 import { ImageType, ImageModel } from '../../types/image'
+import { SelectorImage, SelectorSong } from './partials/selector'
+import { SongModel } from '../../types/song'
+import { createFactoryStoreSave, Store } from '../../service/utils/store'
+import { RouteComponentProps } from 'react-router'
 
 
-interface SelectImageStateProps { }
-interface SelectImageComponentState {
-  /**
-   * 是否显示弹出框
-   */
-  visibleModal: boolean,
-  /**
-   * 正在使用的专辑封面图
-   */
-  image: ImageModel | null
-
-  /**
-   * 选择中的专辑封面图
-   */
-  selectImage: ImageModel | null
-}
-
-class SelectImage extends React.Component<SelectImageStateProps, SelectImageComponentState> {
-  state: SelectImageComponentState = {
-    visibleModal: false,
-    image: null,
-    selectImage: null,
-  }
-  /**
-   * 关闭或取消选择图片
-   */
-  handleCloseSelectImageModal = () => {
-    this.setState({
-      visibleModal: false,
-      // showImageSelectError: !this.state.image
-    })
-  }
-  /**
-   * 确认选择图片，选择图片的容器点击确定之后
-   */
-  handleOKSelectImageModal = () => {
-    if (!this.state.selectImage) {
-      message.error('请选择文章图片(-10000)')
-      return
-    }
-    // this.setStore('image', this.state.selectImage)
-    this.setState({
-      visibleModal: false,
-      image: this.state.selectImage,
-      // 清空掉选择的图片
-      selectImage: null,
-    })
-  }
-  /**
-   * 选择图片（注意，不是确认选择，而是每进行一次选择动作都会进行触发的事件）
-   */
-  handleSelectImage = (image: ImageModel) => {
-    this.setState({
-      selectImage: image,
-    })
-  }
-  render() {
-    return (
-      <div className={`${s.selectImage} ${this.state.image ? s.zoom : ''}`}>
-        <div className={s.selectMask} onClick={() => this.setState({ visibleModal: true })}>
-          <Icon type="picture">
-            点击选择图片
-          </Icon>
-        </div>
-        <div
-          className={s.articleImage}
-          style={
-            this.state.image ? { backgroundImage: `url(${this.state.image.thumb})` } : {}
-          }
-        />
-        <Modal
-          title="选择文章图片"
-          width={'80%'}
-          closable={false}
-          visible={this.state.visibleModal}
-          onCancel={this.handleCloseSelectImageModal}
-          onOk={this.handleOKSelectImageModal}
-          okText="确定"
-          cancelText="取消"
-        >
-          <ImageComponent
-            imageType={ImageType.Article}
-            image={void 0 as any}
-            mode="select"
-            onSelect={this.handleSelectImage}
-            selectImage={this.state.image}
-          />
-        </Modal>
-      </div>
-    )
-  }
-}
-
-const SelectSong = () => {
-  return (
-    <div className={s.selectSong}>
-      <div className={s.selectMask}>
-        <Icon type="picture">
-          点击选择歌曲
-        </Icon>
-      </div>
-    </div>
-  )
-}
+/**
+ * 本地存储的数据的 key
+ */
+const LOCALSTOREKEY = 'add'
 
 // 创建统一风格的表单项
 const FormItem = createFormItem({
@@ -128,25 +32,165 @@ const FormItem = createFormItem({
   }
 })
 
-export interface StateProps {
+interface StateProps {
   articleStore: ArticleStore,
 }
+
+/**
+ * 页面对应的数据模型
+ */
+interface PageArticleModel {
+  /**
+   * 标题
+   */
+  title: string
+  /**
+   * 正文
+   */
+  context: string
+  /**
+   * 图片
+   */
+  poster: ImageModel | null
+  /**
+   * 歌曲
+   */
+  song: SongModel | null
+  /**
+   * 描述
+   */
+  summary: string
+}
+
+interface ComponentStates extends PageArticleModel {
+  /**
+   * 文章 ID，如果 props 里面有这个属性表示是编辑模式
+   */
+  articleId?: string,
+  /**
+   * 是否激活操作过 context 输入框，如果操作过就进行校验，校验不通过就显示错误
+   */
+  firstActiveContext: boolean
+
+  /**
+   * 从本地或远程读取的初始化文章正文
+   * 因为 SaidEdit 的 value 会监控数据变化
+   * 所以初始默认读静态的值
+   */
+  initContextValue: string
+  /**
+   * 经过 createFactoryStoreSave() 创建过的高级本地保存对象
+   */
+  superStore: {
+    store: Store,
+    save: (val: {
+      title?: string
+      context?: string
+      poster?: ImageModel | null
+      song?: SongModel | null
+      summary?: string
+    }) => void
+  }
+}
+
 
 @inject((allStores: any) => ({
   articleStore: allStores.store.article,
 }))
 @observer
-class ArticleDetail extends React.Component<StateProps & FormComponentProps> {
-  handleChangeContext = (text: string) => {
-    console.log(text)
+class ArticleDetail extends React.Component<
+RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, ComponentStates
+> {
+  state: ComponentStates = {
+    articleId: this.props.match.params.id,
+    firstActiveContext: false,
+    initContextValue: '',
+    title: '',
+    context: '',
+    summary: '',
+    song: null,
+    poster: null,
+    superStore:
+      this.props.match.params.id ?
+        // 有 articleId 表示是编辑模式，所以不需要从本地缓存读数据
+        // 所以实现一个傀儡对象，但是 save() 函数是假的
+        {
+          store: new Store('article.view.edit'),
+          save: (val: any) => {
+            // empty
+          }
+        } :
+        // 添加模式下，保存数据
+        createFactoryStoreSave<PageArticleModel>('article.view.edit', LOCALSTOREKEY)
   }
+
+  componentDidMount() {
+    if (!this.state.articleId) {
+      this.loadLocalData()
+    }
+  }
+
+  /**
+   * 本地 localstorage 读数据
+   */
+  loadLocalData = () => {
+    const store = this.state.superStore.store
+    const data: PageArticleModel & { initContextValue: string } = {
+      title: '',
+      context: '',
+      summary: '',
+      poster: null,
+      song: null,
+      initContextValue: ''
+    }
+    const localData = store.val(LOCALSTOREKEY) || {}
+    Object.keys(data).forEach(key => {
+      if (localData[key] && key in data) {
+        data[key] = localData[key]
+      }
+    })
+    if (data.context) {
+      data.initContextValue = data.context
+    }
+    this.setState(data)
+  }
+
+
+  /**
+   * 生成保存数据到本地 store 的函数
+   */
+  createHandelChangeSaveToLocal = (name: string) => {
+    return (e: React.ChangeEvent<any>) => {
+      this.state.superStore.save({
+        [name]: e.target.value
+      })
+    }
+  }
+
+  handleChangeContext = (text: string) => {
+    this.state.superStore.save({
+      context: text,
+    })
+  }
+
+  handleSelectImage = (image: ImageModel) => {
+    this.state.superStore.save({
+      poster: image,
+    })
+  }
+  handleSelectSong = (song: SongModel) => {
+    this.state.superStore.save({
+      song,
+    })
+  }
+
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
     return (
       <div className={`${s.view} ${s.editSaid}`}>
         <Form layout="vertical">
           <Row>
-            <Col span={14}>
+            <Col span={14} md={20}>
               <FormItem>
                 {
                   getFieldDecorator(
@@ -154,38 +198,51 @@ class ArticleDetail extends React.Component<StateProps & FormComponentProps> {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请输入文章标题' }],
-                      // initialValue: this.state.title
+                      initialValue: this.state.title
                     })(
                     <Input
                       placeholder="文章标题"
                       size="large"
                       autoComplete="off"
-                    // onChange={this.createHandelChangeSaveToLocal('title')}
+                      onChange={this.createHandelChangeSaveToLocal('title')}
                     />
                     )
                 }
               </FormItem>
               <FormItem
-              // validateStatus={!this.state.firstActiveContext || this.state.context.length ? void 0 : 'error'}
-              // help={!this.state.firstActiveContext || this.state.context.length ? void 0 : '请输入文章内容'}
+                validateStatus={!this.state.firstActiveContext || this.state.context.length ? undefined : 'error'}
+                help={!this.state.firstActiveContext || this.state.context.length ? undefined : '请输入文章内容'}
               >
                 {
                   <SaidEditor
                     onChange={this.handleChangeContext}
-                  // value={this.state.initContext}
+                    value={this.state.initContextValue}
                   // onDrag={this.handleOnDrag}
                   />
                 }
               </FormItem>
             </Col>
-            <Col span={8} offset={2}>
+            <Col
+              span={8}
+              offset={2}
+              md={{
+                offset: 0,
+                span: 20,
+              }}
+            >
               <FormItem>
                 <Row type="flex" justify="space-between">
                   <Col>
-                    <SelectImage />
+                    <SelectorImage
+                      onSelect={this.handleSelectImage}
+                      initSelectModel={this.state.poster}
+                    />
                   </Col>
                   <Col>
-                    <SelectSong />
+                    <SelectorSong
+                      onSelect={this.handleSelectSong}
+                      initSelectModel={this.state.song}
+                    />
                   </Col>
                 </Row>
               </FormItem>
@@ -196,18 +253,18 @@ class ArticleDetail extends React.Component<StateProps & FormComponentProps> {
                     {
                       validateTrigger: ['onChange', 'onBlur'],
                       rules: [{ required: true, message: '请输入简述,支持多行' }],
-                      // initialValue: this.state.summary
+                      initialValue: this.state.summary
                     })(
                     <Input.TextArea
                       placeholder="简述\n支持多行"
                       autoComplete="off"
                       autosize={{ minRows: 4, maxRows: 4 }}
-                    // onChange={this.createHandelChangeSaveToLocal('summary')}
+                      onChange={this.createHandelChangeSaveToLocal('summary')}
                     />
                     )
                 }
               </FormItem>
-              <Collapse bordered={false} className={s.collapse}>
+              {/* <Collapse bordered={false} className={s.collapse}>
                 <Collapse.Panel header="高级选项" key="1">
                   <div className={s.marginBootom}>
                     {
@@ -236,10 +293,10 @@ class ArticleDetail extends React.Component<StateProps & FormComponentProps> {
                       )
                   }
                 </Collapse.Panel>
-              </Collapse>
+              </Collapse> */}
             </Col>
           </Row>
-          <Row type="flex" justify="center">
+          <Row type="flex" justify="center" className={s.actions}>
             <Button loading={false} size="large">
               预览
             </Button>

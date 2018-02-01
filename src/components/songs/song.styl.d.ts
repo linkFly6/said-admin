@@ -1,5 +1,6 @@
 export const songComponents: string;
 export const cardBox: string;
+export const songGrid: string;
 export const uploadGrid: string;
 export const iconUpload: string;
 export const formImageBox: string;

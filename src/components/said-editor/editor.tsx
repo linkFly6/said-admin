@@ -34,7 +34,10 @@ interface StateProps {
      * 调用后会用 text 替换掉临时上传文本
      */
     next: (text: string) => void) => boolean,
-  value?: string
+    /**
+     * 初始默认值，只能在 react componentDidMount() 中使用才有效
+     */
+    value?: string
 }
 
 export default class extends React.Component<StateProps, {}> {
@@ -58,7 +61,6 @@ export default class extends React.Component<StateProps, {}> {
   }
 
   getText() {
-    console.log(this.value)
     return this.value
   }
 

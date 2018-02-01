@@ -164,8 +164,10 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
      * 如果传入了初始默认被选择的歌曲，则更新这个默认值
      */
     if (nextProps.selectSong) {
+      this.state.player.stop()
       this.setState({
         selectSong: nextProps.selectSong,
+        playSong: null,
       })
     }
   }
@@ -262,6 +264,7 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
     }
     // 如果被删除的歌曲正在播放，则停止播放
     if (this.state.playSong && this.state.playSong._id === song._id) {
+      this.state.player.stop()
       update.playSong = null
     }
     this.setState(update)
@@ -305,8 +308,10 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
    * 关闭上传表单
    */
   closeForm = () => {
+    this.state.player.stop()
     this.setState({
       addModalVisible: false,
+      playSong: null,
       song: null,
     })
   }
@@ -317,7 +322,7 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
   handleSelectImage = (song: SongModel) => {
     if (this.props.mode === 'select') {
       this.setState({
-        selectSong: song
+        selectSong: song,
       })
       if (this.props.onSelect) {
         this.props.onSelect(song)
@@ -337,7 +342,7 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
             this.props.mode !== 'select' ?
               (
                 // 普通模式才可以上传音乐，选择模式不显示上传歌曲的逻辑
-                <div className={s.uploadGrid}>
+                <div className={`${s.uploadGrid} ${s.songGrid}`}>
                   <Modal
                     title="新增歌曲"
                     closable={false}
@@ -369,21 +374,22 @@ export class SongComponent extends React.Component<StateProps, ComponentState> {
           {
             this.props.songStore.songs.map(song => {
               return (
-                <SongGrid
-                  key={song._id}
-                  mode={this.props.mode || 'view'}
-                  onSelect={this.handleSelectImage}
-                  actived={this.state.selectSong ? this.state.selectSong._id === song._id : false}
-                  song={song}
-                  isPlay={
-                    this.state.playSong
-                      ? this.state.playSong._id === song._id : false}
-                  isShowDelete={this.props.mode !== 'select' && this.props.adminStore.isRoot()}
-                  onPlay={this.handleSongPlay}
-                  onPause={this.handleSongPause}
-                  onDelete={this.handleSongDelete}
-                  isDeleteting={this.state.deleteList.contains(song._id)}
-                />
+                <div key={song._id} className={s.songGrid}>
+                  <SongGrid
+                    mode={this.props.mode || 'view'}
+                    onSelect={this.handleSelectImage}
+                    actived={this.state.selectSong ? this.state.selectSong._id === song._id : false}
+                    song={song}
+                    isPlay={
+                      this.state.playSong
+                        ? this.state.playSong._id === song._id : false}
+                    isShowDelete={this.props.mode !== 'select' && this.props.adminStore.isRoot()}
+                    onPlay={this.handleSongPlay}
+                    onPause={this.handleSongPause}
+                    onDelete={this.handleSongDelete}
+                    isDeleteting={this.state.deleteList.contains(song._id)}
+                  />
+                </div>
               )
             })
           }

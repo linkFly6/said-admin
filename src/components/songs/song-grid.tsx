@@ -18,7 +18,7 @@ export interface SongGridStateProps {
   /**
    * 选择图片触发的事件
    */
-  onSelect: (song: SongModel) => void,
+  onSelect?: (song: SongModel) => void,
   /**
    * 对应渲染的歌曲对象
    */
@@ -38,11 +38,11 @@ export interface SongGridStateProps {
   /**
    * 点播放触发
    */
-  onPlay: (song: SongModel) => void
+  onPlay?: (song: SongModel) => void
   /**
    * 点暂停触发
    */
-  onPause: (song: SongModel) => void
+  onPause?: (song: SongModel) => void
   /**
    * 删除触发
    */
@@ -110,7 +110,9 @@ export const SongGrid = (props: SongGridStateProps) => {
                           onClick={
                             (e) => {
                               e.stopPropagation()
-                              props.onPause(props.song)
+                              if (props.onPause) {
+                                props.onPause(props.song)
+                              }
                             }
                           }
                         />
@@ -124,7 +126,9 @@ export const SongGrid = (props: SongGridStateProps) => {
                             (e) => {
                               // 播放音乐不要影响到父级别的选择事件(props.onSelect)
                               e.stopPropagation()
-                              props.onPlay(props.song)
+                              if (props.onPlay) {
+                                props.onPlay(props.song)
+                              }
                             }
                           }
                         />
