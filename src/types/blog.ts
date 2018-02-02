@@ -23,7 +23,7 @@ export interface BlogModel {
   /**
    * 标记，可以自定义，也可以自动生成，url 中使用
    */
-  urlKey: string,
+  key: string,
   /**
    * 作者信息
    */
@@ -32,10 +32,6 @@ export interface BlogModel {
    * 描述
    */
   summary: string,
-  /**
-   * 文件名
-   */
-  fileName: string,
   /**
    * 标签
    */

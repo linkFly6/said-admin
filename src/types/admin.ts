@@ -27,7 +27,7 @@ export interface AdminModel {
   /**
    * 用户名
    */
-  username: string
+  username?: string
   /**
    * 昵称
    */

@@ -13,6 +13,7 @@ import { SelectorImage, SelectorSong } from './partials/selector'
 import { SongModel } from '../../types/song'
 import { createFactoryStoreSave, Store } from '../../service/utils/store'
 import { RouteComponentProps } from 'react-router'
+import history from '../../assets/js/history'
 
 
 /**
@@ -90,7 +91,16 @@ interface ComponentStates extends PageArticleModel {
       song?: SongModel | null
       summary?: string
     }) => void
-  }
+  },
+
+  /**
+   * 是否显示图片选择错误信息
+   */
+  selectImageShowError: boolean,
+  /**
+   * 是否显示歌曲选择错误信息
+   */
+  selectSongShowError: boolean
 }
 
 
@@ -121,12 +131,36 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
           }
         } :
         // 添加模式下，保存数据
-        createFactoryStoreSave<PageArticleModel>('article.view.edit', LOCALSTOREKEY)
+        createFactoryStoreSave<PageArticleModel>('article.view.edit', LOCALSTOREKEY),
+    selectImageShowError: false,
+    selectSongShowError: false,
   }
 
   componentDidMount() {
-    if (!this.state.articleId) {
+    if (this.state.articleId) {
+      this.loadRemoteData(this.state.articleId)
+    } else {
       this.loadLocalData()
+    }
+  }
+
+  /**
+   * 从远程读数据
+   */
+  loadRemoteData = async (articleId: string) => {
+    const returns = await this.props.articleStore.queryBlogBaseInfo(articleId)
+    if (returns.success) {
+      const article = returns.data.article
+      this.setState({
+        title: article.title,
+        context: article.context,
+        summary: article.summary,
+        poster: article.poster,
+        song: article.song,
+        initContextValue: article.context,
+      })
+    } else {
+      // TODO 显示页面错误
     }
   }
 
@@ -168,19 +202,75 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
   }
 
   handleChangeContext = (text: string) => {
+    this.setState({
+      context: text,
+    })
     this.state.superStore.save({
       context: text,
     })
   }
 
-  handleSelectImage = (image: ImageModel) => {
+  handleSelectImage = (poster: ImageModel) => {
+    this.setState({
+      poster,
+    })
     this.state.superStore.save({
-      poster: image,
+      poster,
     })
   }
   handleSelectSong = (song: SongModel) => {
+    this.setState({
+      song,
+    })
     this.state.superStore.save({
       song,
+    })
+  }
+
+  handleSubmit = () => {
+    this.props.form.validateFields(async (err, field: {
+      title: '',
+      summary: '',
+    }) => {
+      this.setState({
+        firstActiveContext: true,
+      })
+      if (err) return
+      if (!this.state.context.length) {
+        return
+      }
+      if (!this.state.poster) {
+        this.setState({
+          selectImageShowError: true
+        })
+        return
+      }
+      if (!this.state.song) {
+        this.setState({
+          selectSongShowError: true
+        })
+        return
+      }
+      const returns = await this.props.articleStore.save({
+        _id: this.state.articleId,
+        title: field.title,
+        summary: field.summary,
+        context: this.state.context,
+        songId: this.state.song!._id,
+        posterId: this.state.poster!._id,
+      })
+
+      if (returns.success) {
+        if (this.state.articleId) {
+          message.success(`编辑文章《${field.title}》成功`)
+        } else {
+          message.success(`新增文章《${field.title}》成功`)
+        }
+        this.state.superStore.store.clear()
+        setTimeout(() => {
+          history.push('/article')
+        }, 1000)
+      }
     })
   }
 
@@ -190,7 +280,7 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
       <div className={`${s.view} ${s.editSaid}`}>
         <Form layout="vertical">
           <Row>
-            <Col span={14} md={20}>
+            <Col span={24} xxl={10}>
               <FormItem>
                 {
                   getFieldDecorator(
@@ -223,11 +313,11 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
               </FormItem>
             </Col>
             <Col
-              span={8}
-              offset={2}
-              md={{
-                offset: 0,
-                span: 20,
+              span={24}
+              offset={0}
+              xxl={{
+                offset: 2,
+                span: 12,
               }}
             >
               <FormItem>
@@ -236,12 +326,14 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
                     <SelectorImage
                       onSelect={this.handleSelectImage}
                       initSelectModel={this.state.poster}
+                      showerror={this.state.selectImageShowError}
                     />
                   </Col>
                   <Col>
                     <SelectorSong
                       onSelect={this.handleSelectSong}
                       initSelectModel={this.state.song}
+                      showerror={this.state.selectSongShowError}
                     />
                   </Col>
                 </Row>
@@ -259,6 +351,7 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
                       placeholder="简述\n支持多行"
                       autoComplete="off"
                       autosize={{ minRows: 4, maxRows: 4 }}
+                      maxLength={200}
                       onChange={this.createHandelChangeSaveToLocal('summary')}
                     />
                     )
@@ -300,10 +393,15 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
             <Button loading={false} size="large">
               预览
             </Button>
-            <Button type="primary" size="large" htmlType="submit" style={{ marginLeft: '2rem' }}>
+            <Button
+              type="primary"
+              size="large"
+              htmlType="submit"
+              style={{ marginLeft: '2rem' }}
+              onClick={this.handleSubmit}
+            >
               {
-                // this.state.blogId ? '保存' : '发表'
-                '保存'
+                this.state.articleId ? '保存' : '发表'
               }
             </Button>
           </Row>

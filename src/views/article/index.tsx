@@ -1,33 +1,115 @@
 import * as React from 'react'
-import { Table, Button } from 'antd'
-import { SaidDemoModel } from '../../types/article'
+// import SaidEditor from '../../components/said-editor'
+import { Button, Row, Col, Table, Icon, Popconfirm, message } from 'antd'
+import { FormComponentProps } from 'antd/lib/form/Form'
 import { inject, observer } from 'mobx-react'
+import { ArticleStore } from '../../store/article'
+import history from '../../assets/js/history'
+import { List } from 'immutable'
+import * as moment from 'moment'
+import { ArticleModel } from '../../types/article'
 
 export interface StateProps {
-  articles: SaidDemoModel[]
+  articleStore: ArticleStore
 }
 
-// 无状态组件用这种方式绑定
-export default inject('store')(observer(function ({ articles }: StateProps) {
-  const columns = [{
-    title: '名称',
-    dataIndex: 'name',
-    key: 'name'
-  }, {
-    title: '文本',
-    dataIndex: 'context',
-    key: 'context'
-  }]
-  return (
-    <div>
-      <Table
-        // bordered
-        title={() => <Button className="editable-add-btn">添加测试</Button>}
-        columns={columns}
-        // 这个 articles 是 redux 传过来的
-        dataSource={articles}
-      // onChange={handleChange}
-      />
-    </div>
-  )
+@inject((allStores: any) => ({
+  articleStore: allStores.store.article
 }))
+@observer
+class Index extends React.Component<StateProps, { deleteList: List<string> }> {
+
+  state = {
+    deleteList: List<string>()
+  }
+
+  /**
+   * constructor 中不允许操作 state
+   */
+  componentWillMount() {
+    this.load()
+  }
+
+  /**
+   * 远程加载数据
+   */
+  async load() {
+    this.props.articleStore.load()
+  }
+  handelRemoveEditArticle = (articleId) => {
+    history.push(`/article/edit/${articleId}`)
+  }
+  handelRemoveArticle = (articleId: string) => {
+    this.setState({
+      deleteList: this.state.deleteList.push(articleId)
+    })
+    this.props.articleStore.remove(articleId).then(returns => {
+      let index = this.state.deleteList.indexOf(articleId)
+      if (~index) {
+        this.setState({
+          deleteList: this.state.deleteList.remove(index)
+        })
+      }
+      if (returns.success) {
+        message.success('删除成功!')
+      }
+    })
+  }
+  render() {
+    const columns = [{
+      title: '标题',
+      dataIndex: 'title',
+      key: 'title',
+    }, {
+      title: '作者',
+      dataIndex: 'author.nickName',
+      key: 'nickName',
+    }, {
+      title: '喜欢',
+      dataIndex: 'info.likeCount',
+      key: 'likeCount',
+    }, {
+      title: '歌曲',
+      dataIndex: 'song.title',
+      key: 'songTitle',
+    }, {
+      title: '更新时间',
+      dataIndex: 'info.updateTime',
+      key: 'updateTime',
+      render(updateTime: number) {
+        return moment(updateTime).format('YYYY-MM-DD HH:mm:ss')
+      }
+    }, {
+      title: '操作',
+      key: 'action',
+      render: (text, article: ArticleModel) => (
+        <span>
+          <Button
+            icon="edit"
+            type="primary"
+            style={{ marginRight: '1rem' }}
+            onClick={() => this.handelRemoveEditArticle(article._id)}
+          />
+          {
+            this.state.deleteList.contains(article._id) ?
+              <Button icon="delete" type="danger" loading /> :
+              <Popconfirm title="确定是否删除?" onConfirm={() => this.handelRemoveArticle(article._id)}>
+                <Button icon="delete" type="danger" />
+              </Popconfirm>
+          }
+        </span>
+      )
+    }]
+    return (
+      <div>
+        <Table
+          rowKey="_id"
+          columns={columns}
+          dataSource={this.props.articleStore.articles.slice()}
+        />
+      </div >
+    )
+  }
+}
+
+export default Index

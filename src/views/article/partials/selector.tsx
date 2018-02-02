@@ -10,6 +10,7 @@ import { SongComponent } from '../../../components/songs/song'
 interface SelectorStateProps<T> {
   onSelect: (model: T) => void
   initSelectModel?: T | null
+  showerror?: boolean
 }
 interface SelectorComponentState<T> {
   /**
@@ -48,6 +49,11 @@ export class SelectorImage extends React.Component<SelectorStateProps<ImageModel
   }
 
   componentWillReceiveProps(nextProp: SelectorStateProps<ImageModel>) {
+    if (nextProp.showerror != null) {
+      this.setState({
+        showerror: nextProp.showerror,
+      })
+    }
     this.init(nextProp.initSelectModel)
   }
 
@@ -157,6 +163,11 @@ export class SelectorSong extends React.Component<SelectorStateProps<SongModel>,
   }
 
   componentWillReceiveProps(nextProp: SelectorStateProps<SongModel>) {
+    if (nextProp.showerror != null) {
+      this.setState({
+        showerror: nextProp.showerror,
+      })
+    }
     this.init(nextProp.initSelectModel)
   }
 

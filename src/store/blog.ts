@@ -8,10 +8,9 @@ import { BlogModel } from '../types/blog'
 export class Blog {
   _id: string = ''
   title: string = ''
-  urlKey: string = ''
+  key: string = ''
   author: string = ''
   summary: string = ''
-  fileName: string = ''
   tags: string = ''
   category: string = ''
   config = {
@@ -105,7 +104,7 @@ export class BlogStore {
    */
   remove(blogId: string) {
     return post('/back/api/user/blog/remove', { blogId }).then(returns => {
-      if (returns.check()) {
+      if (returns.success) {
         runInAction(() => {
           let index = this.blogs.findIndex(blog => blog._id === blogId)
           if (~index) {

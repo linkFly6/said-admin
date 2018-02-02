@@ -2,16 +2,10 @@ import { AdminModel } from './admin'
 import { ImageModel } from './image'
 import { SongModel } from './song'
 
-export interface SaidDemoModel {
-  key: number,
-  name: string,
-  context: string,
-}
-
 /**
  * Said Model(听说)
  */
-export interface SaidModel {
+export interface ArticleModel {
   /**
    * mongoDB 默认 ID
    */
@@ -27,7 +21,7 @@ export interface SaidModel {
   /**
    * 标记，可以自定义，也可以自动生成，url 中使用
    */
-  urlKey: string,
+  key: string,
   /**
    * 作者信息
    */
@@ -36,10 +30,6 @@ export interface SaidModel {
    * 描述
    */
   summary: string,
-  /**
-   * 文件名
-   */
-  fileName: string,
 
   /**
    * said 配图海报

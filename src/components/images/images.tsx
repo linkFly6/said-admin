@@ -189,7 +189,9 @@ export class ImageComponent extends React.Component<StateProps, ComponentState> 
    * @param nextProps 
    */
   componentWillReceiveProps(nextProps: StateProps) {
-    this.load(nextProps.imageType)
+    if (this.props.imageType !== nextProps.imageType) {
+      this.load(nextProps.imageType)
+    }
     /**
      * 如果传入了初始默认被选择的 image，则更新这个默认值
      */
