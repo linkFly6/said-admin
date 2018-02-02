@@ -19,15 +19,26 @@ import { Returns } from '../models/returns'
 
 import { userReady } from '../service/user'
 import { PageLoading } from '../components/common'
+import { AdminRule } from '../types/admin'
 
 
 const { SubMenu } = Menu
 const { Header, Content, Sider } = Layout
 
-interface State {
+interface ComponentStates {
+  /**
+   * 当前选中的子项
+   */
   current: string
+  /**
+   * 展开的父菜单列表
+   */
   openKeys: string[]
-  routePaths: string[]
+  // routePaths: string[]
+
+  /**
+   * 是否登录，决定了是否渲染子页面
+   */
   isLogin: boolean
 }
 
@@ -71,12 +82,12 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
           <Route path="/article" component={Article} exact />
           <Route path="/article/add" component={ArticleEdit} exact />
           <Route path="/article/edit/:id" component={ArticleEdit} exact />
-          <Route path="/others/images" component={ImageManager} exact />
           <Route path="/blog" component={Blog} exact />
           <Route path="/blog/edit/:id" component={BlogEdit} exact />
           <Route path="/blog/add" component={BlogEdit} exact />
-          <Route path="/category" component={Category} exact />
-          <Route path="/song" component={Song} exact />
+          <Route path="/others/images" component={ImageManager} exact />
+          <Route path="/others/song" component={Song} exact />
+          <Route path="/others/category" component={Category} exact />
         </Switch>
       </div>
     )
@@ -93,30 +104,31 @@ const Routers = (props: { isLogin: boolean, pathname: string }) => {
   admin: allStores.store.admin
 }))
 @observer
-export default class App extends React.Component<RouteComponentProps<{}> & StateProps, State> {
-  state = {
+export default class App extends React.Component<RouteComponentProps<{}> & StateProps, ComponentStates> {
+  state: ComponentStates = {
     current: '1',
     openKeys: ['said'],
-    routePaths: ['said'],
+    // routePaths: ['said'],
     isLogin: false
   }
 
-  constructor(props: RouteComponentProps<{}> & StateProps) {
-    super(props)
-    // setTimeout(() => {
-    //   this.setState({
-    //     isLogin: true
-    //   })
-    // }, 2000)
-  }
+  // constructor(props: RouteComponentProps<{}> & StateProps) {
+  //   super(props)
+  //   // setTimeout(() => {
+  //   //   this.setState({
+  //   //     isLogin: true
+  //   //   })
+  //   // }, 2000)
+  // }
 
   componentWillMount() {
+    this.setMenu(this.props)
     this.login()
   }
 
 
-  componentWillReceiveProps() {
-    // console.log(this.props.location)
+  componentWillReceiveProps(nextProps: RouteComponentProps<{}> & StateProps) {
+    this.setMenu(nextProps)
   }
 
 
@@ -133,17 +145,32 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
     }
   }
 
-  handleClick = (e: ClickParam) => {
-    this.props.history.push(e.key)
-    let routePaths = e.key.split('/')
-    // 如果是 /said/blog 的路径
-    if (!routePaths[0]) {
-      routePaths.shift()
+  /**
+   * 路由切换的时候定位对应的菜单
+   */
+  setMenu = (props: RouteComponentProps<{}>) => {
+    const pathName = props.location.pathname
+    const keys = pathName.split('/')
+    // 如果是 /said/blog 的路径，最前面带 / 的
+    if (!keys[0]) {
+      keys.shift()
     }
     this.setState({
-      current: e.key,
-      routePaths
+      current: pathName,
+      openKeys: [keys[0]],
     })
+  }
+
+  handleClick = (e: ClickParam) => {
+    this.props.history.push(e.key)
+    // let routePaths = e.key.split('/')
+
+    // if (!routePaths[0]) {
+    //   routePaths.shift()
+    // }
+    // this.setState({
+    //   routePaths
+    // })
   }
   onOpenChange = (openKeys: string[]) => {
     const state = this.state
@@ -173,31 +200,50 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
               onClick={this.handleClick}
               style={{ height: '100%' }}
             >
-              <SubMenu key="said" title={<span><Icon type="article" />听说管理</span>}>
-                <Menu.Item key="/article"><Icon type="rizhi11" />听说概况</Menu.Item>
-                <Menu.Item key="/article/add"><Icon type="bianxie" />添加听说</Menu.Item>
-              </SubMenu>
-              <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
-                <Menu.Item key="/blog"><Icon type="rizhi11" />日志管理</Menu.Item>
-                <Menu.Item key="/blog/add"><Icon type="bianxie" />添加日志</Menu.Item>
-              </SubMenu>
-              <SubMenu key="other" title={<span><Icon type="guanli" />其他管理</span>}>
+              <Menu.Item key="/home">
+                <Icon type="homepagenormal" />首页
+              </Menu.Item>
+              {
+                this.state.isLogin && this.props.admin.hasRule(AdminRule.SAID) ?
+                  <SubMenu key="article" title={<span><Icon type="article" />听说管理</span>}>
+                    <Menu.Item key="/article"><Icon type="rizhi11" />听说概况</Menu.Item>
+                    <Menu.Item key="/article/add"><Icon type="bianxie" />添加听说</Menu.Item>
+                  </SubMenu> : null
+              }
+              {
+                this.state.isLogin && this.props.admin.hasRule(AdminRule.BLOG) ?
+                  <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
+                    <Menu.Item key="/blog"><Icon type="rizhi11" />日志管理</Menu.Item>
+                    <Menu.Item key="/blog/add"><Icon type="bianxie" />添加日志</Menu.Item>
+                  </SubMenu> : null
+              }
+              <SubMenu key="others" title={<span><Icon type="guanli" />其他管理</span>}>
                 <Menu.Item key="/others/images"><Icon type="tupian" />图片管理</Menu.Item>
-                <Menu.Item key="/song"><Icon type="icon14" />音乐管理</Menu.Item>
-                <Menu.Item key="/category"><Icon type="biaoqian" />分类管理</Menu.Item>
+                {
+                  this.state.isLogin && this.props.admin.hasRule(AdminRule.SAID) ?
+                    <Menu.Item key="/others/song"><Icon type="icon14" />音乐管理</Menu.Item> : null
+                }
+                {
+                  this.state.isLogin && this.props.admin.hasRule(AdminRule.BLOG) ?
+                    <Menu.Item key="/others/category"><Icon type="biaoqian" />分类管理</Menu.Item> : null
+                }
               </SubMenu>
-              <SubMenu key="site" title={<span><Icon type="diannao" />站点管理</span>}>
-                <Menu.Item key="8"><Icon type="tongji" />访问概况</Menu.Item>
-                <Menu.Item key="9"><Icon type="fenlei" />站点日志</Menu.Item>
-              </SubMenu>
+              {
+                this.state.isLogin && this.props.admin.hasRule(AdminRule.GLOBAL) ?
+                  <SubMenu key="site" title={<span><Icon type="diannao" />站点管理</span>}>
+                    <Menu.Item key="8"><Icon type="tongji" />访问概况</Menu.Item>
+                    <Menu.Item key="9"><Icon type="fenlei" />站点日志</Menu.Item>
+                  </SubMenu> : null
+              }
+
             </Menu>
           </Sider>
           <Layout style={{ padding: '0 24px 24px' }}>
             <Breadcrumb className={s.appBreadcrumb}>
               {
-                this.state.routePaths.map((path: string) => {
-                  return <Breadcrumb.Item key={path}>{path}</Breadcrumb.Item>
-                })
+                // this.state.routePaths.map((path: string) => {
+                //   return <Breadcrumb.Item key={path}>{path}</Breadcrumb.Item>
+                // })
               }
             </Breadcrumb>
             <Content style={{ background: '#fff', padding: 24, margin: 0, position: 'relative' }}>

@@ -8,6 +8,13 @@ import './icon.styl'
 
 // export default Icon
 
-let Icon = ({ type }: { type: string }) => <i className={'icon saidiconfont icon-' + type} />
+export const SaidIcon = (props: { type: string, children?: React.ReactNode | null }) => {
 
-export default Icon
+  return (
+    <i className={'icon saidiconfont icon-' + props.type} >
+      {props.children}
+    </i>
+  )
+}
+
+export default SaidIcon

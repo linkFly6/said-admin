@@ -8,12 +8,13 @@ import { createFormItem } from '../../components/common'
 import { ArticleStore } from '../../store/article'
 import { SongGrid } from '../../components/songs/song-grid'
 import { ImageComponent } from '../../components/images/images'
-import { ImageType, ImageModel } from '../../types/image'
+import { ImageType, ImageModel, acceptMimetypes } from '../../types/image'
 import { SelectorImage, SelectorSong } from './partials/selector'
 import { SongModel } from '../../types/song'
 import { createFactoryStoreSave, Store } from '../../service/utils/store'
 import { RouteComponentProps } from 'react-router'
 import history from '../../assets/js/history'
+import { ImageStore } from '../../store/image'
 
 
 /**
@@ -35,6 +36,7 @@ const FormItem = createFormItem({
 
 interface StateProps {
   articleStore: ArticleStore,
+  imageStore: ImageStore,
 }
 
 /**
@@ -106,6 +108,7 @@ interface ComponentStates extends PageArticleModel {
 
 @inject((allStores: any) => ({
   articleStore: allStores.store.article,
+  imageStore: allStores.store.image,
 }))
 @observer
 class ArticleDetail extends React.Component<
@@ -201,6 +204,9 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
     }
   }
 
+  /**
+   * 文章正文改变
+   */
   handleChangeContext = (text: string) => {
     this.setState({
       context: text,
@@ -210,6 +216,9 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
     })
   }
 
+  /**
+   * 选择图片
+   */
   handleSelectImage = (poster: ImageModel) => {
     this.setState({
       poster,
@@ -218,6 +227,10 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
       poster,
     })
   }
+
+  /**
+   * 选择歌曲
+   */
   handleSelectSong = (song: SongModel) => {
     this.setState({
       song,
@@ -227,6 +240,60 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
     })
   }
 
+  /**
+   * 编辑器拖拽事件
+   */
+  handleOnDrag = (
+    /**
+     * 拖拽事件
+     */
+    e: DragEvent,
+    /**
+     * 调用后会插入临时上传文本
+     * 参数 success 标识是否插入文本
+     */
+    inserUploadingFlag: (success: boolean) => void,
+    /**
+     * 调用后会用 text 替换掉临时上传文本
+     */
+    next: (text: string) => void
+  ) => {
+    if (e.dataTransfer.files.length) {
+      // 只处理第一个文件
+      const file = e.dataTransfer.files[0]
+      if (~acceptMimetypes.indexOf(file.type)) {
+        // 在编辑器插入占位符
+        inserUploadingFlag(true)
+        // 上传图片
+        this.uploadImage(file).then(returns => {
+          if (!returns.check()) {
+            message.error(`${returns.message}${returns.code == null ? '' : `(${returns.code})`}`)
+            // 清掉占位符
+            next('')
+          } else {
+            // 插入替换占位符后的 markdown 文本
+            next(`![alt](${returns.data.url})`)
+          }
+        })
+      } else {
+        // 表示不支持该文件，不要在编辑器插入占位符
+        inserUploadingFlag(false)
+      }
+    }
+    return false
+  }
+
+  // 上传文件
+  uploadImage = (file: File) => {
+    return this.props.imageStore.upload({
+      imageType: ImageType.Article,
+      img: file,
+    })
+  }
+
+  /**
+   * 提交保存
+   */
   handleSubmit = () => {
     this.props.form.validateFields(async (err, field: {
       title: '',
@@ -307,7 +374,7 @@ RouteComponentProps<{ id: string }> & StateProps & FormComponentProps, Component
                   <SaidEditor
                     onChange={this.handleChangeContext}
                     value={this.state.initContextValue}
-                  // onDrag={this.handleOnDrag}
+                    onDrag={this.handleOnDrag}
                   />
                 }
               </FormItem>

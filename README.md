@@ -308,9 +308,9 @@ class Index extends React.Component<DispatchProp<duckCategory.DispatchProps>> {
 export default Index
 ```
 
-## 请求架构
+## 架构
 
-待定
+字体：使用 [阿里巴巴图标库](http://www.iconfont.cn/) 和 CDN 在线加载。
 
 
 
@@ -320,12 +320,15 @@ export default Index
 - ~~前台访问用 `cookie`，后台 + 前台管理员访问接口带 `token`， `token` 每次进行校验~~
 - 静态文件处理(例如分类里面的小图片)
 - 图片管理把普通用户的删除权限去掉（不显示删除按钮）
+- 登录信息已失效要自动清 cookie 跳转到登录页
 
 
 ## 开发计划
 
 - 访问量/阅读量/浏览量：通过 `log` 文件定期收集(例如 10min)
 - 目前后台大部分接口都没有对数据字段做长度约束限制，后续会补上接口
+- Home/管理员管理页/站点日志页
+- 检查系统权限，没有权限的操作样式(按钮)都不做展现
 
 ## 版权
 

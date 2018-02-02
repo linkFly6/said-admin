@@ -6,6 +6,7 @@ import { ImageComponent } from '../../../components/images/images'
 import { SongGrid } from '../../../components/songs/song-grid'
 import { SongModel } from '../../../types/song'
 import { SongComponent } from '../../../components/songs/song'
+import { SaidIcon } from '../../../components/icon/icon'
 
 interface SelectorStateProps<T> {
   onSelect: (model: T) => void
@@ -229,9 +230,9 @@ export class SelectorSong extends React.Component<SelectorStateProps<SongModel>,
         }
       >
         <div className={s.selectMask} onClick={() => this.setState({ visibleModal: true })}>
-          <Icon type="picture">
+          <SaidIcon type="yinle">
             点击选择歌曲
-          </Icon>
+          </SaidIcon>
         </div>
         {
           this.state.model ?

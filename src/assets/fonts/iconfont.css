@@ -15,6 +15,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* linkfly 修正 */
+.saidiconfont:before {
+  display: block;
+}
+
 .icon-tupian1:before { content: "\e61e"; }
 
 .icon-icon14:before { content: "\e660"; }

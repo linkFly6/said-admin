@@ -1,7 +1,7 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import 'antd/dist/antd.css'
-import './assets/fonts/iconfont.css'
+// import './assets/fonts/iconfont.css'
 import { LocaleProvider } from 'antd'
 import zhCN from 'antd/lib/locale-provider/zh_CN'
 import App from './views/App'

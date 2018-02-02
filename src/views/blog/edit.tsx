@@ -137,7 +137,6 @@ RouteComponentProps<{ id: string }>
     const returns = await this.props.blog.queryBlogBaseInfo(blogId)
     // 编辑模式
     if (returns.check() && blogId && returns.data.blog) {
-      // TODO 编辑模式下要还原数据
       this.setState({
         blogId: blogId,
         title: returns.data.blog.title,
@@ -385,7 +384,6 @@ RouteComponentProps<{ id: string }>
                       mode="tags"
                       size="large"
                       placeholder="选择或输入标签"
-                      // defaultValue={['新增']}
                       onChange={this.handleChangeTags}
                     >
                       {

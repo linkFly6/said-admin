@@ -84,7 +84,7 @@ export function fetch<T>(
   ).then((returns: Returns<T>) => {
     if (!returns.success) {
       if (isLoginFailCode(returns.code)) {
-        // 登录失败要重新
+        // 登录失败要重新登录
         history.replace({
           pathname: '/login',
           search: 'src=' + encodeURIComponent(history.location.pathname + history.location.search)
@@ -140,6 +140,14 @@ export function postForm<T>(uri: string, data: FormData,
       } catch (error) {
         resolve(new Returns<T>(new ReturnsError(xhr.status, xhr.statusText)))
         return
+      }
+
+      if (isLoginFailCode(json.code)) {
+        // 登录失败要重新登录
+        history.replace({
+          pathname: '/login',
+          search: 'src=' + encodeURIComponent(history.location.pathname + history.location.search)
+        })
       }
       if (json.code !== 0) {
         resolve(new Returns<T>(new ReturnsError(json.code, json.message)))
