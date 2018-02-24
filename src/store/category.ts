@@ -24,6 +24,16 @@ export class CategoryStore {
   }
 
   /**
+   * 查看是否有同名的分类名称
+   * @param categoryName 
+   */
+  exists(categoryName: string, id?: string) {
+    return this.categorys.some(category => {
+      return category.name === categoryName.trim() && id !== category._id
+    })
+  }
+
+  /**
    * 新增
    * @param category 
    */

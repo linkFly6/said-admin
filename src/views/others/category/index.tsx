@@ -9,6 +9,12 @@ import { inject, observer } from 'mobx-react'
 import { CategoryStore } from '../../../store/category'
 
 
+/**
+ * 匹配分类名称合法性，匹配字母、下划线、数字和.号
+ */
+const regCategoryName = /^[\d\w\.]{1,18}$/i
+
+
 export interface StateProps {
   category: CategoryStore
 }
@@ -108,7 +114,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
           </span>
         )
       }]
-    
+
   }
   state: State = {
     visible: false,
@@ -121,10 +127,10 @@ export default class CategoryManage extends React.Component<StateProps, State> {
     cacheData: Map<string, CategoryModel>()
   }
 
-  componentWillMount () {
+  componentWillMount() {
     this.load()
   }
-  async load() {
+  load() {
     this.props.category.load()
   }
 
@@ -147,6 +153,13 @@ export default class CategoryManage extends React.Component<StateProps, State> {
     })
   }
 
+  /**
+   * 验证分类名称是否正确
+   */
+  checkCategoryName = (categoryName: string) => {
+    return regCategoryName.test(categoryName)
+  }
+
   // 编辑模式
   edit(category: CategoryModel) {
     this.setState({
@@ -163,14 +176,22 @@ export default class CategoryManage extends React.Component<StateProps, State> {
   // 保存编辑
   save(categoryId: string) {
     const category = this.state.cacheData.get(categoryId)
+    if (!this.checkCategoryName(category.name)) {
+      message.error('分类名称只能包含：字母、数字、.、_')
+      return
+    }
+    if (this.props.category.exists(category.name)) {
+      message.error(`分类"${category.name}"已存在`)
+      return
+    }
     this.removeCache(categoryId)
     this.props.category.updateById(categoryId, {
       icon: category.icon,
-      name: category.name,
+      name: category.name.trim(),
     }).then(returns => {
-      if (!returns.check()) {
-        message.error(returns.message)
-      }
+      // if (!returns.success) {
+      //   message.error(returns.message)
+      // }
     })
   }
 
@@ -232,6 +253,30 @@ export default class CategoryManage extends React.Component<StateProps, State> {
       })
       return false
     }
+    if (!this.checkCategoryName(this.state.editModel.name)) {
+      this.setState({
+        editModel: {
+          ...this.state.editModel,
+          ...{
+            validateStatus: 'error',
+            errMsg: '分类名称只能包含：字母、数字、.、_',
+          }
+        }
+      })
+      return false
+    }
+    if (this.props.category.exists(this.state.editModel.name)) {
+      this.setState({
+        editModel: {
+          ...this.state.editModel,
+          ...{
+            validateStatus: 'error',
+            errMsg: `分类"${this.state.editModel.name}"已存在`,
+          }
+        }
+      })
+      return false
+    }
     this.clearErrorMsg()
     return true
   }
@@ -249,12 +294,10 @@ export default class CategoryManage extends React.Component<StateProps, State> {
   handelAddCategory = () => {
     if (!this.validateAddCategory()) return
     this.props.category.create({
-      name: this.state.editModel.name,
+      name: this.state.editModel.name.trim(),
       icon: this.state.editModel.icon,
     }).then(returns => {
-      if (!returns.check()) {
-        message.error(returns.message)
-      } else {
+      if (returns.success) {
         this.setEditModel({
           name: ''
         })
