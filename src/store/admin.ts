@@ -65,7 +65,7 @@ export class AdminStore implements SimpleAdmin {
    */
   @action
   checkUserState(token: string) {
-    return innerFetch<SimpleAdmin>('/back/api/getUserByToken', {
+    return innerFetch<SimpleAdmin>('/back/api/getAdminByToken', {
       token,
     }).then(returns => {
       if (returns.check()) {

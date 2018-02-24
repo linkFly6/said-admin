@@ -33,12 +33,4 @@ export interface UserModel {
    * 用户角色
    */
   role: UserRole
-  /**
-   * 用户会话 token
-   */
-  token: string
-  /**
-   * 用户渠道 ID（用于用户分享）
-   */
-  channelId: string
 }
