@@ -1,9 +1,15 @@
+import { throttle } from './utils'
 
 export interface PlayerOption {
   /**
    * 是否自动播放
    */
   autoplay?: boolean
+
+  /**
+   * 音频播放源
+   */
+  src?: string
 
   /**
    * 是否显示控制面板
@@ -49,6 +55,9 @@ export class Player {
 
   constructor(option: PlayerOption = {}) {
     this.$elem = document.createElement('audio')
+    if (option.src) {
+      this.$elem.src = option.src
+    }
     if (option.autoplay) {
       this.$elem.autoplay = true
     }
@@ -56,7 +65,7 @@ export class Player {
       this.$elem.controls = true
     }
     if (option.loop) {
-      this.$elem.controls = true
+      this.$elem.loop = true
     }
     // 默认 preload 会节省带宽
     this.$elem.preload = option.preload == null ? 'none' : option.preload
@@ -79,7 +88,7 @@ export class Player {
    * 监听播放中事件，每 1s 执行一次
    * @param listener 事件函数
    */
-  onTimeupdate(listener: (
+  onTimer(listener: (
     /**
      * 进度百分比
      */
@@ -91,18 +100,18 @@ export class Player {
     /**
      * 总时长(s)
      */
-    duration: number,
+    duration: number) => any) {
     /**
-     * 委托的事件参数
+     * timeupdate 事件不是 1s 执行一次，而是在任务队列有空隙的时候执行，1s 内可能执行多次，所以并不靠谱
+     * https://stackoverflow.com/questions/12325787/setting-the-granularity-of-the-html5-audio-event-timeupdate
+     * 这里采用的方案是通过函数节流从而实现 1s 执行一次
      */
-    ev: HTMLMediaElementEventMap['timeupdate']) => any) {
-    // timeupdate 事件默认 1s 一次
-    this.on('timeupdate', (e) => {
+    this.on('timeupdate', throttle(e => {
       const progress = this.$elem.duration ?
         // 因为如果是懒加载资源的话， play 之后才会开始播放音乐
         this.$elem.currentTime / this.$elem.duration * 100 : 0
-      listener.call(this, progress, this.$elem.currentTime, this.$elem.duration || 0, e)
-    })
+      listener.call(this, progress, this.$elem.currentTime, this.$elem.duration || 0)
+    }, 1000))
     return this
   }
 
