@@ -137,15 +137,26 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
       this.setStore(name, e.target.value)
     }
   }
+
+  /**
+   * componentWillReceiveProps 会一直触发
+   * http://react-china.org/t/react-componentwillreceiveprops-updata-render/16469
+   * @param nextProps 
+   */
   componentWillReceiveProps(nextProps: StateProps) {
-    // 重置数据
-    if (nextProps.song) {
+    /**
+     * 如果这里不加 this.state.cache.name 的的判断，componentWillReceiveProps 会在输入框的 change/blur 之后各种执行（没找到原因）
+     * 从而导致这里是 props 一直覆盖 state
+     * 所以这里判断如果有 cache 就不更新了
+     */
+    if (nextProps.song && !this.state.cache.name) {
       this.setState({
         cache: nextProps.song,
         image: nextProps.song.image ? nextProps.song.image : null,
         selectImage: nextProps.song.image ? nextProps.song.image : null
       })
     }
+    return true
   }
 
   /**
@@ -284,7 +295,6 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
 
   render() {
     const getFieldDecorator = this.props.form.getFieldDecorator
-
     const image = this.state.image ?
       (
         <div
@@ -342,9 +352,9 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                 getFieldDecorator(
                   'title',
                   {
-                    validateTrigger: ['onChange', 'onBlur'],
+                    validateTrigger: ['onChange'],
                     rules: [{ required: true, message: '请输入歌曲名称' }],
-                    initialValue: this.state.cache.title
+                    // initialValue: this.state.cache.title
                   })(
                   <Input
                     placeholder="歌曲名称"
@@ -361,7 +371,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                   {
                     validateTrigger: ['onChange', 'onBlur'],
                     rules: [{ required: true, message: '请输入歌手名称' }],
-                    initialValue: this.state.cache.artist
+                    // initialValue: this.state.cache.artist
                   })(
                   <Input
                     placeholder="歌手名称"
@@ -378,7 +388,7 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
                   {
                     validateTrigger: ['onChange', 'onBlur'],
                     rules: [{ required: true, message: '请输入专辑名称' }],
-                    initialValue: this.state.cache.album
+                    // initialValue: this.state.cache.album
                   })(
                   <Input
                     placeholder="专辑名称"
@@ -414,4 +424,29 @@ class SongFormComponent extends React.Component<StateProps, ComponentState> {
   }
 }
 
-export default Form.create()(SongFormComponent)
+export default Form.create({
+  /**
+   * 初始化表单的值，因为 antd 表单 input 的 initialValue 只有初次生效
+   * 导致了这个表单多次打开，默认显示的值都是第一次的，所以在这里进行数据 merge 到表单
+   * 数据的来源可以是 props，也可以是 cache
+   * mapPropsToFields 参见：https://ant.design/components/form-cn/#components-form-demo-global-state
+   * @param prop 
+   */
+  mapPropsToFields(props: StateProps) {
+    let data = props.song || songStore.val(SONGCACHENAME) as SongModel
+    if (data) {
+      return {
+        title: Form.createFormField({
+          value: data.title
+        }),
+        artist: Form.createFormField({
+          value: data.artist
+        }),
+        album: Form.createFormField({
+          value: data.album
+        }),
+      }
+    }
+    return {}
+  }
+})(SongFormComponent) as any

@@ -3,21 +3,19 @@ import { Popover, Button } from 'antd'
 import * as s from './index.styl'
 
 interface StateProp {
+  /**
+   * 当前选中的 icon
+   */
   icon?: string
+  /**
+   * icon 列表
+   */
+  icons: string[]
+  
   name?: string
   disabled?: boolean
-  changeIcon?: (src: string) => void
+  changeIcon?: (src: string) => void,
 }
-
-
-const images = [
-  process.env.PUBLIC_URL + '/images/default.png',
-  process.env.PUBLIC_URL + '/images/icon-CSS3.gif',
-  process.env.PUBLIC_URL + '/images/icon-HTML5.gif',
-  process.env.PUBLIC_URL + '/images/icon-jQuery.gif',
-  process.env.PUBLIC_URL + '/images/icon-JS.gif',
-  process.env.PUBLIC_URL + '/images/icon-Require.gif'
-]
 
 export default class SelectCategory extends React.Component<StateProp> {
   state = {
@@ -49,7 +47,7 @@ export default class SelectCategory extends React.Component<StateProp> {
         content={
           <div className={s.card}>
             {
-              images.map((src) => {
+              this.props.icons.map((src) => {
                 return <div className={s.iconBtn} key={src} onClick={this.handleImgClick.bind(this, src)}>
                   <img src={src} />
                 </div>

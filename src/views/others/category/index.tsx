@@ -57,11 +57,11 @@ export default class CategoryManage extends React.Component<StateProps, State> {
             {
               <SelectCategory
                 icon={
-                  process.env.PUBLIC_URL + '' +
                   (this.hasCache(category._id) ? this.getCache(category._id).icon : category.icon)
                 }
                 disabled={!this.hasCache(category._id)}
                 changeIcon={icon => this.handelChangeColumnIcon(icon, category._id)}
+                icons={this.props.category.icons}
               />
             }
           </div>
@@ -119,7 +119,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
   state: State = {
     visible: false,
     editModel: {
-      icon: process.env.PUBLIC_URL + '/images/default.png',
+      icon: '',
       name: '',
       validateStatus: 'success',
       errMsg: '',
@@ -130,8 +130,11 @@ export default class CategoryManage extends React.Component<StateProps, State> {
   componentWillMount() {
     this.load()
   }
-  load() {
-    this.props.category.load()
+  async load() {
+    await this.props.category.load()
+    this.setEditModel({
+      icon: this.props.category.defaultIcon,
+    })
   }
 
   // 一些工具函数
@@ -180,7 +183,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
       message.error('分类名称只能包含：字母、数字、.、_')
       return
     }
-    if (this.props.category.exists(category.name)) {
+    if (this.props.category.exists(category.name, category._id)) {
       message.error(`分类"${category.name}"已存在`)
       return
     }
@@ -324,6 +327,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
                     <SelectCategory
                       icon={this.state.editModel.icon}
                       changeIcon={this.handelChangeIcon}
+                      icons={this.props.category.icons}
                     />
                   }
                   value={this.state.editModel.name}

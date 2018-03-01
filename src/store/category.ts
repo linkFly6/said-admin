@@ -5,18 +5,36 @@ import { targetDiffInObj } from '../service/utils'
 import { Returns } from '../models/returns'
 
 
+/**
+ * 服务端返回的 icon 列表
+ * defaults 是默认 icon
+ * icons 是所有 icon 列表，包含 defaults
+ */
+export interface Icons {
+  defaults: string,
+  icons: string[]
+}
 
 export class CategoryStore {
   @observable categorys: CategoryModel[] = []
-
+  /**
+   * 默认 icon
+   */
+  @observable defaultIcon: string = ''
+  /**
+   * icon 列表
+   */
+  @observable icons: string[] = []
   /**
    * 加载列表
    */
   load() {
-    return fetch<CategoryModel[]>('/back/api/user/category/query').then(returns => {
+    return fetch<{ categorys: CategoryModel[], icons: Icons }>('/back/api/user/category/base').then(returns => {
       if (returns.check()) {
         runInAction(() => {
-          this.categorys = returns.data
+          this.categorys = returns.data.categorys
+          this.defaultIcon = returns.data.icons.defaults
+          this.icons = returns.data.icons.icons
         })
       }
       return returns

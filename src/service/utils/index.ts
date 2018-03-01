@@ -1,3 +1,4 @@
+import * as copy from 'copy-to-clipboard'
 
 /**
  * url 参数解码
@@ -133,4 +134,23 @@ export const debounce = function <T extends Function>(func: any, wait: number, i
  */
 export const isEmptyObject = (obj: any) => {
   return !Object.keys(obj).length
+}
+
+
+/**
+ * 复制 url 到剪切板
+ * 会对 url 协议进行修正，例如 //example.com 会修正为 https://example.com
+ * @param url 
+ */
+export const copyUrl = (url: string) => {
+  // 包含 http/https 的前缀，直接返回
+  if (/^http(s)?:\/\//i.test(url)) {
+    return copy(url)
+  }
+  // 自适应协议，//exmaple.com
+  if (/^\/\//.test(url)) {
+    return copy('https:' + url)
+  }
+  // 默认 http 协议
+  return copy('http://' + url)
 }

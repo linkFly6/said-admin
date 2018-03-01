@@ -8,6 +8,7 @@ import { userReady } from '../../service/user'
 import { inject, observer } from 'mobx-react'
 import { List } from 'immutable'
 import { PageLoading } from '../common'
+import { copyUrl } from '../../service/utils/index'
 
 
 interface StateProps {
@@ -57,6 +58,7 @@ const ImageGrid = (props: {
   deleteting: boolean,
   onClickPreview: (image: ImageModel) => void,
   onClickDelete: (image: ImageModel) => void,
+  onClickCopy: (image: ImageModel) => void,
   /**
    * 模式，默认 "view" 是普通页面模式，支持上传和删除相关图片，点击图片会放大
    * "select" 模式只支持上传图片图片，点击图片会选中图片，且每次点击图片都会触发 onSelect 事件
@@ -84,14 +86,15 @@ const ImageGrid = (props: {
       (
         <div className={s.buttons}>
           <span>
-            <Icon type="eye-o" style={{ color: '#fff' }} onClick={() => props.onClickPreview(props.iamge)} />
+            <Icon type="eye-o" onClick={() => props.onClickPreview(props.iamge)} title="查看大图" />
+            <Icon type="link" onClick={() => props.onClickCopy(props.iamge)} title="复制链接" />
             <Popconfirm
               title="确认是否删除？"
               onConfirm={() => props.onClickDelete(props.iamge)}
               okText="是"
               cancelText="否"
             >
-              <Icon type="delete" style={{ color: '#fff' }} />
+              <Icon type="delete" title="删除图片" />
             </Popconfirm>
           </span>
         </div>
@@ -288,6 +291,15 @@ export class ImageComponent extends React.Component<StateProps, ComponentState> 
   hanleClickPreviewImage = (image: ImageModel) => this.setState({ previewImage: image, previewVisible: true })
   // 关闭预览图片
   handlePreviewModalClose = () => this.setState({ previewVisible: false })
+
+  /**
+   * copy 图片地址
+   */
+  handleClickCopy = (image: ImageModel) => {
+    copyUrl(image.url)
+    message.success(`成功复制图片地址`)
+  }
+
   // 拖拽
   handleShowDragger = (e: React.DragEvent<HTMLDivElement>) => {
     this.setState({ drag: true })
@@ -366,6 +378,7 @@ export class ImageComponent extends React.Component<StateProps, ComponentState> 
                 deleteting={this.state.deleteList.contains(image._id)}
                 onClickDelete={this.handleClickDeleteImage}
                 onClickPreview={this.hanleClickPreviewImage}
+                onClickCopy={this.handleClickCopy}
                 onSelect={this.handleSelectImage}
                 mode={this.props.mode || 'view'}
                 actived={this.state.selectImage ? this.state.selectImage._id === image._id : false}

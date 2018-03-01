@@ -213,7 +213,7 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
               {
                 this.state.isLogin && this.props.admin.hasRule(AdminRule.BLOG) ?
                   <SubMenu key="blog" title={<span><Icon type="screen" />日志管理</span>}>
-                    <Menu.Item key="/blog"><Icon type="rizhi11" />日志管理</Menu.Item>
+                    <Menu.Item key="/blog"><Icon type="rizhi11" />日志概况</Menu.Item>
                     <Menu.Item key="/blog/add"><Icon type="bianxie" />添加日志</Menu.Item>
                   </SubMenu> : null
               }
@@ -228,13 +228,13 @@ export default class App extends React.Component<RouteComponentProps<{}> & State
                     <Menu.Item key="/others/category"><Icon type="biaoqian" />分类管理</Menu.Item> : null
                 }
               </SubMenu>
-              {
+              {/* {
                 this.state.isLogin && this.props.admin.hasRule(AdminRule.GLOBAL) ?
                   <SubMenu key="site" title={<span><Icon type="diannao" />站点管理</span>}>
                     <Menu.Item key="8"><Icon type="tongji" />访问概况</Menu.Item>
                     <Menu.Item key="9"><Icon type="fenlei" />站点日志</Menu.Item>
                   </SubMenu> : null
-              }
+              } */}
 
             </Menu>
           </Sider>

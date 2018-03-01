@@ -324,10 +324,11 @@ export default Index
 - 编辑日志/文章那里，要支持选择图片（从图库中选择图片），并且要支持粘贴图片
 - 图片管理把普通用户的删除权限去掉（不显示删除按钮）
 - 登录信息已失效要自动清 cookie 跳转到登录页
-- 访问量/阅读量/浏览量：通过 `log` 文件定期收集(例如 10min)
 - 目前后台大部分接口都没有对数据字段做长度约束限制，后续会补上接口
 - Home/管理员管理页/站点日志页
 - 检查系统权限，没有权限的操作样式(按钮)都不做展现
+- `initialValue` 的逻辑，具体参见 `src/components/songs/song-from.tsx` 的 `Form.create()` 代码
+- `componentWillReceiveProps` 的逻辑处理，具体参见 `src/components/songs/song-from.tsx` 的 `componentWillReceiveProps()` 代码
 
 ## 版权
 
