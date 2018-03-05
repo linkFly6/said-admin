@@ -6,7 +6,7 @@ import { COOKIENAME } from '../store/admin'
 import { message } from 'antd'
 
 export const isLoginFailCode = (code: number) => {
-  return code === 10001 || code === 10002
+  return code === 10000 || code === 10001
 }
 
 let userReadyPromise: Promise<number>
