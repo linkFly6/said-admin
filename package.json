@@ -8,7 +8,7 @@
     "test": "node scripts/test.js --env=jsdom"
   },
   "proxy": "http://localhost:4000",
-  "homepage": "https://tasaid.com",
+  "homepage": "https://static.tasaid.com",
   "devDependencies": {
     "@types/immutable": "^3.8.7",
     "@types/react-codemirror": "^1.0.0",
