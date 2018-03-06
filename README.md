@@ -330,6 +330,10 @@ export default Index
 - `initialValue` 的逻辑，具体参见 `src/components/songs/song-from.tsx` 的 `Form.create()` 代码
 - `componentWillReceiveProps` 的逻辑处理，具体参见 `src/components/songs/song-from.tsx` 的 `componentWillReceiveProps()` 代码
 
+## 其他
+
+本仓库使用 `create-react-app` 脚手架生成，模板来自 [https://www.npmjs.com/package/react-scripts-ts](https://www.npmjs.com/package/react-scripts-ts)
+
 ## 版权
 
 [Said](https://github.com/linkFly6/Said) 项目代码和内容均采用 [知识共享署名3.0 ( CC Attribution-NonCommercial )](https://creativecommons.org/licenses/by-nc/3.0/) 许可，并且 [Said](https://github.com/linkFly6/Said) 项目和代码还采用 [GPL](http://choosealicense.com/licenses/gpl-3.0/) 协议。
