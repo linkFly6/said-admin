@@ -161,7 +161,7 @@ export function postForm<T>(uri: string, data: FormData,
       xhr.upload.onprogress = options.onProgress // 上传
     }
     if ('onprogerss' in xhr && options.onProgress) {
-      xhr.onprogress = options.onProgress // 下载
+      (xhr as XMLHttpRequest).onprogress = options.onProgress // 下载
     }
     xhr.open('POST', uri)
     xhr.send(data)
