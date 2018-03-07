@@ -249,7 +249,7 @@ export class ImageComponent extends React.Component<StateProps, ComponentState> 
           if (e.lengthComputable) {
             // loaded 表示已上传字节， total 为总数
             this.setState({
-              percent: e.loaded / e.total * 100
+              percent: Math.round(e.loaded / e.total * 100)
             })
           }
         }
