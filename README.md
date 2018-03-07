@@ -330,6 +330,8 @@ export default Index
 - 检查系统权限，没有权限的操作样式(按钮)都不做展现
 - `initialValue` 的逻辑，具体参见 `src/components/songs/song-from.tsx` 的 `Form.create()` 代码
 - `componentWillReceiveProps` 的逻辑处理，具体参见 `src/components/songs/song-from.tsx` 的 `componentWillReceiveProps()` 代码
+- 重写 `hr` 的解析样式，浏览器默认样式太丑了
+- 文章/日志列表页，点击列表项可以跳转到对应的文章落地页
 
 ## 其他
 
