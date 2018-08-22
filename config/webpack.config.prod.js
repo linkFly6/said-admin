@@ -156,7 +156,13 @@ module.exports = {
           {
             test: /\.(ts|tsx)$/,
             include: paths.appSrc,
-            loader: require.resolve('ts-loader')
+            loader: require.resolve('ts-loader'),
+            options: {
+              compilerOptions: {
+                // sourceMap: false,
+                skipLibCheck: true
+              }
+            }
           },
           {
             test: /\.styl$/,
