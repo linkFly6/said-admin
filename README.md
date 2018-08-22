@@ -22,7 +22,7 @@
 ```bash
 # yarn 目前有问题
 npm i -d
-npm run dev
+npm start
 ```
 
 - Said 模块 [@Jemair](https://github.com/Jemair)

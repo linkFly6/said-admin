@@ -3,7 +3,11 @@ import { Layout, Menu, Breadcrumb, Spin, message, Modal } from 'antd'
 import * as s from './App.styl'
 import Icon from '../components/icon/icon'
 import { ClickParam } from 'antd/lib/menu'
-import { BrowserRouter, Route, Router, Switch, withRouter, RouteComponentProps } from 'react-router-dom'
+import { 
+  Route, Switch, 
+  withRouter as fuckWithRouterTSD, 
+  RouteComponentProps,
+} from 'react-router-dom'
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import { inject, observer } from 'mobx-react'
 import { AdminStore } from '../store/admin'
@@ -15,11 +19,12 @@ import Blog from '../views/blog'
 import BlogEdit from '../views/blog/edit'
 import Category from '../views/others/category'
 import Song from '../views/others/song'
-import { Returns } from '../models/returns'
 
 import { userReady } from '../service/user'
 import { PageLoading } from '../components/common'
 import { AdminRule } from '../types/admin'
+
+const withRouter = fuckWithRouterTSD as any
 
 
 const { SubMenu } = Menu

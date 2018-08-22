@@ -78,7 +78,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
                 <Input
                   style={{ margin: '-5px 0' }}
                   value={this.state.cacheData.get(category._id).name}
-                  maxLength="18"
+                  maxLength={18}
                   onChange={e => this.handelColumnChange(e.target.value, category._id)}
                 />
               </div>
@@ -331,7 +331,7 @@ export default class CategoryManage extends React.Component<StateProps, State> {
                     />
                   }
                   value={this.state.editModel.name}
-                  maxLength="18"
+                  maxLength={18}
                   className={s.prefixInput}
                   placeholder="分类名称"
                   onChange={this.handelInputChange}

@@ -9,6 +9,7 @@ import { ImageStore } from '../../../store/image'
 import { ImageType, getUserImageTypeTexts, hasImageType } from '../../../types/image'
 import { Store } from '../../../service/utils/store'
 import { isEmptyObject } from '../../../service/utils'
+import { RadioChangeEvent } from 'antd/lib/radio'
 
 const store = new Store('other.view.image')
 
@@ -60,7 +61,7 @@ export default class ImageManage extends React.Component<StateProps, ComponentSt
     }
   }
 
-  handleImageTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  handleImageTypeChange = (e: RadioChangeEvent) => {
     const value = e.target.value
     if (hasImageType(value)) {
       store.val('imagetype', value)

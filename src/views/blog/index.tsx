@@ -108,7 +108,7 @@ class Index extends React.Component<StateProps, { deleteList: List<string> }> {
       <div className={`${s.view} ${s.blogIndex}`}>
         <Table
           rowKey="_id"
-          columns={columns}
+          columns={columns as any}
           dataSource={this.props.blog.blogs.slice()}
         />
       </div >

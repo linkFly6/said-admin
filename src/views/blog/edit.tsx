@@ -180,7 +180,7 @@ RouteComponentProps<{ id: string }>
     this.setState(data)
     if (this.state.store.val('context')) {
       this.setState({
-        initContext: this.state.store.val('context')
+        initContext: this.state.store.val('context') as string
       })
     }
   }

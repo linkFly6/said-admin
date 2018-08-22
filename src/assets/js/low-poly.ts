@@ -124,7 +124,7 @@ export function draw(container: Element, refreshDuration: number = 10000) {
 }
 
 function randomize() {
-  for (let i = 0; i < points!.length; i++) {
+  for (let i = 0; i < (points as any).length; i++) {
     if (points[i].originX !== 0 && points[i].originX !== unitWidth * (numPointsX - 1)) {
       points[i].x = points[i].originX + Math.random() * unitWidth - unitWidth / 2
     }

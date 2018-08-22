@@ -6,8 +6,10 @@ import { FormComponentProps } from 'antd/lib/form/Form'
 import { inject, observer } from 'mobx-react'
 import { AdminStore } from '../../store/admin'
 import history from '../../assets/js/history'
-import { withRouter, RouteComponentProps } from 'react-router-dom'
+import { withRouter as fuckWithRouterTSD, RouteComponentProps } from 'react-router-dom'
 import { deserializeUrl } from '../../service/utils'
+
+const withRouter = fuckWithRouterTSD as any
 
 export interface StateProps {
   admin: AdminStore
