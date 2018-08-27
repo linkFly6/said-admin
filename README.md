@@ -21,7 +21,7 @@
 
 ```bash
 # yarn 目前有问题
-npm i -d
+npm i -d 
 npm start
 ```
 
