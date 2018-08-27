@@ -1,8 +1,7 @@
-import { observable, computed, observe, action, runInAction } from 'mobx'
+import { observable, action, runInAction } from 'mobx'
 import { AdminRule } from '../types/admin'
-import { innerFetch } from '../service/http'
+import { innerFetch, post } from '../service/http'
 import { setCookie } from '../service/utils/store'
-import { RouteComponentProps } from 'react-router-dom'
 import { setUserReadyPromise } from '../service/user'
 
 interface SimpleAdmin {
@@ -44,7 +43,7 @@ export class AdminStore implements SimpleAdmin {
 
   @action
   login(username: string, password: string) {
-    return innerFetch<SimpleAdmin>('/back/api/login', {
+    return post<SimpleAdmin>('/back/api/login', {
       username,
       password,
     }).then((returns) => {

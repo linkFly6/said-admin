@@ -37,7 +37,8 @@ export const userReady = () => {
     userReadyPromise = store.admin.checkUserState(token).then(returns => {
       if (!returns.check()) {
         message.error(returns.message)
-        if (returns.code === 6) {
+        // 没有 token 和 token 已失效
+        if (returns.code === 5 || returns.code === 10004) {
           history.replace({
             pathname: '/login',
             search: 'src=' + encodeURIComponent(history.location.pathname + history.location.search)
