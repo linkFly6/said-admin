@@ -1,6 +1,6 @@
 {
   "name": "tasaid",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "private": true,
   "scripts": {
     "start": "node scripts/start.js --env=development",
@@ -21,7 +21,8 @@
     "react-router-dom": "^4.2.2",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
-    "typings-for-css-modules-loader": "^1.7.0"
+    "typings-for-css-modules-loader": "^1.7.0",
+    "webpack-bundle-analyzer": "^2.13.1"
   },
   "dependencies": {
     "antd": "^3.1.6",
@@ -53,60 +54,16 @@
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
     "sw-precache-webpack-plugin": "^0.11.4",
-    "ts-jest": "^20.0.7",
     "ts-loader": "^2.3.7",
     "tslint": "^5.7.0",
     "tslint-loader": "^3.5.3",
     "tslint-react": "^3.2.0",
     "typescript": "^2.6.1",
-    "url-loader": "^0.5.9",
+    "url-loader": "^1.1.1",
     "webpack": "^3.12.0",
     "webpack-dev-server": "^2.7.1",
     "webpack-manifest-plugin": "^1.2.1",
     "whatwg-fetch": "^2.0.3"
-  },
-  "jest": {
-    "mapCoverage": true,
-    "collectCoverageFrom": [
-      "src/**/*.{js,jsx,ts,tsx}"
-    ],
-    "setupFiles": [
-      "<rootDir>/config/polyfills.js"
-    ],
-    "testMatch": [
-      "<rootDir>/src/**/__tests__/**/*.ts?(x)",
-      "<rootDir>/src/**/?(*.)(spec|test).ts?(x)"
-    ],
-    "testEnvironment": "node",
-    "testURL": "http://localhost",
-    "transform": {
-      "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
-      "^.+\\.tsx?$": "<rootDir>/config/jest/typescriptTransform.js",
-      "^(?!.*\\.(js|jsx|css|json)$)": "<rootDir>/config/jest/fileTransform.js"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$"
-    ],
-    "moduleNameMapper": {
-      "^react-native$": "react-native-web"
-    },
-    "moduleFileExtensions": [
-      "web.ts",
-      "ts",
-      "web.tsx",
-      "tsx",
-      "web.js",
-      "js",
-      "web.jsx",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "globals": {
-      "ts-jest": {
-        "tsConfigFile": "/Users/linkfly/Documents/projects/said-admin/tsconfig.test.json"
-      }
-    }
   },
   "babel": {
     "presets": [
