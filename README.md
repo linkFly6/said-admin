@@ -20,9 +20,12 @@
 ## 开发
 
 ```bash
-# yarn 目前有问题
-npm i -d 
-npm start
+yarn # or npm i --dd
+yarn start # or npm start
+
+
+# build
+yarn build # or npm run build
 ```
 
 - Said 模块 [@Jemair](https://github.com/Jemair)
