@@ -1,7 +1,6 @@
 import * as React from 'react'
 // import SaidEditor from '../../components/said-editor'
-import { Button, Row, Col, Table, Icon, Popconfirm, message } from 'antd'
-import { FormComponentProps } from 'antd/lib/form/Form'
+import { Button, Table, Popconfirm, message } from 'antd'
 import * as s from './index.styl'
 import { inject, observer } from 'mobx-react'
 import { BlogStore } from '../../store/blog'
@@ -64,6 +63,9 @@ class Index extends React.Component<StateProps, { deleteList: List<string> }> {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
+      render(title: string, blog: BlogModel) {
+        return <a href={`/blog/${blog.key}.html`} target="_blank">{title}</a>
+      }
     }, {
       title: '分类',
       dataIndex: 'category.name',

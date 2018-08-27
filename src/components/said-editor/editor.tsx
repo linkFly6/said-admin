@@ -2,16 +2,21 @@
 
 import * as React from 'react'
 import * as ReactCodeMirror from 'react-codemirror'
-import * as CodeMirror from 'CodeMirror'
+import * as CodeMirror from 'codemirror'
 import * as s from './said-editor.styl'
 import 'codemirror/lib/codemirror.css'
 // import 'codemirror/theme/solarized.css'
 import 'codemirror/mode/markdown/markdown'
 import 'codemirror/addon/display/placeholder'
-import 'codemirror/addon/search/searchcursor'
-import { Button } from 'antd'
+import 'codemirror/addon/dialog/dialog'
+import 'codemirror/addon/dialog/dialog.css'
+import 'codemirror/addon/search/search'
+import 'codemirror/addon/search/jump-to-line'
 
-
+/**
+ * 如果要做 search
+ * 参考 cm-searchbox、codemirror-revisedsearch 的源码
+ */
 
 interface StateProps {
   onChange: (text: string) => void,
